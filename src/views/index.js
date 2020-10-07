@@ -31,6 +31,7 @@ export { default as SkuAggrDash } from './SkuAggrDash';
 export { default as OrderDash } from './OrderDash';
 export { default as EditOrder } from './EditOrder';
 export { default as AddOrderDetail } from './AddOrderDetail';
+export { default as AddManualOrder } from './AddManualOrder';
 export { default as OrderDetail } from './OrderDetail';
 export { default as RoutingDash } from './RoutingDash';
 export { default as RouteDetails } from './RouteDetails';

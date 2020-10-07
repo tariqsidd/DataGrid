@@ -10,40 +10,82 @@ export default class UserModel {
   }
 
   isAuth() {
-    if (localStorage.getItem('auth-token')) {
+    if (localStorage.getItem('sales-auth-token')) {
       return true;
     }
     return false;
   }
 
   signOut() {
-    localStorage.removeItem('auth-token');
+    localStorage.removeItem('sales-auth-token');
     window.location.href = '/sign-in';
   }
 
   getToken() {
-    return localStorage.getItem('auth-token');
+    return localStorage.getItem('sales-auth-token');
   }
   saveToken(token) {
-    localStorage.setItem('auth-token', token);
+    localStorage.setItem('sales-auth-token', token);
   }
 
   getUserRole() {
     return localStorage.getItem('user_role');
   }
 
-  Login(username, password, successTrigger, failureTrigger) {
+  Login(mobile, password, successTrigger, failureTrigger) {
     ApiManager.getInstance().Login(
-      username,
+      mobile,
       password,
       function resSuccess(user) {
         console.log('user', user);
         UserModel.getInstance().saveToken(user.token, user.user_role_id);
         successTrigger(user);
       },
-
+      
       function resFailed(msg) {
         console.log('Error: ' + msg);
+        failureTrigger(msg);
+      }
+    );
+  }
+
+  getUsersListFromMobile(params, successTrigger, failureTrigger) {
+    let token = UserModel.getInstance().getToken();
+    ApiManager.getInstance().getUsersListFromMobile(
+      token,
+      params,
+      function resSuccess(data) {
+        successTrigger(data);
+      },
+      function resFailed(msg) {
+        failureTrigger(msg);
+      }
+    );
+  }
+
+  getSkuByName(params, successTrigger, failureTrigger) {
+    let token = UserModel.getInstance().getToken();
+    ApiManager.getInstance().getSkuByName(
+      token,
+      params,
+      function resSuccess(data) {
+        successTrigger(data);
+      },
+      function resFailed(msg) {
+        failureTrigger(msg);
+      }
+    );
+  }
+
+  postManualOrder(params, successTrigger, failureTrigger) {
+    let token = UserModel.getInstance().getToken();
+    ApiManager.getInstance().postManualOrder(
+      token,
+      params,
+      function resSuccess(data) {
+        successTrigger(data);
+      },
+      function resFailed(msg) {
         failureTrigger(msg);
       }
     );

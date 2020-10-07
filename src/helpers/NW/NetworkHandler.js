@@ -25,16 +25,16 @@ export default class NetworkHandler {
     successCallback,
     failureCallback
   ) {
-    console.log('parameters are : ' + JSON.stringify(serviceParams));
+    // console.log('parameters are : ' + JSON.stringify(serviceParams));
 
-    console.log({ serviceParams });
+    // console.log({ serviceParams });
     if (serviceParams != null) {
       url = url + '?';
       for (const [key, value] of Object.entries(serviceParams)) {
-        console.log({ key, value });
+        // console.log({ key, value });
         url = url + key + '=' + value + '&';
         // console.log(key, value);
-        console.log('ssss', url);
+        // console.log('ssss', url);
       }
       url = url.slice(0, -1);
       // serviceParams.forEach(element => {
@@ -42,7 +42,7 @@ export default class NetworkHandler {
       // });
     }
 
-    console.log('url', url);
+    // console.log('url', url);
     NetworkHandler.getInstance()
       .timeout(
         fetch(url, {
@@ -56,19 +56,19 @@ export default class NetworkHandler {
         })
       )
       .then(response => {
-        console.log('reponse', response);
+        // console.log('reponse', response);
         if (response.status === 401) {
           UserModel.getInstance().signOut();
         }
         return response.json();
       })
       .then(responseJson => {
-        console.log('Responce from server is ', responseJson);
+        // console.log('Responce from server is ', responseJson);
         if (responseJson.status === true) {
-          console.log('Success');
+          // console.log('Success');
           successCallback(responseJson.data);
         } else {
-          console.log('Failure');
+          // console.log('Failure');
           failureCallback(responseJson.message);
         }
         // if (responseJson.data !== null) {
@@ -94,12 +94,12 @@ export default class NetworkHandler {
     successCallback,
     failureCallback
   ) {
-    console.log('parameters are : ' + JSON.stringify(serviceParams));
+    // console.log('parameters are : ' + JSON.stringify(serviceParams));
 
     if (serviceParams != null) {
       url = url;
       for (const [key, value] of Object.entries(serviceParams)) {
-        console.log('obj enn', Object.entries(serviceParams));
+        // console.log('obj enn', Object.entries(serviceParams));
         url = url + '&' + key + '=' + value;
       }
       // url = url.slice(0, -1);
@@ -108,7 +108,7 @@ export default class NetworkHandler {
       // });
     }
 
-    console.log(url);
+    // console.log(url);
     NetworkHandler.getInstance()
       .timeout(
         fetch(url, {
@@ -122,19 +122,19 @@ export default class NetworkHandler {
         })
       )
       .then(response => {
-        console.log('reponse', response);
+        // console.log('reponse', response);
         if (response.status === 401) {
           UserModel.getInstance().signOut();
         }
         return response.json();
       })
       .then(responseJson => {
-        console.log('Responce from server is ', responseJson);
+        // console.log('Responce from server is ', responseJson);
         if (responseJson.status === true) {
-          console.log('Success');
+          // console.log('Success');
           successCallback(responseJson.data);
         } else {
-          console.log('Failure');
+          // console.log('Failure');
           failureCallback(responseJson.message);
         }
         // if (responseJson.data !== null) {
@@ -161,7 +161,7 @@ export default class NetworkHandler {
     successCallback,
     failureCallback
   ) {
-    console.log('parameters are : ' + JSON.stringify(serviceParams));
+    // console.log('parameters are : ' + JSON.stringify(serviceParams));
 
     if (serviceParams != null) {
       url = url + serviceParams;
@@ -175,7 +175,7 @@ export default class NetworkHandler {
       // });
     }
 
-    console.log(url);
+    // console.log(url);
     NetworkHandler.getInstance()
       .timeout(
         fetch(url, {
@@ -189,19 +189,19 @@ export default class NetworkHandler {
         })
       )
       .then(response => {
-        console.log('reponse', response);
+        // console.log('reponse', response);
         if (response.status === 401) {
           UserModel.getInstance().signOut();
         }
         return response.json();
       })
       .then(responseJson => {
-        console.log('Responce from server is ', responseJson);
+        // console.log('Responce from server is ', responseJson);
         if (responseJson.status === true) {
-          console.log('Success');
+          // console.log('Success');
           successCallback(responseJson.data);
         } else {
-          console.log('Failure');
+          // console.log('Failure');
           failureCallback(responseJson.message);
         }
       })
@@ -241,19 +241,19 @@ export default class NetworkHandler {
         })
       )
       .then(response => {
-        console.log('reponse', response);
+        // console.log('reponse', response);
         if (response.status === 401) {
           UserModel.getInstance().signOut();
         }
         return response.json();
       })
       .then(responseJson => {
-        console.log('Responce from server is ', responseJson);
+        // console.log('Responce from server is ', responseJson);
         if (responseJson.status === true) {
-          console.log('Success');
+          // console.log('Success');
           successCallback(responseJson.data);
         } else {
-          console.log('Failure');
+          // console.log('Failure');
           failureCallback(responseJson.message);
         }
         // if (responseJson.data !== null) {
@@ -304,19 +304,19 @@ export default class NetworkHandler {
         })
       )
       .then(response => {
-        console.log('reponse', response);
+        // console.log('reponse', response);
         if (response.status === 401) {
           UserModel.getInstance().signOut();
         }
         return response.json();
       })
       .then(responseJson => {
-        console.log('Responce from server is ', responseJson);
+        // console.log('Responce from server is ', responseJson);
         if (responseJson.status === true) {
-          console.log('Success');
+          // console.log('Success');
           successCallback(responseJson.data);
         } else {
-          console.log('Failure');
+          // console.log('Failure');
           failureCallback(responseJson.message);
         }
         // if (responseJson.data !== null) {
@@ -349,8 +349,8 @@ export default class NetworkHandler {
     if (token) {
       _headers['Authorization'] = `Bearer ${token}`;
     }
-    console.log('parameters are : ' + JSON.stringify(serviceParams));
-    console.log('url', url);
+    // console.log('parameters are : ' + JSON.stringify(serviceParams));
+    // console.log('url', url);
     NetworkHandler.getInstance()
       .timeout(
         fetch(url, {
@@ -371,12 +371,12 @@ export default class NetworkHandler {
         return response.json();
       })
       .then(responseJson => {
-        console.log('Responce from server is ', responseJson);
+        // console.log('Responce from server is ', responseJson);
         if (responseJson.status === true) {
-          console.log('Success');
+          // console.log('Success');
           successCallback(responseJson.data);
         } else {
-          console.log('Failure');
+          // console.log('Failure');
           failureCallback(responseJson.message);
         }
         // if (responseJson.data !== null) {
@@ -403,16 +403,16 @@ export default class NetworkHandler {
     successCallback,
     failureCallback
   ) {
-    console.log('param form data', serviceParams);
-    console.log('token', token);
-    console.log('url', url);
+    // console.log('param form data', serviceParams);
+    // console.log('token', token);
+    // console.log('url', url);
     let _headers = {
       // 'content-type': 'multipart/form-data'
     };
     if (token) {
       _headers['Authorization'] = `Bearer ${token}`;
     }
-    console.log('parameters are : ' + serviceParams);
+    // console.log('parameters are : ' + serviceParams);
     NetworkHandler.getInstance()
       .timeout(
         fetch(url, {
@@ -433,12 +433,12 @@ export default class NetworkHandler {
         return response.json();
       })
       .then(responseJson => {
-        console.log('Responce from server is ', responseJson);
+        // console.log('Responce from server is ', responseJson);
         if (responseJson.status === true) {
-          console.log('Success');
+          // console.log('Success');
           successCallback(responseJson.data);
         } else {
-          console.log('Failure');
+          // console.log('Failure');
           failureCallback(responseJson.message);
         }
         // if (responseJson.data !== null) {
@@ -471,8 +471,8 @@ export default class NetworkHandler {
     if (token) {
       _headers['Authorization'] = `Bearer ${token}`;
     }
-    console.log('parameters are : ' + JSON.stringify(serviceParams));
-    console.log('url', url);
+    // console.log('parameters are : ' + JSON.stringify(serviceParams));
+    // console.log('url', url);
     NetworkHandler.getInstance()
       .timeout(
         fetch(url, {
@@ -493,12 +493,12 @@ export default class NetworkHandler {
         return response.json();
       })
       .then(responseJson => {
-        console.log('Responce from server is ', responseJson);
+        // console.log('Responce from server is ', responseJson);
         if (responseJson.status === true) {
-          console.log('Success');
+          // console.log('Success');
           successCallback(responseJson.data);
         } else {
-          console.log('Failure');
+          // console.log('Failure');
           failureCallback(responseJson.message);
         }
         // if (responseJson.data !== null) {
@@ -519,7 +519,7 @@ export default class NetworkHandler {
   }
 
   postFormRequest(url, token, serviceParams, successCallback, failureCallback) {
-    console.log('parameters are : ' + JSON.stringify(serviceParams));
+    // console.log('parameters are : ' + JSON.stringify(serviceParams));
     NetworkHandler.getInstance()
       .timeout(
         fetch(url, {
@@ -538,12 +538,12 @@ export default class NetworkHandler {
         return response.json();
       })
       .then(responseJson => {
-        console.log('Responce from server is ', responseJson);
+        // console.log('Responce from server is ', responseJson);
         if (responseJson.status === true) {
-          console.log('Success');
+          // console.log('Success');
           successCallback(responseJson.data);
         } else {
-          console.log('Failure');
+          // console.log('Failure');
           failureCallback(responseJson.message);
         }
         // console.log('Responce from server is ', responseJson)
@@ -571,7 +571,7 @@ export default class NetworkHandler {
     successCallback,
     failureCallback
   ) {
-    console.log('parameters are : ' + JSON.stringify(serviceParams));
+    // console.log('parameters are : ' + JSON.stringify(serviceParams));
 
     if (serviceParams != null) {
       url = url + '?';

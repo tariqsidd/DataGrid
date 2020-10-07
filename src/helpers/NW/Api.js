@@ -13,7 +13,7 @@ export default class Api {
 
   Login(username, password, successCallback, failureCallback) {
     var params = {};
-    params.email = username;
+    params.mobile = username;
     params.password = password;
 
     NetworkManger.getInstance().postNetworkRequest(
@@ -25,6 +25,48 @@ export default class Api {
       },
       function reqFailed(text) {
         failureCallback(text);
+      }
+    );
+  }
+
+  getUsersListFromMobile(token, params, successCallback, failureCallback) {
+    NetworkManger.getInstance().getNetworkRequest(
+      CONSTANT.baseURL + 'search/retailer',
+      token,
+      params,
+      function reqSuccess(data) {
+        successCallback(data);
+      },
+      function reqFailed(error) {
+        failureCallback(error);
+      }
+    );
+  }
+
+  getSkuByName(token, params, successCallback, failureCallback) {
+    NetworkManger.getInstance().getNetworkRequest(
+      CONSTANT.baseURL + 'search/sku',
+      token,
+      params,
+      function reqSuccess(data) {
+        successCallback(data);
+      },
+      function reqFailed(error) {
+        failureCallback(error);
+      }
+    );
+  }
+
+  postManualOrder(token, params, successCallback, failureCallback) {
+    NetworkManger.getInstance().postNetworkRequest(
+      CONSTANT.baseURL + 'order',
+      token,
+      params,
+      function reqSuccess(data) {
+        successCallback(data);
+      },
+      function reqFailed(error) {
+        failureCallback(error);
       }
     );
   }

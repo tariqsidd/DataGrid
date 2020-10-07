@@ -36,11 +36,11 @@ import UserModel from '../../models/UserModel';
 // }
 
 const schema = {
-  email: {
+  mobile: {
     presence: { allowEmpty: false, message: 'is required' },
-    email: true,
+    // email: true,
     length: {
-      maximum: 64
+      maximum: 13
     }
   },
   password: {
@@ -172,7 +172,7 @@ const SignIn = props => {
     event.preventDefault();
     console.log(formState.values);
     UserModel.getInstance().Login(
-      formState.values.email,
+      formState.values.mobile,
       formState.values.password,
       data => {
         console.log(data);
@@ -207,16 +207,16 @@ const SignIn = props => {
                 </Typography>
                 <TextField
                   className={classes.textField}
-                  error={hasError('email')}
+                  error={hasError('mobile')}
                   fullWidth
                   helperText={
-                    hasError('email') ? formState.errors.email[0] : null
+                    hasError('mobile') ? formState.errors.mobile[0] : null
                   }
-                  label="Email address"
-                  name="email"
+                  label="Mobile number"
+                  name="mobile"
                   onChange={handleChange}
                   type="text"
-                  value={formState.values.email || ''}
+                  value={formState.values.mobile || ''}
                   variant="outlined"
                   color="secondary"
                 />
