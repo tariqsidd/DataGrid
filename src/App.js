@@ -7,6 +7,7 @@ import validate from 'validate.js';
 
 import { chartjs } from './helpers';
 import theme from './theme';
+import PerfectScrollbar from 'react-perfect-scrollbar';
 import 'react-perfect-scrollbar/dist/css/styles.css';
 import './assets/scss/index.scss';
 import validators from './common/validators';
@@ -28,7 +29,9 @@ export default class App extends Component {
     return (
       <ThemeProvider theme={theme}>
         <Router history={browserHistory}>
-          <Routes />
+          <PerfectScrollbar>
+            <Routes />
+          </PerfectScrollbar>
         </Router>
       </ThemeProvider>
     );

@@ -115,7 +115,7 @@ const AddManualOrder = props => {
     };
 
     const checkErrors = () => {
-        console.log(selectedMobileData)
+        // console.log(selectedMobileData)
         orderItemRows && orderItemRows.length > 0 && Array.isArray(orderItemRows) && orderItemRows.forEach(({ name, quantity, price, cost }, index) => {
             if (
                 !name || !quantity || !price || !cost || !selectedSkuItems[index].id || !selectedSkuItems[index].name
@@ -149,22 +149,22 @@ const AddManualOrder = props => {
                     qty: item.quantity
                 }))
                 var obj = {
-                    user_id: selectedMobileData.id, // re3taielr aID
+                    user_id: selectedMobileData.id, // retailer ID
                     items: orderList
                 };
                 UserModel.getInstance().postManualOrder(
                     obj,
                     succ => {
                         setOpenData({ ...openData, openSuccess: true });
-                        console.log(succ);
+                        // console.log(succ);
                         setTimeout(() => {
-                            props.history.push('/add-manual-order'); // RIGHT NOW, we're redirecting to the same page
+                            props.history.push('/manual-orders');
                         }, 1000);
                     },
                     err => {
                         setParams({ ...params, submitStatus: false });
                         console.log(err);
-                        console.log(obj);
+                        // console.log(obj);
                     }
                 );
             }
@@ -193,9 +193,9 @@ const AddManualOrder = props => {
 
     const handleOrderItemDetailsChange = (e, index) => {
         // console.log('eeeeeeeee handleOrderItemChange', e.target.name)
-        console.clear()
+        // console.clear()
         // console.log('handleOrderItemChange')
-        console.log(e.target.name, e.target.value, { index })
+        // console.log(e.target.name, e.target.value, { index })
         const orderItemsDetailArr = orderItemRows;
         orderItemsDetailArr[index][e.target.name] = e.target.value;
         if (e.target.name === 'quantity') {
@@ -260,18 +260,18 @@ const AddManualOrder = props => {
     const removeOrderItem = (index) => {
         let orderItemsDetailArr = [...orderItemRows];
         orderItemsDetailArr.splice(index, 1)
-        console.log(orderItemsDetailArr)
+        // console.log(orderItemsDetailArr)
         setOrderItemRows([...orderItemsDetailArr])
         let skuSelectedDetailsArr = [...selectedSkuItems];
         skuSelectedDetailsArr.splice(index, 1)
-        console.log(skuSelectedDetailsArr)
+        // console.log(skuSelectedDetailsArr)
         setSelectedSkuItems([...skuSelectedDetailsArr])
         setImpCondition(!impCondition)  // ask before removing
     }
 
     const generateOrderItemsRows = (values, index) => {
-        console.log({ orderItemRows, selectedSkuItems })
-        console.log({ values })
+        // console.log({ orderItemRows, selectedSkuItems })
+        // console.log({ values })
         return (
             <Grid container spacing={4}>
 

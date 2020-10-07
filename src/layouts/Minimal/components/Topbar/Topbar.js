@@ -29,7 +29,7 @@ const Topbar = props => {
     <AppBar
       {...rest}
       style={{
-        background: 'linear-gradient(to right, #ffcc00 0%, #FF3A3A 100%)'
+        background: 'linear-gradient(to right, #0f2027 0%, #2c5364 100%)'
       }}
       color="primary"
       position="fixed">

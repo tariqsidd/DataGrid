@@ -91,6 +91,112 @@ export default class UserModel {
     );
   }
 
+  getOrderLog(params, successTrigger, failureTrigger) {
+    let token = UserModel.getInstance().getToken();
+    ApiManager.getInstance().getOrderLog(
+      token,
+      params,
+      function resSuccess(data) {
+        successTrigger(data);
+      },
+      function resFailed(error) {
+        failureTrigger(error);
+      }
+    );
+  }
+
+  downloadOrderDetails(params, successTrigger, failureTrigger) {
+    let token = UserModel.getInstance().getToken();
+    ApiManager.getInstance().downloadOrderDetails(
+      token,
+      params,
+      function resSuccess(data) {
+        successTrigger(data);
+      },
+      function resFailed(error) {
+        failureTrigger(error);
+      }
+    );
+  }
+
+  globalSearchOrder(params, paramObj, successTrigger, failureTrigger) {
+    let token = UserModel.getInstance().getToken();
+    console.log('param usermodel', params);
+    ApiManager.getInstance().globalSearchOrder(
+      token,
+      params,
+      paramObj,
+      function resSuccess(data) {
+        //console.log({ data });
+        // UserModel.getInstance().productList = data.categories.data
+        successTrigger(data);
+      },
+      function resFailed(msg) {
+        failureTrigger(msg);
+      }
+    );
+  }
+  
+  getOrderDetail(orderDetailId, successTrigger, failureTrigger) {
+    let token = UserModel.getInstance().getToken();
+    ApiManager.getInstance().getOrderDetail(
+      token,
+      orderDetailId,
+      function resSuccess(data) {
+        successTrigger(data);
+      },
+      function resFailed(error) {
+        failureTrigger(error);
+      }
+    );
+  }
+  
+  addOrderDetail(params, successTrigger, failureTrigger) {
+    let token = UserModel.getInstance().getToken();
+    ApiManager.getInstance().addOrderDetail(
+      token,
+      params,
+      function resSuccess(data) {
+        successTrigger(data);
+      },
+      function resFailed(error) {
+        failureTrigger(error);
+      }
+    );
+  }
+
+  removeOrderDetail(params, successTrigger, failureTrigger) {
+    let token = UserModel.getInstance().getToken();
+    ApiManager.getInstance().removeOrderDetail(
+      token,
+      params,
+      function resSuccess(data) {
+        successTrigger(data);
+      },
+      function resFailed(error) {
+        failureTrigger(error);
+      }
+    );
+  }
+
+  updateOrderStatus(order_id, params, successTrigger, failureTrigger) {
+    let token = UserModel.getInstance().getToken();
+    ApiManager.getInstance().updateOrderStatus(
+      token,
+      order_id,
+      params,
+      function resSuccess(data) {
+        successTrigger(data);
+      },
+      function resFailed(error) {
+        failureTrigger(error);
+      }
+    );
+  }
+
+
+
+
   // Sku Requests
   getSkuRequests(params, successTrigger, failureTrigger) {
     let token = UserModel.getInstance().getToken();
@@ -493,20 +599,6 @@ export default class UserModel {
   downloadSku(params, successTrigger, failureTrigger) {
     let token = UserModel.getInstance().getToken();
     ApiManager.getInstance().downloadSku(
-      token,
-      params,
-      function resSuccess(data) {
-        successTrigger(data);
-      },
-      function resFailed(error) {
-        failureTrigger(error);
-      }
-    );
-  }
-
-  downloadOrderDetails(params, successTrigger, failureTrigger) {
-    let token = UserModel.getInstance().getToken();
-    ApiManager.getInstance().downloadOrderDetails(
       token,
       params,
       function resSuccess(data) {
@@ -1985,37 +2077,9 @@ export default class UserModel {
 
   // order
 
-  getOrderLog(params, successTrigger, failureTrigger) {
-    let token = UserModel.getInstance().getToken();
-    ApiManager.getInstance().getOrderLog(
-      token,
-      params,
-      function resSuccess(data) {
-        successTrigger(data);
-      },
-      function resFailed(error) {
-        failureTrigger(error);
-      }
-    );
-  }
 
-  globalSearchOrder(params, paramObj, successTrigger, failureTrigger) {
-    let token = UserModel.getInstance().getToken();
-    console.log('param usermodel', params);
-    ApiManager.getInstance().globalSearchOrder(
-      token,
-      params,
-      paramObj,
-      function resSuccess(data) {
-        //console.log({ data });
-        // UserModel.getInstance().productList = data.categories.data
-        successTrigger(data);
-      },
-      function resFailed(msg) {
-        failureTrigger(msg);
-      }
-    );
-  }
+
+
 
   searchOrderLog(params, successTrigger, failureTrigger) {
     let token = UserModel.getInstance().getToken();
@@ -2033,67 +2097,10 @@ export default class UserModel {
     );
   }
 
-  getOrderDetail(orderDetailId, successTrigger, failureTrigger) {
-    let token = UserModel.getInstance().getToken();
-    ApiManager.getInstance().getOrderDetail(
-      token,
-      orderDetailId,
-      function resSuccess(data) {
-        successTrigger(data);
-      },
-      function resFailed(error) {
-        failureTrigger(error);
-      }
-    );
-  }
-
-  addOrderDetail(params, successTrigger, failureTrigger) {
-    let token = UserModel.getInstance().getToken();
-    ApiManager.getInstance().addOrderDetail(
-      token,
-      params,
-      function resSuccess(data) {
-        successTrigger(data);
-      },
-      function resFailed(error) {
-        failureTrigger(error);
-      }
-    );
-  }
-
-  removeOrderDetail(params, successTrigger, failureTrigger) {
-    let token = UserModel.getInstance().getToken();
-    ApiManager.getInstance().removeOrderDetail(
-      token,
-      params,
-      function resSuccess(data) {
-        successTrigger(data);
-      },
-      function resFailed(error) {
-        failureTrigger(error);
-      }
-    );
-  }
-
   checkNewOrders(successTrigger, failureTrigger) {
     let token = UserModel.getInstance().getToken();
     ApiManager.getInstance().checkNewOrders(
       token,
-      function resSuccess(data) {
-        successTrigger(data);
-      },
-      function resFailed(error) {
-        failureTrigger(error);
-      }
-    );
-  }
-
-  updateOrderStatus(order_id, params, successTrigger, failureTrigger) {
-    let token = UserModel.getInstance().getToken();
-    ApiManager.getInstance().updateOrderStatus(
-      token,
-      order_id,
-      params,
       function resSuccess(data) {
         successTrigger(data);
       },

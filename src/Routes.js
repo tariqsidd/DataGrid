@@ -32,7 +32,9 @@ import {
   OrderDash,
   EditOrder,
   OrderDetail,
+  ManualOrderDash,
   AddManualOrder,
+  EditManualOrder,
   SkuAggrDash,
   RoutingDash,
   AddRoute,
@@ -88,10 +90,22 @@ const Routes = () => {
         path="/dashboard"
       />
       <RouteWithLayout
+        component={ManualOrderDash}
+        exact
+        layout={MainLayout}
+        path="/manual-orders"
+      />
+      <RouteWithLayout
         component={AddManualOrder}
         exact
         layout={MainLayout}
         path="/add-manual-order"
+      />
+      <RouteWithLayout
+        component={EditManualOrder}
+        exact
+        layout={MainLayout}
+        path="/manual-order/edit-manual-order-detail/:id"
       />
       {/* <RouteWithLayout
         component={UserListView}

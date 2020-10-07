@@ -13,7 +13,7 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import LockOpenIcon from '@material-ui/icons/LockOpen';
 import DriveEtaIcon from '@material-ui/icons/DriveEta';
 import ListAltIcon from '@material-ui/icons/ListAlt';
-
+import PerfectScrollbar from 'react-perfect-scrollbar';
 import { Profile, SidebarNav } from './components';
 import Version from './components/Version/version';
 import { DealSkuAdd } from 'views';
@@ -54,95 +54,95 @@ const Sidebar = props => {
     },
     {
       title: 'Manual Orders',
-      href: '/add-manual-order',
-      icon: <DashboardIcon />
-    },
-    {
-      title: 'Products',
-      href: '/products',
-      icon: <ShoppingBasketIcon />
-    },
-    {
-      title: 'SKUs',
-      href: '/skus',
-      icon: <ShoppingBasketIcon />
-    },
-    {
-      title: 'Deal SKUs',
-      href: '/deal-sku-add'
-    },
-    {
-      title: 'Deals',
-      href: '/deal-manager',
-      icon: <ShoppingBasketIcon />
-    },
-    {
-      title: 'Orders',
-      href: '/orders',
+      href: '/manual-orders',
       icon: <ListAltIcon />
     },
-    {
-      title: 'Vehicles',
-      href: '/vehicles',
-      icon: <DriveEtaIcon />
-    },
-    {
-      title: 'Drivers',
-      href: '/drivers',
-      icon: <DriveEtaIcon />
-    },
-    {
-      title: 'Brands',
-      href: '/brands'
-    },
-    {
-      title: 'Subcategories',
-      href: '/subcategories'
-    },
-    {
-      title: 'Categories',
-      href: '/categories'
-    },
-    {
-      title: 'Cities',
-      href: '/cities'
-    },
-    {
-      title: 'Retailers',
-      href: '/retailers'
-    },
-    {
-      title: 'Users',
-      href: '/users'
-    },
-    {
-      title: 'Suppliers',
-      href: '/supplier'
-    },
-    {
-      title: 'Daily Sku Aggregates',
-      href: '/sku-aggregates'
-    },
-    {
-      title: 'Routes',
-      href: '/routes'
-    },
-    {
-      title: 'Batch Update SKU',
-      href: '/batch-upload'
-    },
-    {
-      title: 'Banners',
-      href: '/banners'
-    },
-    {
-      title: 'SKU Requests',
-      href: '/sku-requests'
-    },
-    {
-      title: 'Broadcast Messages',
-      href: '/broadcast-messages'
-    }
+    // {
+    //   title: 'Products',
+    //   href: '/products',
+    //   icon: <ShoppingBasketIcon />
+    // },
+    // {
+    //   title: 'SKUs',
+    //   href: '/skus',
+    //   icon: <ShoppingBasketIcon />
+    // },
+    // {
+    //   title: 'Deal SKUs',
+    //   href: '/deal-sku-add'
+    // },
+    // {
+    //   title: 'Deals',
+    //   href: '/deal-manager',
+    //   icon: <ShoppingBasketIcon />
+    // },
+    // {
+    //   title: 'Orders',
+    //   href: '/orders',
+    //   icon: <ListAltIcon />
+    // },
+    // {
+    //   title: 'Vehicles',
+    //   href: '/vehicles',
+    //   icon: <DriveEtaIcon />
+    // },
+    // {
+    //   title: 'Drivers',
+    //   href: '/drivers',
+    //   icon: <DriveEtaIcon />
+    // },
+    // {
+    //   title: 'Brands',
+    //   href: '/brands'
+    // },
+    // {
+    //   title: 'Subcategories',
+    //   href: '/subcategories'
+    // },
+    // {
+    //   title: 'Categories',
+    //   href: '/categories'
+    // },
+    // {
+    //   title: 'Cities',
+    //   href: '/cities'
+    // },
+    // {
+    //   title: 'Retailers',
+    //   href: '/retailers'
+    // },
+    // {
+    //   title: 'Users',
+    //   href: '/users'
+    // },
+    // {
+    //   title: 'Suppliers',
+    //   href: '/supplier'
+    // },
+    // {
+    //   title: 'Daily Sku Aggregates',
+    //   href: '/sku-aggregates'
+    // },
+    // {
+    //   title: 'Routes',
+    //   href: '/routes'
+    // },
+    // {
+    //   title: 'Batch Update SKU',
+    //   href: '/batch-upload'
+    // },
+    // {
+    //   title: 'Banners',
+    //   href: '/banners'
+    // },
+    // {
+    //   title: 'SKU Requests',
+    //   href: '/sku-requests'
+    // },
+    // {
+    //   title: 'Broadcast Messages',
+    //   href: '/broadcast-messages'
+    // }
   ];
 
   return (
@@ -152,12 +152,14 @@ const Sidebar = props => {
       onClose={onClose}
       open={open}
       variant={variant}>
-      <div {...rest} className={clsx(classes.root, className)}>
-        <Profile />
-        <Divider className={classes.divider} />
-        <SidebarNav className={classes.nav} pages={pages} />
-        <Version />
-      </div>
+      <PerfectScrollbar>
+        <div {...rest} className={clsx(classes.root, className)}>
+          <Profile />
+          <Divider className={classes.divider} />
+          <SidebarNav className={classes.nav} pages={pages} />
+          <Version />
+        </div>
+      </PerfectScrollbar>
     </Drawer>
   );
 };

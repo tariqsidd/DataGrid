@@ -29,6 +29,8 @@ export default class Api {
     );
   }
 
+
+  // Manual Orders
   getUsersListFromMobile(token, params, successCallback, failureCallback) {
     NetworkManger.getInstance().getNetworkRequest(
       CONSTANT.baseURL + 'search/retailer',
@@ -70,6 +72,119 @@ export default class Api {
       }
     );
   }
+
+  getOrderLog(token, params, successCallback, failureCallback) {
+    NetworkManger.getInstance().getNetworkRequest(
+      CONSTANT.baseURL + 'order',
+      token,
+      params,
+      function reqSuccess(data) {
+        successCallback(data);
+      },
+      function reqFailed(error) {
+        failureCallback(error);
+      }
+    );
+  }
+  
+  downloadOrderDetails(token, params, successCallback, failureCallback) {
+    NetworkManger.getInstance().getNetworkRequest(
+      CONSTANT.baseURL + 'order/download',
+      token,
+      params,
+      function reqSuccess(data) {
+        successCallback(data);
+      },
+      function reqFailed(error) {
+        failureCallback(error);
+      }
+    );
+  }
+
+  globalSearchOrder(token, params, paramObj, successCallback, failureCallback) {
+    console.log('params', params);
+    let searchParamsURL = '';
+    params &&
+      params.length > 0 &&
+      Array.isArray(params) &&
+      params.map((item, index) => {
+        console.log(index, item);
+        searchParamsURL +=
+          `${item.column_name}=${item.text}` +
+          (params.length - 1 == index ? '' : '&');
+      });
+    console.log('searchParamURL', searchParamsURL);
+    NetworkManger.getInstance().getSearchNetworkRequest(
+      CONSTANT.baseURL + `order/search?orders.${searchParamsURL}`,
+      token,
+      paramObj,
+      function reqSuccess(data) {
+        successCallback(data);
+      },
+      function reqFailed(error) {
+        failureCallback(error);
+      }
+    );
+  }
+  
+  getOrderDetail(token, orderDetailId, successCallback, failureCallback) {
+    NetworkManger.getInstance().getNetworkRequest(
+      CONSTANT.baseURL + 'order/' + orderDetailId,
+      token,
+      null,
+      function reqSuccess(data) {
+        successCallback(data);
+      },
+      function reqFailed(error) {
+        failureCallback(error);
+      }
+    );
+  }
+
+  addOrderDetail(token, params, successCallback, failureCallback) {
+    NetworkManger.getInstance().patchNetworkRequest(
+      CONSTANT.baseURL + 'order/sku',
+      token,
+      params,
+      function reqSuccess(data) {
+        successCallback(data);
+      },
+      function reqFailed(error) {
+        failureCallback(error);
+      }
+    );
+  }
+
+  removeOrderDetail(token, params, successCallback, failureCallback) {
+    NetworkManger.getInstance().patchNetworkRequest(
+      CONSTANT.baseURL + 'order/sku',
+      token,
+      params,
+      function reqSuccess(data) {
+        successCallback(data);
+      },
+      function reqFailed(error) {
+        failureCallback(error);
+      }
+    );
+  }
+
+  updateOrderStatus(token, order_id, params, successCallback, failureCallback) {
+    NetworkManger.getInstance().updateNetworkRequest(
+      CONSTANT.baseURL + 'order/' + order_id,
+      token,
+      params,
+      function reqSuccess(data) {
+        successCallback(data);
+      },
+      function reqFailed(error) {
+        failureCallback(error);
+      }
+    );
+  }
+
+
+
 
   // Sku Requests
   getSkuRequests(token, params, successCallback, failureCallback) {
@@ -3613,45 +3728,9 @@ export default class Api {
 
   // order list
 
-  getOrderLog(token, params, successCallback, failureCallback) {
-    NetworkManger.getInstance().getNetworkRequest(
-      CONSTANT.baseURL + 'order',
-      token,
-      params,
-      function reqSuccess(data) {
-        successCallback(data);
-      },
-      function reqFailed(error) {
-        failureCallback(error);
-      }
-    );
-  }
 
-  globalSearchOrder(token, params, paramObj, successCallback, failureCallback) {
-    console.log('params', params);
-    let searchParamsURL = '';
-    params &&
-      params.length > 0 &&
-      Array.isArray(params) &&
-      params.map((item, index) => {
-        console.log(index, item);
-        searchParamsURL +=
-          `${item.column_name}=${item.text}` +
-          (params.length - 1 == index ? '' : '&');
-      });
-    console.log('searchParamURL', searchParamsURL);
-    NetworkManger.getInstance().getSearchNetworkRequest(
-      CONSTANT.baseURL + `order/search?orders.${searchParamsURL}`,
-      token,
-      paramObj,
-      function reqSuccess(data) {
-        successCallback(data);
-      },
-      function reqFailed(error) {
-        failureCallback(error);
-      }
-    );
-  }
+
+
 
   searchOrderLog(token, params, successCallback, failureCallback) {
     NetworkManger.getInstance().getNetworkRequest(
@@ -3667,61 +3746,6 @@ export default class Api {
     );
   }
 
-  getOrderDetail(token, orderDetailId, successCallback, failureCallback) {
-    NetworkManger.getInstance().getNetworkRequest(
-      CONSTANT.baseURL + 'order/' + orderDetailId,
-      token,
-      null,
-      function reqSuccess(data) {
-        successCallback(data);
-      },
-      function reqFailed(error) {
-        failureCallback(error);
-      }
-    );
-  }
-
-  addOrderDetail(token, params, successCallback, failureCallback) {
-    NetworkManger.getInstance().patchNetworkRequest(
-      CONSTANT.baseURL + 'order/sku',
-      token,
-      params,
-      function reqSuccess(data) {
-        successCallback(data);
-      },
-      function reqFailed(error) {
-        failureCallback(error);
-      }
-    );
-  }
-
-  removeOrderDetail(token, params, successCallback, failureCallback) {
-    NetworkManger.getInstance().patchNetworkRequest(
-      CONSTANT.baseURL + 'order/sku',
-      token,
-      params,
-      function reqSuccess(data) {
-        successCallback(data);
-      },
-      function reqFailed(error) {
-        failureCallback(error);
-      }
-    );
-  }
-
-  downloadOrderDetails(token, params, successCallback, failureCallback) {
-    NetworkManger.getInstance().getNetworkRequest(
-      CONSTANT.baseURL + 'order/download',
-      token,
-      params,
-      function reqSuccess(data) {
-        successCallback(data);
-      },
-      function reqFailed(error) {
-        failureCallback(error);
-      }
-    );
-  }
 
   // value type
 
@@ -3890,20 +3914,6 @@ export default class Api {
   addCardSet(token, params, successCallback, failureCallback) {
     NetworkManger.getInstance().postNetworkRequest(
       CONSTANT.baseURL + 'card',
-      token,
-      params,
-      function reqSuccess(data) {
-        successCallback(data);
-      },
-      function reqFailed(error) {
-        failureCallback(error);
-      }
-    );
-  }
-
-  updateOrderStatus(token, order_id, params, successCallback, failureCallback) {
-    NetworkManger.getInstance().updateNetworkRequest(
-      CONSTANT.baseURL + 'order/' + order_id,
       token,
       params,
       function reqSuccess(data) {
