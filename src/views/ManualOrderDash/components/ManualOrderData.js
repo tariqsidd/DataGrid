@@ -62,7 +62,7 @@ const ManualOrderData = props => {
       title: 'Order Date',
       field: 'created_at',
       editable: 'never',
-      filtering: true
+      filtering: false
     },
     {
       title: 'Retailer',
