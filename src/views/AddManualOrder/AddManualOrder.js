@@ -390,7 +390,7 @@ const AddManualOrder = props => {
                                     placeholder="Retailer Name"
                                     margin="dense"
                                     name="name"
-                                    onChange={handleChange}
+                                    // onChange={handleChange}
                                     required
                                     value={selectedMobileData.name}
                                     variant="outlined"
