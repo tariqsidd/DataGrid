@@ -86,7 +86,7 @@ export default class Api {
       }
     );
   }
-  
+
   downloadOrderDetails(token, params, successCallback, failureCallback) {
     NetworkManger.getInstance().getNetworkRequest(
       CONSTANT.baseURL + 'order/download',
@@ -126,7 +126,7 @@ export default class Api {
       }
     );
   }
-  
+
   getOrderDetail(token, orderDetailId, successCallback, failureCallback) {
     NetworkManger.getInstance().getNetworkRequest(
       CONSTANT.baseURL + 'order/' + orderDetailId,
@@ -448,8 +448,8 @@ export default class Api {
     console.log('params', params);
     NetworkManger.getInstance().getSearchNetworkRequest(
       CONSTANT.baseURL +
-        `product/search?${params.column_name}.name=` +
-        params.text,
+      `product/search?${params.column_name}.name=` +
+      params.text,
       token,
       paramObj,
       function reqSuccess(data) {
@@ -1001,7 +1001,7 @@ export default class Api {
     console.log('params', params);
     NetworkManger.getInstance().getNetworkRequest(
       CONSTANT.baseURL +
-        `category/check-availability?${params.field}=${params.text}`,
+      `category/check-availability?${params.field}=${params.text}`,
       token,
       null,
       function reqSuccess(data) {
@@ -2905,19 +2905,18 @@ export default class Api {
   }
 
   downloadLogs(token, params, successCallback, failureCallback) {
-    let fileName = `${
-      params.type === 'redemption'
+    let fileName = `${params.type === 'redemption'
         ? 'Redemption-Logs ' + params.from + ' to ' + params.to
         : params.type === 'payment'
-        ? 'Payment-Logs : ' + params.from + ' to ' + params.to
-        : params.type === 'merchant'
-        ? 'All-Merchants'
-        : params.type === 'outlet'
-        ? 'All-Outlets'
-        : params.type === 'offer'
-        ? 'All-Offers'
-        : ''
-    }.csv`;
+          ? 'Payment-Logs : ' + params.from + ' to ' + params.to
+          : params.type === 'merchant'
+            ? 'All-Merchants'
+            : params.type === 'outlet'
+              ? 'All-Outlets'
+              : params.type === 'offer'
+                ? 'All-Offers'
+                : ''
+      }.csv`;
     NetworkManger.getInstance().getDownloadUrl(
       CONSTANT.baseURL + 'logs/download',
       token,
@@ -4811,5 +4810,5 @@ export default class Api {
   }
 
 
-  
+
 }

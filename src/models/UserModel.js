@@ -41,7 +41,7 @@ export default class UserModel {
         UserModel.getInstance().saveToken(user.token, user.user_role_id);
         successTrigger(user);
       },
-      
+
       function resFailed(msg) {
         console.log('Error: ' + msg);
         failureTrigger(msg);
@@ -136,7 +136,7 @@ export default class UserModel {
       }
     );
   }
-  
+
   getOrderDetail(orderDetailId, successTrigger, failureTrigger) {
     let token = UserModel.getInstance().getToken();
     ApiManager.getInstance().getOrderDetail(
@@ -150,7 +150,7 @@ export default class UserModel {
       }
     );
   }
-  
+
   addOrderDetail(params, successTrigger, failureTrigger) {
     let token = UserModel.getInstance().getToken();
     ApiManager.getInstance().addOrderDetail(
@@ -2707,150 +2707,150 @@ export default class UserModel {
 
 
   // Users 
-    //User section start
-    addUser(params, successTrigger, failureTrigger) {
-      let token = UserModel.getInstance().getToken();
-      ApiManager.getInstance().addUser(
-        token,
-        params,
-        function resSuccess(data) {
-          successTrigger(data);
-        },
-        function resFailed(msg) {
-          console.log(msg);
-          failureTrigger(msg);
-        }
-      );
-    }
-  
-    getUserDetails(userId, successTrigger, failureTrigger) {
-      let token = UserModel.getInstance().getToken();
-      ApiManager.getInstance().getUserDetails(
-        token,
-        userId,
-        function resSuccess(data) {
-          successTrigger(data);
-        },
-        function resFailed(error) {
-          failureTrigger(error);
-        }
-      );
-    }
-  
-    updateUser(userid, params, successTrigger, failureTrigger) {
-      let token = UserModel.getInstance().getToken();
-      ApiManager.getInstance().updateUser(
-        token,
-        userid,
-        params,
-        function resSuccess(data) {
-          successTrigger(data);
-        },
-        function resFailed(error) {
-          failureTrigger(error);
-        }
-      );
-    }
-  
-    getUsersList(params, successTrigger, failureTrigger) {
-      let token = UserModel.getInstance().getToken();
-      ApiManager.getInstance().getUsersList(
-        token,
-        params,
-        function resSuccess(data) {
-          successTrigger(data);
-        },
-        function resFailed(msg) {
-          failureTrigger(msg);
-        }
-      );
-    }
-  
-    userActivation(userId, params, successTrigger, failureTrigger) {
-      let token = UserModel.getInstance().getToken();
-      ApiManager.getInstance().userActivation(
-        token,
-        userId,
-        params,
-        function resSuccess(data) {
-          UserModel.getInstance().UserList.forEach((user, index) => {
-            if (user.id === userId) {
-              user.is_active = params.is_active;
-              successTrigger(data);
-            }
-          });
-        },
-        function resFailed(msg) {
-          failureTrigger(msg);
-        }
-      );
-    }
-  
-    downloadUsers(params, successTrigger, failureTrigger) {
-      let token = UserModel.getInstance().getToken();
-      ApiManager.getInstance().downloadUsers(
-        token,
-        params,
-        function resSuccess(data) {
-          successTrigger(data);
-        },
-        function resFailed(msg) {
-          failureTrigger(msg);
-        }
-      );
-    }
-  
-    searchUsersList(params, successTrigger, failureTrigger) {
-      let token = UserModel.getInstance().getToken();
-      ApiManager.getInstance().searchUsersList(
-        token,
-        params,
-        function resSuccess(data) {
-          successTrigger(data);
-        },
-        function resFailed(msg) {
-          failureTrigger(msg);
-        }
-      );
-    }
-  
-    removeUser(userId, successTrigger, failureTrigger) {
-      let token = UserModel.getInstance().getToken();
-      ApiManager.getInstance().removeUser(
-        token,
-        userId,
-        function resSuccess() {
-          UserModel.getInstance().UserList.forEach((user, index) => {
-            if (user.id === userId) {
-              UserModel.getInstance().UserList.splice(index, 1);
-              successTrigger();
-            }
-          });
-          successTrigger();
-        },
-        function resFailed(error) {
-          failureTrigger(error);
-        }
-      );
-    }
-    
-    globalSearchUsers(params, paramObj, successTrigger, failureTrigger) {
-      let token = UserModel.getInstance().getToken();
-      console.log('param usermodel', params);
-      ApiManager.getInstance().globalSearchUsers(
-        token,
-        params,
-        paramObj,
-        function resSuccess(data) {
-          console.log({ data });
-          // UserModel.getInstance().productList = data.categories.data
-          successTrigger(data);
-        },
-        function resFailed(msg) {
-          failureTrigger(msg);
-        }
-      );
-    }
+  //User section start
+  addUser(params, successTrigger, failureTrigger) {
+    let token = UserModel.getInstance().getToken();
+    ApiManager.getInstance().addUser(
+      token,
+      params,
+      function resSuccess(data) {
+        successTrigger(data);
+      },
+      function resFailed(msg) {
+        console.log(msg);
+        failureTrigger(msg);
+      }
+    );
+  }
+
+  getUserDetails(userId, successTrigger, failureTrigger) {
+    let token = UserModel.getInstance().getToken();
+    ApiManager.getInstance().getUserDetails(
+      token,
+      userId,
+      function resSuccess(data) {
+        successTrigger(data);
+      },
+      function resFailed(error) {
+        failureTrigger(error);
+      }
+    );
+  }
+
+  updateUser(userid, params, successTrigger, failureTrigger) {
+    let token = UserModel.getInstance().getToken();
+    ApiManager.getInstance().updateUser(
+      token,
+      userid,
+      params,
+      function resSuccess(data) {
+        successTrigger(data);
+      },
+      function resFailed(error) {
+        failureTrigger(error);
+      }
+    );
+  }
+
+  getUsersList(params, successTrigger, failureTrigger) {
+    let token = UserModel.getInstance().getToken();
+    ApiManager.getInstance().getUsersList(
+      token,
+      params,
+      function resSuccess(data) {
+        successTrigger(data);
+      },
+      function resFailed(msg) {
+        failureTrigger(msg);
+      }
+    );
+  }
+
+  userActivation(userId, params, successTrigger, failureTrigger) {
+    let token = UserModel.getInstance().getToken();
+    ApiManager.getInstance().userActivation(
+      token,
+      userId,
+      params,
+      function resSuccess(data) {
+        UserModel.getInstance().UserList.forEach((user, index) => {
+          if (user.id === userId) {
+            user.is_active = params.is_active;
+            successTrigger(data);
+          }
+        });
+      },
+      function resFailed(msg) {
+        failureTrigger(msg);
+      }
+    );
+  }
+
+  downloadUsers(params, successTrigger, failureTrigger) {
+    let token = UserModel.getInstance().getToken();
+    ApiManager.getInstance().downloadUsers(
+      token,
+      params,
+      function resSuccess(data) {
+        successTrigger(data);
+      },
+      function resFailed(msg) {
+        failureTrigger(msg);
+      }
+    );
+  }
+
+  searchUsersList(params, successTrigger, failureTrigger) {
+    let token = UserModel.getInstance().getToken();
+    ApiManager.getInstance().searchUsersList(
+      token,
+      params,
+      function resSuccess(data) {
+        successTrigger(data);
+      },
+      function resFailed(msg) {
+        failureTrigger(msg);
+      }
+    );
+  }
+
+  removeUser(userId, successTrigger, failureTrigger) {
+    let token = UserModel.getInstance().getToken();
+    ApiManager.getInstance().removeUser(
+      token,
+      userId,
+      function resSuccess() {
+        UserModel.getInstance().UserList.forEach((user, index) => {
+          if (user.id === userId) {
+            UserModel.getInstance().UserList.splice(index, 1);
+            successTrigger();
+          }
+        });
+        successTrigger();
+      },
+      function resFailed(error) {
+        failureTrigger(error);
+      }
+    );
+  }
+
+  globalSearchUsers(params, paramObj, successTrigger, failureTrigger) {
+    let token = UserModel.getInstance().getToken();
+    console.log('param usermodel', params);
+    ApiManager.getInstance().globalSearchUsers(
+      token,
+      params,
+      paramObj,
+      function resSuccess(data) {
+        console.log({ data });
+        // UserModel.getInstance().productList = data.categories.data
+        successTrigger(data);
+      },
+      function resFailed(msg) {
+        failureTrigger(msg);
+      }
+    );
+  }
 
 
 
