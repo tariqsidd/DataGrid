@@ -224,8 +224,15 @@ const AddManualOrder = props => {
             orderItemsDetailArr[index].name = val.name;
             // orderItemsDetailArr[index].quantity = val.quantity;
             orderItemsDetailArr[index].price = val.price;
-            // orderItemsDetailArr[index].cost = val.cost;
+            orderItemsDetailArr[index].cost = orderItemsDetailArr[index].quantity > 1 ? (orderItemsDetailArr[index].quantity * val.price) : (orderItemsDetailArr[index].quantity === 0 ? 0 : '')
             setOrderItemRows(orderItemsDetailArr)
+
+            let subtotal = 0;
+            orderItemRows && orderItemRows.length > 0 && Array.isArray(orderItemRows) && orderItemRows.forEach(item => {
+                subtotal += item.cost
+            })
+            setSubtotal(subtotal)
+            setImpCondition(!impCondition)  // ask before removing
         }
     };
 
@@ -418,7 +425,7 @@ const AddManualOrder = props => {
 
                         <Grid container spacing={3}>
                             <Grid item md={9} xs={12}>
-                                <Hidden>{() => {return null}}</Hidden>
+                                <Hidden>{() => { return null }}</Hidden>
                             </Grid>
 
                             <Grid item md={2} xs={12}>

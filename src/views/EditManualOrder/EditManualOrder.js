@@ -307,7 +307,7 @@ const EditManualOrder = props => {
                   variant="outlined"
                 />
               </Grid>
-              
+
               <Snackbar
                 open={params.openSuccess}
                 autoHideDuration={6000}
@@ -332,9 +332,9 @@ const EditManualOrder = props => {
               Make changes
             </Button>
           </CardActions>
-          <Divider/>
+          <Divider />
         </form>
-        <br/>
+        <br />
 
         <MuiThemeProvider theme={theme}>
           <MaterialTable
@@ -377,7 +377,10 @@ const EditManualOrder = props => {
                       }
                     );
                   }, 600);
-                }),
+                })
+                  .then(() =>
+                    window.location.reload()
+                  ),
 
               onRowUpdate: (newData, oldData) =>
                 new Promise((resolve, reject) => {
@@ -409,7 +412,10 @@ const EditManualOrder = props => {
                     }
                   )
                   // }, 1000);
-                }),
+                })
+                  .then(() =>
+                    window.location.reload()
+                  ),
             }}
 
           >
