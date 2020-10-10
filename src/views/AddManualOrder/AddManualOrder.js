@@ -265,15 +265,17 @@ const AddManualOrder = props => {
     }
 
     const removeOrderItem = (index) => {
-        let orderItemsDetailArr = [...orderItemRows];
-        orderItemsDetailArr.splice(index, 1)
-        // console.log(orderItemsDetailArr)
-        setOrderItemRows([...orderItemsDetailArr])
-        let skuSelectedDetailsArr = [...selectedSkuItems];
-        skuSelectedDetailsArr.splice(index, 1)
-        // console.log(skuSelectedDetailsArr)
-        setSelectedSkuItems([...skuSelectedDetailsArr])
-        setImpCondition(!impCondition)  // ask before removing
+        if (index !== orderItemRows.length - 1) {
+            let orderItemsDetailArr = [...orderItemRows];
+            orderItemsDetailArr.splice(index, 1)
+            // console.log(orderItemsDetailArr)
+            setOrderItemRows([...orderItemsDetailArr])
+            let skuSelectedDetailsArr = [...selectedSkuItems];
+            skuSelectedDetailsArr.splice(index, 1)
+            // console.log(skuSelectedDetailsArr)
+            setSelectedSkuItems([...skuSelectedDetailsArr])
+            setImpCondition(!impCondition)  // ask before removing
+        }
     }
 
     const generateOrderItemsRows = (values, index) => {
