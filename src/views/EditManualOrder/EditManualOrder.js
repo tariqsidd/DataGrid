@@ -141,15 +141,6 @@ const EditManualOrder = props => {
     };
   }, []);
 
-  useEffect(() => {
-    let subtotal = 0;
-    orderItemRows && orderItemRows.length > 0 && Array.isArray(orderItemRows)
-      && orderItemRows.forEach(item => {
-        subtotal += item.cost
-      })
-    setSubtotal(subtotal)
-  }, [orderItemRows])
-
   let history = useHistory();
 
   const classes = useStyles();
