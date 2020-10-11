@@ -156,25 +156,30 @@ const AddManualOrder = props => {
                     price: item.price,
                     qty: item.quantity
                 }))
-                var obj = {
-                    user_id: selectedMobileData.id, // retailer ID
-                    items: orderList
-                };
-                UserModel.getInstance().postManualOrder(
-                    obj,
-                    succ => {
-                        setOpenData({ ...openData, openSuccess: true });
-                        // console.log(succ);
-                        setTimeout(() => {
-                            props.history.push('/manual-orders');
-                        }, 1000);
-                    },
-                    err => {
-                        setParams({ ...params, submitStatus: false });
-                        console.log(err);
-                        // console.log(obj);
-                    }
-                );
+                if (orderList.length > 0) {
+                    var obj = {
+                        user_id: selectedMobileData.id, // retailer ID
+                        items: orderList
+                    };
+                    UserModel.getInstance().postManualOrder(
+                        obj,
+                        succ => {
+                            setOpenData({ ...openData, openSuccess: true });
+                            // console.log(succ);
+                            setTimeout(() => {
+                                props.history.push('/manual-orders');
+                            }, 1000);
+                        },
+                        err => {
+                            setParams({ ...params, submitStatus: false });
+                            console.log(err);
+                            // console.log(obj);
+                        }
+                    );
+                }
+                else {
+                    setOpenData({ ...openData, openWarning: true });
+                }
             }
         }
     }
@@ -420,6 +425,8 @@ const AddManualOrder = props => {
 
                         {
                             <div id="orderSkuItems">
+                                <h5>Order Items</h5>
+                                <br/>
                                 {orderItemRows && orderItemRows.length > 0 &&
                                     Array.isArray(orderItemRows) &&
                                     orderItemRows.map((val, index) => {
@@ -460,8 +467,8 @@ const AddManualOrder = props => {
                             autoHideDuration={6000}
                             onClose={handleClose}>
                             <Alert onClose={handleClose} severity="warning">
-                                Please complete above row(s) by selecting SKU and desired quantity!
-                                </Alert>
+                                Please complete above row(s) by selecting SKU(s) and desired quantity!
+                            </Alert>
                         </Snackbar>
                         <Snackbar
                             open={openData.openSuccess}
