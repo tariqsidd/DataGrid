@@ -83,6 +83,14 @@ const AddManualOrder = props => {
         name: "",
     });
 
+    useEffect(() => {
+        let subtotal = 0;
+        orderItemRows && orderItemRows.length > 0 && Array.isArray(orderItemRows)
+            && orderItemRows.forEach(item => {
+                subtotal += item.cost
+            })
+        setSubtotal(subtotal)
+    }, [orderItemRows])
 
     const mobileHandleChange = async (event, val) => {
         // var arr = event.target.getAttribute('data-option-index');
