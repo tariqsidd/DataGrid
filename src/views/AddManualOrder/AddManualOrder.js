@@ -278,7 +278,7 @@ const AddManualOrder = props => {
     }
 
     const removeOrderItem = (index) => {
-        if (index !== orderItemRows.length - 1) {
+        if (orderItemRows.length > 1) {
             let orderItemsDetailArr = [...orderItemRows];
             orderItemsDetailArr.splice(index, 1)
             // console.log(orderItemsDetailArr)
