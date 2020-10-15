@@ -86,6 +86,7 @@ export default class UserModel {
         successTrigger(data);
       },
       function resFailed(msg) {
+        alert(msg)
         failureTrigger(msg);
       }
     );
