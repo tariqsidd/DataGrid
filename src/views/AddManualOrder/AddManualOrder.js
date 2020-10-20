@@ -192,9 +192,14 @@ const AddManualOrder = props => {
             await setParams({ ...params, dataFetchStatus: false });
             await UserModel.getInstance().getSkuByName(
                 { 'q': value },
-                succ => {
-                    // console.log(succ);
-                    setSkuItems(succ);
+                data => {
+                    // console.log(data);
+                    let itemsInStockArr = [];
+                    data && data.length > 0 && Array.isArray(data) && data.forEach((item) => {
+                        // console.log(item.is_stock, item.name)
+                        item.is_stock && itemsInStockArr.push(item)
+                    })
+                    setSkuItems([...itemsInStockArr]);
                     setParams({ ...params, dataFetchStatus: true });
                 },
                 err => {
