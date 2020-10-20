@@ -1,4 +1,5 @@
 import UserModel from '../../models/UserModel';
+import CONSTANT from '../../constants';
 
 export default class NetworkHandler {
   static myInstance = null;
@@ -18,6 +19,69 @@ export default class NetworkHandler {
     });
   }
 
+  postRefreshTokenNetworkRequest(callbackFunc, url, serviceParams, successCallback, failureCallback) {
+    let _headers = {
+      'content-type': 'application/json'
+    };
+    // console.log(callbackFunc)
+    let refreshtoken = localStorage.getItem('sales-refresh-token')
+    let refreshTokenUrl = CONSTANT.baseURL + 'user/refreshtoken'
+    if (refreshtoken) {
+      _headers['Authorization'] = `Bearer ${refreshtoken}`;
+    }
+    console.log('refreshTokenUrl', refreshTokenUrl);
+    NetworkHandler.getInstance()
+      .timeout(
+        fetch(refreshTokenUrl, {
+          method: 'POST',
+          headers: _headers,
+          // body: JSON.stringify({})
+        })
+      )
+      // .then((response) => {
+      //   if (response.status === 401) {
+      //     UserModel.getInstance().signOut();
+      //   }
+      // })
+      .then(response => {
+        if (response.status === 401) {
+          console.log('Arey bhai.. refresh token bhe expire hogyya kya??')
+          // UserModel.getInstance().signOut();
+        }
+        return response.json();
+      })
+      .then(responseJson => {
+        // console.log('Responce from server is ', responseJson);
+        if (responseJson.status === true) {
+          console.log('Success rephresh token');
+          // console.log('token', responseJson.data.token)
+          // console.log('refreshtoken', responseJson.data.refreshToken)
+          let NewToken = responseJson.data.token;
+          localStorage.setItem('sales-auth-token', responseJson.data.token)
+          localStorage.setItem('sales-refresh-token', responseJson.data.refreshToken)
+          // NetworkHandler.getInstance()
+          callbackFunc(url, NewToken, serviceParams, successCallback, failureCallback)
+        } else {
+          // console.log('Failure');
+        }
+        // if (responseJson.data !== null) {
+        //   if (responseJson.status === true){
+        //     successCallback(responseJson.data);
+        //   }
+        //   else {
+        //     failureCallback('Error in input params: '+ responseJson.error);
+        //   }
+        // } else {
+        //   console.log('server wala error')
+        //     failureCallback('Error from server :'+ responseJson.error);
+        // }
+      })
+      .catch(error => {
+        // console.log('Failure', error);
+        // failureCallback(error);
+      });
+  }
+
   getNetworkRequest(
     url,
     token,
@@ -28,7 +92,7 @@ export default class NetworkHandler {
     // console.log('parameters are : ' + JSON.stringify(serviceParams));
 
     // console.log({ serviceParams });
-    if (serviceParams != null) {
+    if (serviceParams != null && !url.includes('?')) {
       url = url + '?';
       for (const [key, value] of Object.entries(serviceParams)) {
         // console.log({ key, value });
@@ -58,7 +122,7 @@ export default class NetworkHandler {
       .then(response => {
         // console.log('reponse', response);
         if (response.status === 401) {
-          UserModel.getInstance().signOut();
+          // UserModel.getInstance().signOut();
         }
         return response.json();
       })
@@ -68,6 +132,11 @@ export default class NetworkHandler {
           // console.log('Success');
           successCallback(responseJson.data);
         } else {
+          if (responseJson.error && responseJson.error.name === "TokenExpiredError") {
+            // console.log('token Expired and refresh token called')
+            return NetworkHandler.getInstance()
+            .postRefreshTokenNetworkRequest(NetworkHandler.getInstance().getNetworkRequest, url, serviceParams, successCallback, failureCallback);
+          }
           // console.log('Failure');
           failureCallback(responseJson.message);
         }
@@ -87,6 +156,7 @@ export default class NetworkHandler {
         failureCallback(error);
       });
   }
+
   getSearchNetworkRequest(
     url,
     token,
@@ -96,7 +166,7 @@ export default class NetworkHandler {
   ) {
     // console.log('parameters are : ' + JSON.stringify(serviceParams));
 
-    if (serviceParams != null) {
+    if (serviceParams != null && !url.includes('?')) {
       url = url;
       for (const [key, value] of Object.entries(serviceParams)) {
         // console.log('obj enn', Object.entries(serviceParams));
@@ -124,7 +194,7 @@ export default class NetworkHandler {
       .then(response => {
         // console.log('reponse', response);
         if (response.status === 401) {
-          UserModel.getInstance().signOut();
+          // UserModel.getInstance().signOut();
         }
         return response.json();
       })
@@ -134,6 +204,12 @@ export default class NetworkHandler {
           // console.log('Success');
           successCallback(responseJson.data);
         } else {
+          if (responseJson.error && responseJson.error.name === "TokenExpiredError") {
+            console.log(responseJson.status)
+            console.log('token Expired and refresh token called')
+            return NetworkHandler.getInstance()
+            .postRefreshTokenNetworkRequest(NetworkHandler.getInstance().getSearchNetworkRequest, url, serviceParams, successCallback, failureCallback);
+          }
           // console.log('Failure');
           failureCallback(responseJson.message);
         }
@@ -163,7 +239,7 @@ export default class NetworkHandler {
   ) {
     // console.log('parameters are : ' + JSON.stringify(serviceParams));
 
-    if (serviceParams != null) {
+    if (serviceParams != null && !url.includes('?')) {
       url = url + serviceParams;
       // for (const [key, value] of Object.entries(serviceParams)) {
       //   console.log('obj enn', Object.entries(serviceParams));
@@ -191,7 +267,7 @@ export default class NetworkHandler {
       .then(response => {
         // console.log('reponse', response);
         if (response.status === 401) {
-          UserModel.getInstance().signOut();
+          // UserModel.getInstance().signOut();
         }
         return response.json();
       })
@@ -201,6 +277,11 @@ export default class NetworkHandler {
           // console.log('Success');
           successCallback(responseJson.data);
         } else {
+          if (responseJson.error && responseJson.error.name === "TokenExpiredError") {
+            console.log('token Expired and refresh token called')
+            return NetworkHandler.getInstance()
+            .postRefreshTokenNetworkRequest(NetworkHandler.getInstance().getSkuNetworkRequest, url, serviceParams, successCallback, failureCallback);
+          }
           // console.log('Failure');
           failureCallback(responseJson.message);
         }
@@ -217,7 +298,7 @@ export default class NetworkHandler {
     successCallback,
     failureCallback
   ) {
-    if (serviceParams != null) {
+    if (serviceParams != null && !url.includes('?')) {
       url = url + '?';
       for (const [key, value] of Object.entries(serviceParams)) {
         url = url + key + '=' + value + '&';
@@ -243,7 +324,7 @@ export default class NetworkHandler {
       .then(response => {
         // console.log('reponse', response);
         if (response.status === 401) {
-          UserModel.getInstance().signOut();
+          // UserModel.getInstance().signOut();
         }
         return response.json();
       })
@@ -253,6 +334,11 @@ export default class NetworkHandler {
           // console.log('Success');
           successCallback(responseJson.data);
         } else {
+          if (responseJson.error && responseJson.error.name === "TokenExpiredError") {
+            console.log('token Expired and refresh token called')
+            return NetworkHandler.getInstance()
+            .postRefreshTokenNetworkRequest(NetworkHandler.getInstance().deleteNetworkRequest, url, serviceParams, successCallback, failureCallback);
+          }
           // console.log('Failure');
           failureCallback(responseJson.message);
         }
@@ -280,7 +366,7 @@ export default class NetworkHandler {
     successCallback,
     failureCallback
   ) {
-    // if (serviceParams != null) {
+    // if (serviceParams != null && !url.includes('?')) {
     //   url = url + '?'
     //   for (const [key, value] of Object.entries(serviceParams)) {
     //     url = url + key + '=' + value + '&'
@@ -306,7 +392,7 @@ export default class NetworkHandler {
       .then(response => {
         // console.log('reponse', response);
         if (response.status === 401) {
-          UserModel.getInstance().signOut();
+          // UserModel.getInstance().signOut();
         }
         return response.json();
       })
@@ -316,6 +402,11 @@ export default class NetworkHandler {
           // console.log('Success');
           successCallback(responseJson.data);
         } else {
+          if (responseJson.error && responseJson.error.name === "TokenExpiredError") {
+            console.log('token Expired and refresh token called')
+            return NetworkHandler.getInstance()
+            .postRefreshTokenNetworkRequest(NetworkHandler.getInstance().updateNetworkRequest, url, serviceParams, successCallback, failureCallback);
+          }
           // console.log('Failure');
           failureCallback(responseJson.message);
         }
@@ -366,7 +457,7 @@ export default class NetworkHandler {
       // })
       .then(response => {
         if (response.status === 401) {
-          UserModel.getInstance().signOut();
+          // UserModel.getInstance().signOut();
         }
         return response.json();
       })
@@ -376,6 +467,11 @@ export default class NetworkHandler {
           // console.log('Success');
           successCallback(responseJson.data);
         } else {
+          if (responseJson.error && responseJson.error.name === "TokenExpiredError") {
+            console.log('token Expired and refresh token called')
+            return NetworkHandler.getInstance()
+            .postRefreshTokenNetworkRequest(NetworkHandler.getInstance().postNetworkRequest, url, serviceParams, successCallback, failureCallback);
+          }
           // console.log('Failure');
           failureCallback(responseJson.message);
         }
@@ -428,7 +524,7 @@ export default class NetworkHandler {
       // })
       .then(response => {
         if (response.status === 401) {
-          UserModel.getInstance().signOut();
+          // UserModel.getInstance().signOut();
         }
         return response.json();
       })
@@ -438,6 +534,11 @@ export default class NetworkHandler {
           // console.log('Success');
           successCallback(responseJson.data);
         } else {
+          if (responseJson.error && responseJson.error.name === "TokenExpiredError") {
+            console.log('token Expired and refresh token called')
+            return NetworkHandler.getInstance()
+            .postRefreshTokenNetworkRequest(NetworkHandler.getInstance().postImageNetworkRequest, url, serviceParams, successCallback, failureCallback);
+          }
           // console.log('Failure');
           failureCallback(responseJson.message);
         }
@@ -488,7 +589,7 @@ export default class NetworkHandler {
       // })
       .then(response => {
         if (response.status === 401) {
-          UserModel.getInstance().signOut();
+          // UserModel.getInstance().signOut();
         }
         return response.json();
       })
@@ -498,6 +599,11 @@ export default class NetworkHandler {
           // console.log('Success');
           successCallback(responseJson.data);
         } else {
+          if (responseJson.error && responseJson.error.name === "TokenExpiredError") {
+            console.log('token Expired and refresh token called')
+            return NetworkHandler.getInstance()
+            .postRefreshTokenNetworkRequest(NetworkHandler.getInstance().patchNetworkRequest, url, serviceParams, successCallback, failureCallback);
+          }
           // console.log('Failure');
           failureCallback(responseJson.message);
         }
@@ -533,7 +639,7 @@ export default class NetworkHandler {
       )
       .then(response => {
         if (response.status === 401) {
-          UserModel.getInstance().signOut();
+          // UserModel.getInstance().signOut();
         }
         return response.json();
       })
@@ -543,6 +649,11 @@ export default class NetworkHandler {
           // console.log('Success');
           successCallback(responseJson.data);
         } else {
+          if (responseJson.error && responseJson.error.name === "TokenExpiredError") {
+            console.log('token Expired and refresh token called')
+            return NetworkHandler.getInstance()
+            .postRefreshTokenNetworkRequest(NetworkHandler.getInstance().postFormRequest, url, serviceParams, successCallback, failureCallback);
+          }
           // console.log('Failure');
           failureCallback(responseJson.message);
         }
@@ -573,7 +684,7 @@ export default class NetworkHandler {
   ) {
     // console.log('parameters are : ' + JSON.stringify(serviceParams));
 
-    if (serviceParams != null) {
+    if (serviceParams != null && !url.includes('?')) {
       url = url + '?';
       for (const [key, value] of Object.entries(serviceParams)) {
         url = url + key + '=' + value + '&';

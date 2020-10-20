@@ -18,14 +18,16 @@ export default class UserModel {
 
   signOut() {
     localStorage.removeItem('sales-auth-token');
+    localStorage.removeItem('sales-refresh-token');
     window.location.href = '/sign-in';
   }
 
   getToken() {
     return localStorage.getItem('sales-auth-token');
   }
-  saveToken(token) {
+  saveToken(token, refreshToken) {
     localStorage.setItem('sales-auth-token', token);
+    localStorage.setItem('sales-refresh-token', refreshToken);
   }
 
   getUserRole() {
@@ -38,7 +40,7 @@ export default class UserModel {
       password,
       function resSuccess(user) {
         console.log('user', user);
-        UserModel.getInstance().saveToken(user.token, user.user_role_id);
+        UserModel.getInstance().saveToken(user.token, user.refreshToken);
         successTrigger(user);
       },
 
