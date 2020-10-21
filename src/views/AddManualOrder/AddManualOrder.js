@@ -197,7 +197,7 @@ const AddManualOrder = props => {
                     let itemsInStockArr = [];
                     data && data.length > 0 && Array.isArray(data) && data.forEach((item) => {
                         // console.log(item.is_stock, item.name)
-                        item.is_stock && itemsInStockArr.push(item)
+                        !item.is_stock && itemsInStockArr.push(item)
                     })
                     setSkuItems([...itemsInStockArr]);
                     setParams({ ...params, dataFetchStatus: true });
