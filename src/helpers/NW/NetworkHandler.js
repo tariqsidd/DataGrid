@@ -46,7 +46,7 @@ export default class NetworkHandler {
       .then(response => {
         if (response.status === 401) {
           console.log('Arey bhai.. refresh token bhe expire hogyya kya??')
-          // UserModel.getInstance().signOut();
+          UserModel.getInstance().signOut();
         }
         return response.json();
       })
@@ -137,8 +137,12 @@ export default class NetworkHandler {
             return NetworkHandler.getInstance()
             .postRefreshTokenNetworkRequest(NetworkHandler.getInstance().getNetworkRequest, url, serviceParams, successCallback, failureCallback);
           }
-          // console.log('Failure');
-          failureCallback(responseJson.message);
+          if (responseJson.message) {
+            failureCallback(responseJson.message)
+          }
+          else if (responseJson.error) {
+            failureCallback(responseJson.error.message)
+          }
         }
         // if (responseJson.data !== null) {
         //   if (responseJson.status === true){
@@ -210,8 +214,12 @@ export default class NetworkHandler {
             return NetworkHandler.getInstance()
             .postRefreshTokenNetworkRequest(NetworkHandler.getInstance().getSearchNetworkRequest, url, serviceParams, successCallback, failureCallback);
           }
-          // console.log('Failure');
-          failureCallback(responseJson.message);
+          if (responseJson.message) {
+            failureCallback(responseJson.message)
+          }
+          else if (responseJson.error) {
+            failureCallback(responseJson.error.message)
+          }
         }
         // if (responseJson.data !== null) {
         //   if (responseJson.status === true){
@@ -282,8 +290,12 @@ export default class NetworkHandler {
             return NetworkHandler.getInstance()
             .postRefreshTokenNetworkRequest(NetworkHandler.getInstance().getSkuNetworkRequest, url, serviceParams, successCallback, failureCallback);
           }
-          // console.log('Failure');
-          failureCallback(responseJson.message);
+          if (responseJson.message) {
+            failureCallback(responseJson.message)
+          }
+          else if (responseJson.error) {
+            failureCallback(responseJson.error.message)
+          }
         }
       })
       .catch(error => {
@@ -339,8 +351,12 @@ export default class NetworkHandler {
             return NetworkHandler.getInstance()
             .postRefreshTokenNetworkRequest(NetworkHandler.getInstance().deleteNetworkRequest, url, serviceParams, successCallback, failureCallback);
           }
-          // console.log('Failure');
-          failureCallback(responseJson.message);
+          if (responseJson.message) {
+            failureCallback(responseJson.message)
+          }
+          else if (responseJson.error) {
+            failureCallback(responseJson.error.message)
+          }
         }
         // if (responseJson.data !== null) {
         //   if (responseJson.status === true){
@@ -407,8 +423,12 @@ export default class NetworkHandler {
             return NetworkHandler.getInstance()
             .postRefreshTokenNetworkRequest(NetworkHandler.getInstance().updateNetworkRequest, url, serviceParams, successCallback, failureCallback);
           }
-          // console.log('Failure');
-          failureCallback(responseJson.message);
+          if (responseJson.message) {
+            failureCallback(responseJson.message)
+          }
+          else if (responseJson.error) {
+            failureCallback(responseJson.error.message)
+          }
         }
         // if (responseJson.data !== null) {
         //   if (responseJson.status === true){
@@ -472,8 +492,12 @@ export default class NetworkHandler {
             return NetworkHandler.getInstance()
             .postRefreshTokenNetworkRequest(NetworkHandler.getInstance().postNetworkRequest, url, serviceParams, successCallback, failureCallback);
           }
-          // console.log('Failure');
-          failureCallback(responseJson.message);
+          if (responseJson.message) {
+            failureCallback(responseJson.message)
+          }
+          else if (responseJson.error) {
+            failureCallback(responseJson.error.message)
+          }
         }
         // if (responseJson.data !== null) {
         //   if (responseJson.status === true){
@@ -539,8 +563,12 @@ export default class NetworkHandler {
             return NetworkHandler.getInstance()
             .postRefreshTokenNetworkRequest(NetworkHandler.getInstance().postImageNetworkRequest, url, serviceParams, successCallback, failureCallback);
           }
-          // console.log('Failure');
-          failureCallback(responseJson.message);
+          if (responseJson.message) {
+            failureCallback(responseJson.message)
+          }
+          else if (responseJson.error) {
+            failureCallback(responseJson.error.message)
+          }
         }
         // if (responseJson.data !== null) {
         //   if (responseJson.status === true){
@@ -604,8 +632,12 @@ export default class NetworkHandler {
             return NetworkHandler.getInstance()
             .postRefreshTokenNetworkRequest(NetworkHandler.getInstance().patchNetworkRequest, url, serviceParams, successCallback, failureCallback);
           }
-          // console.log('Failure');
-          failureCallback(responseJson.message);
+          if (responseJson.message) {
+            failureCallback(responseJson.message)
+          }
+          else if (responseJson.error) {
+            failureCallback(responseJson.error.message)
+          }
         }
         // if (responseJson.data !== null) {
         //   if (responseJson.status === true){
@@ -654,8 +686,12 @@ export default class NetworkHandler {
             return NetworkHandler.getInstance()
             .postRefreshTokenNetworkRequest(NetworkHandler.getInstance().postFormRequest, url, serviceParams, successCallback, failureCallback);
           }
-          // console.log('Failure');
-          failureCallback(responseJson.message);
+          if (responseJson.message) {
+            failureCallback(responseJson.message)
+          }
+          else if (responseJson.error) {
+            failureCallback(responseJson.error.message)
+          }
         }
         // console.log('Responce from server is ', responseJson)
         // if (responseJson.data !== null) {
