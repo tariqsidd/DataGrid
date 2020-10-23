@@ -50,8 +50,8 @@ const order_status = [
   'Ready to Ship',
   'In Transit',
   'Delivered',
-  'closed',
-  'cancelled'
+  'Closed',
+  'Cancelled'
 ];
 
 const ManualOrderData = props => {
@@ -81,7 +81,8 @@ const ManualOrderData = props => {
         2: 'Ready to Ship',
         3: 'In Transit',
         4: 'Delivered',
-        5: 'Cancelled'
+        5: 'Closed',
+        6: 'Cancelled'
       }
     }
   ]);
@@ -159,7 +160,7 @@ const ManualOrderData = props => {
               retailerName: obj.retailer,
               amount: obj.total,
               created_at: new Date(obj.created_at).toLocaleDateString(),
-              status: order_status[obj.status]
+              status: obj.status
             });
           });
           setorderData(tempArr);

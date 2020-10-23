@@ -33,13 +33,13 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const order_status = [
-  'Paending',
+  'Pending',
   'In Preparation',
   'Ready to Ship',
   'In Transit',
-  'Deliverd',
-  'closed',
-  'cancelled'
+  'Delivered',
+  'Closed',
+  'Cancelled'
 ];
 
 const RoutingData = props => {
