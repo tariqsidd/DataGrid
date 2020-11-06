@@ -197,7 +197,15 @@ const AddManualOrder = props => {
                     let itemsInStockArr = [];
                     data && data.length > 0 && Array.isArray(data) && data.forEach((item) => {
                         // console.log(item.is_stock, item.name)
-                        !item.is_stock && itemsInStockArr.push(item)
+                        if (!item.is_stock) {
+                            if (item.is_deal) {
+                                console.log({item})
+                                var tempItem = { ...item, name: item.name + " - DEAL" }
+                                itemsInStockArr.push(tempItem)
+                            } else {
+                                itemsInStockArr.push(item)
+                            }
+                        }
                     })
                     setSkuItems([...itemsInStockArr]);
                     setParams({ ...params, dataFetchStatus: true });
@@ -431,7 +439,7 @@ const AddManualOrder = props => {
                         {
                             <div id="orderSkuItems">
                                 <h5>Order Items</h5>
-                                <br/>
+                                <br />
                                 {orderItemRows && orderItemRows.length > 0 &&
                                     Array.isArray(orderItemRows) &&
                                     orderItemRows.map((val, index) => {
