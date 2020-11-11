@@ -1,8 +1,11 @@
 module.exports = {
   baseURL:
-    // 'http://ec2-3-122-192-200.eu-central-1.compute.amazonaws.com/sales/', //prod URL
-    'http://ec2-18-159-213-247.eu-central-1.compute.amazonaws.com:8000/sales/', //dev new API
+    // 'http://192.168.137.16:8000/sales/', // Sherry local
+    'http://18.157.127.204:8000/sales/', // development server
+    // 'http://3.120.229.198/sales/', // QA server
+  // 'http://ec2-3-122-192-200.eu-central-1.compute.amazonaws.com/sales/', // production build
   baseImageURL:
-    // 'http://ec2-3-122-192-200.eu-central-1.compute.amazonaws.com/media'
-    'http://ec2-18-159-213-247.eu-central-1.compute.amazonaws.com:8000/media'
+  'http://18.157.127.204:8000/media', // dev
+  // 'http://3.120.229.198/media', // QA
+  // 'http://ec2-3-122-192-200.eu-central-1.compute.amazonaws.com/media', // prod
 };
