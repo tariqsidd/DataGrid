@@ -62,7 +62,7 @@ const order_status = [
 const EditManualOrder = props => {
   var [orderData, setorderData] = useState([]);
   const [state, setState] = React.useState([
-    { title: 'No', field: 'number', editable: 'never' },
+    { title: 'No.', field: 'number', editable: 'never' },
     { title: 'Category', field: 'category', editable: 'never' },
     { title: 'Sub Category', field: 'subCategory', editable: 'never' },
     { title: 'Brands', field: 'brand', editable: 'never' },
@@ -205,6 +205,7 @@ const EditManualOrder = props => {
         },
         err => {
           console.log(err);
+          setParams({ ...params, openError: true });
         }
       );
     }
@@ -322,7 +323,7 @@ const EditManualOrder = props => {
                 autoHideDuration={6000}
                 onClose={handleClose}>
                 <Alert onClose={handleClose} severity="error">
-                  Error when making changes. Ensure all fields are filled
+                  Error when making changes. Ensure fields are filled
                 </Alert>
               </Snackbar>
             </Grid>
@@ -393,11 +394,11 @@ const EditManualOrder = props => {
 
                   resolve();
                   // console.log('old data', oldData)
-                  // console.log('new data', newData)
+                  console.log('new data', newData)
                   var obj = {
                     order_id: params.id,
                     sku_id: newData.skuId,
-                    qty: newData.quantity,
+                    qty: +newData.quantity,
                     price: newData.price,
                     discount: newData.discount,
                     type: "update",
@@ -405,8 +406,8 @@ const EditManualOrder = props => {
                   UserModel.getInstance().addOrderDetail(
                     obj,
                     succ => {
-                      // console.log('succ', succ)
-                      window.location.reload();
+                      console.log('succ', succ)
+                      // window.location.reload();
                     },
                     err => {
                       console.log('err', err)
@@ -414,9 +415,9 @@ const EditManualOrder = props => {
                   )
                   // }, 1000);
                 })
-                  .then(() =>
-                    window.location.reload()
-                  ),
+                  // .then(() =>
+                  //   window.location.reload()
+                  // ),
             }}
 
           >

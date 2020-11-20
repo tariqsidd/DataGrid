@@ -4191,20 +4191,20 @@ export default class Api {
     );
   }
 
-  uploadImage(token, params, successCallback, failureCallback) {
-    NetworkManger.getInstance().postImageNetworkRequest(
-      CONSTANT.baseImageURL,
-      token,
-      params,
-      function reqSuccess(data) {
-        console.log('succ', data);
-        successCallback(data);
-      },
-      function reqFailed(error) {
-        failureCallback(error);
-      }
-    );
-  }
+  // uploadImage(token, params, successCallback, failureCallback) {
+  //   NetworkManger.getInstance().postImageNetworkRequest(
+  //     CONSTANT.baseImageURL,
+  //     token,
+  //     params,
+  //     function reqSuccess(data) {
+  //       console.log('succ', data);
+  //       successCallback(data);
+  //     },
+  //     function reqFailed(error) {
+  //       failureCallback(error);
+  //     }
+  //   );
+  // }
 
   // vehicles
 
