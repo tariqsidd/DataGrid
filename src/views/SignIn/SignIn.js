@@ -40,6 +40,7 @@ const schema = {
     presence: { allowEmpty: false, message: 'is required' },
     // email: true,
     length: {
+      minimum: 10,
       maximum: 13
     }
   },
@@ -235,7 +236,7 @@ const SignIn = props => {
                   variant="outlined"
                   color="secondary"
                 />
-  
+
                 <Button
                   className={classes.signInButton}
                   // color="primary"
@@ -244,7 +245,7 @@ const SignIn = props => {
                   size="large"
                   type="submit"
                   variant="contained">
-                  Sign in 
+                  Sign in
                 </Button>
               </form>
             </div>

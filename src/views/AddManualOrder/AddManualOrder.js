@@ -409,7 +409,7 @@ const AddManualOrder = props => {
                                     options={mobileData}
                                     getOptionLabel={option => option.mobile}
                                     renderInput={params => (
-                                        <TextField {...params} label="Retailer's Mobile Number" variant="outlined" margin="dense" placeholder='Search retailer from mobile number' />
+                                        <TextField {...params} label="Retailer's Mobile Number" variant="outlined" required margin="dense" placeholder='Search retailer from mobile number' />
                                     )}
                                     value={selectedMobileData}
                                     onChange={mobileHandleChange}
