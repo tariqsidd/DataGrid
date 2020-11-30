@@ -4,10 +4,4 @@ module.exports = {
     // 'http://18.157.127.204:8000/sales/', // development server
     'http://qa.dastgyr.com/sales/', // QA server
   // 'http://ec2-3-122-192-200.eu-central-1.compute.amazonaws.com/sales/', // production build
-
-
-  // baseImageURL:
-  // // 'http://18.157.127.204:8000/media', // dev
-  // 'http://54.93.77.78/media', // QA
-  // // 'http://ec2-3-122-192-200.eu-central-1.compute.amazonaws.com/media', // prod
 };
