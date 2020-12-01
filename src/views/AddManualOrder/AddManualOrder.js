@@ -63,7 +63,7 @@ const AddManualOrder = props => {
     const { className, ...rest } = props;
 
     var [mobileData, setMobileData] = useState([]);
-    var [selectedMobileData, setSelectedMobileData] = useState({});
+    var [selectedMobileData, setSelectedMobileData] = useState('');
 
     const [impCondition, setImpCondition] = useState(false)  // Ask before removing
 
@@ -123,13 +123,15 @@ const AddManualOrder = props => {
     };
 
     const checkErrors = () => {
-        // console.log(selectedMobileData)
+        console.log("selectedMobData", selectedMobileData)
         orderItemRows && orderItemRows.length > 0 && Array.isArray(orderItemRows) && orderItemRows.forEach(({ name, quantity, price, cost }, index) => {
             if (
-                !name || !quantity || !price || !cost || !selectedSkuItems[index].id || !selectedSkuItems[index].name
+                !name || !quantity || !price || !cost || !selectedSkuItems[index].id || !selectedSkuItems[index].name || selectedMobileData === ''
             ) {
+                console.log("errors exist")
                 return true;
             } else {
+                console.log("errors don't exist")
                 return false;
             }
         })
@@ -142,45 +144,45 @@ const AddManualOrder = props => {
         setOpenData({ openSuccess: false, openError: false });
     };
 
-    const handleSubmit = () => {
-        // console.log({ params })
-        if (!params.submitStatus) {
-            const errors = checkErrors()
-            if (errors) {
-                setOpenData({ ...openData, openError: true });
-            } else {
-                setParams({ ...params, submitStatus: true });
-                let par = new FormData();
-                let orderList = orderItemRows && orderItemRows.filter(x => x.quantity > 0).map((item, index) => ({
-                    sku_id: selectedSkuItems[index].id,
-                    price: item.price,
-                    qty: item.quantity
-                }))
-                if (orderList.length > 0) {
-                    var obj = {
-                        user_id: selectedMobileData.id, // retailer ID
-                        items: orderList
-                    };
-                    UserModel.getInstance().postManualOrder(
-                        obj,
-                        succ => {
-                            setOpenData({ ...openData, openSuccess: true });
-                            // console.log(succ);
-                            setTimeout(() => {
-                                props.history.push('/manual-orders');
-                            }, 1000);
-                        },
-                        err => {
-                            setParams({ ...params, submitStatus: false });
-                            console.log(err);
-                            // console.log(obj);
-                        }
-                    );
-                }
-                else {
-                    setOpenData({ ...openData, openWarning: true });
-                }
+    const handleSubmit = async () => {
+        console.log(params.submitStatus)
+        // if (!params.submitStatus) { //Commented this because it is being handles in render method
+        const errors = await checkErrors() // Hamza you need to redo you error handling. It doesn not work
+        if (errors) {
+            setOpenData({ ...openData, openError: true });
+        } else {
+            setParams({ ...params, submitStatus: true });
+            let par = new FormData();
+            let orderList = orderItemRows && orderItemRows.filter(x => x.quantity > 0).map((item, index) => ({
+                sku_id: selectedSkuItems[index].id,
+                price: item.price,
+                qty: item.quantity
+            }))
+            if (orderList.length > 0 && selectedMobileData !== '') {
+                console.log("MAKING")
+                var obj = {
+                    user_id: selectedMobileData.id, // retailer ID
+                    items: orderList
+                };
+                UserModel.getInstance().postManualOrder(
+                    obj,
+                    succ => {
+                        setOpenData({ ...openData, openSuccess: true });
+                        setTimeout(() => {
+                            props.history.push('/manual-orders');
+                        }, 1000);
+                    },
+                    err => {
+                        setParams({ ...params, submitStatus: false });
+                        console.log(err);
+                    }
+                );
             }
+            else {
+                setParams({ ...params, submitStatus: false });
+                setOpenData({ ...openData, openWarning: true });
+            }
+            // }
         }
     }
 
@@ -199,7 +201,7 @@ const AddManualOrder = props => {
                         // console.log(item.is_stock, item.name)
                         if (!item.is_stock) {
                             if (item.is_deal) {
-                                console.log({item})
+                                console.log({ item })
                                 var tempItem = { ...item, name: item.name + " - DEAL" }
                                 itemsInStockArr.push(tempItem)
                             } else {
@@ -407,7 +409,7 @@ const AddManualOrder = props => {
                                     options={mobileData}
                                     getOptionLabel={option => option.mobile}
                                     renderInput={params => (
-                                        <TextField {...params} label="Retailer's Mobile Number" variant="outlined" margin="dense" placeholder='Search retailer from mobile number' />
+                                        <TextField {...params} label="Retailer's Mobile Number" variant="outlined" required margin="dense" placeholder='Search retailer from mobile number' />
                                     )}
                                     value={selectedMobileData}
                                     onChange={mobileHandleChange}
@@ -480,7 +482,7 @@ const AddManualOrder = props => {
                             autoHideDuration={6000}
                             onClose={handleClose}>
                             <Alert onClose={handleClose} severity="warning">
-                                Please complete above row(s) by selecting SKU(s) and desired quantity!
+                                Please complete above row(s) by selecting SKU(s), desired quantity, and mobile!
                             </Alert>
                         </Snackbar>
                         <Snackbar
