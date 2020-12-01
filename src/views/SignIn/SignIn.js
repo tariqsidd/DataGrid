@@ -134,6 +134,36 @@ const SignIn = props => {
     errors: {}
   });
 
+
+  useEffect(async () => {
+    // console.log(props.history.location)
+    var paramsString = props.history.location.search;
+    var searchParams = new URLSearchParams(paramsString);
+    var authToken = searchParams.get("token");
+    var refreshToken = searchParams.get("refresh");
+    var error = searchParams.get("error_message");
+    // console.log({ authToken, refreshToken, error })
+    if (!authToken || authToken !== 'null')
+      await localStorage.setItem('sales-auth-token', authToken)
+    if (!refreshToken || refreshToken !== 'null')
+      await localStorage.setItem('sales-refresh-token', refreshToken)
+
+    const auth = await localStorage.getItem('sales-auth-token')
+    const refresh = await localStorage.getItem('sales-refresh-token')
+
+    console.log({ auth, refresh })
+    if (auth && refresh && auth !== 'null' && refresh !== 'null') {
+      console.log('auth and refresh token exists')
+      // console.log(props.history.push)
+      // console.log(props)
+      window.location.replace('/dashboard')
+      // setTimeout(() => props.history.push('/dashboard'), 5000)
+    } else if (error && error !== 'null') {
+      alert(error)
+    }
+  }, [])
+
+
   useEffect(() => {
     const errors = validate(formState.values, schema);
 
@@ -193,14 +223,32 @@ const SignIn = props => {
   return (
     <div className={classes.root}>
       <Grid className={classes.grid} container>
-        <Grid className={classes.content} item lg={7} xs={12}>
-          <div className={classes.content}>
-            <div className={classes.contentHeader}>
-              {/* <IconButton onClick={handleBack}>
+        <Grid className={classes.content} item lg={12} xs={12}>
+          <div className={classes.content} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', margin: 'auto' }}>
+            {/* <div className={classes.contentHeader}>
+              <IconButton onClick={handleBack}>
                 <ArrowBackIcon />
-              </IconButton> */}
-            </div>
-            <div className={classes.contentBody}>
+              </IconButton>
+            </div> */}
+
+            <Button
+              // className={classes.signInButton}
+              // color="primary"
+              style={{ fontSize: 20, backgroundColor: 'orange' }}
+              fullWidth
+              size="large"
+              // type="submit"
+              onClick={() => {
+                const myURL = window.location.href;
+                console.log({ myURL })
+                window.location.replace(`http://ec2-18-157-127-204.eu-central-1.compute.amazonaws.com:8000/auth/login?next=${myURL}`)
+              }}
+              variant="contained">
+              Sign in using Google Account
+            </Button>
+
+
+            {/* <div className={classes.contentBody}>
               <form className={classes.form} onSubmit={handleSignIn}>
                 <Typography className={classes.title} variant="h2">
                   Sign in
@@ -247,7 +295,7 @@ const SignIn = props => {
                   Sign in 
                 </Button>
               </form>
-            </div>
+            </div> */}
           </div>
         </Grid>
       </Grid>
