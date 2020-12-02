@@ -241,8 +241,13 @@ const SignIn = props => {
               // type="submit"
               onClick={() => {
                 const myURL = window.location.href;
-                console.log({ myURL })
-                window.location.replace(`http://ec2-18-157-127-204.eu-central-1.compute.amazonaws.com:8000/auth/login?next=${myURL}`)
+                // console.log({ myURL })
+                var baseurl = CONSTANT.baseURL;
+                baseurl = baseurl.slice(0, baseurl.lastIndexOf('/'))
+                console.log(baseurl)
+                baseurl = baseurl.slice(0, baseurl.lastIndexOf('/'))
+                console.log(baseurl)
+                window.location.replace(`${baseurl}/auth/login?next=${myURL}`)
               }}
               variant="contained">
               Sign in using Google Account
