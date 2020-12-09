@@ -69,7 +69,7 @@ const AddManualOrder = props => {
 
     const [skuItems, setSkuItems] = useState([])
     const [selectedSkuItems, setSelectedSkuItems] = useState([{ id: null, name: '' }])
-    const [orderItemRows, setOrderItemRows] = useState([{ name: '', quantity: '', pre_slash_price: '', post_slash_price: '', min_price: '', final_price: '', cost: '' }])
+    const [orderItemRows, setOrderItemRows] = useState([{ name: '', quantity: '', pre_slash_price: '', post_slash_price: '', min_price: '', final_price: '', cost: '', qty_discount: [] }])
 
     var [subTotal, setSubtotal] = useState('');
 
@@ -96,7 +96,7 @@ const AddManualOrder = props => {
         // var arr = event.target.getAttribute('data-option-index');
         // console.log('mobile val', val);
         if (val) {
-            setSelectedMobileData({ mobile: val.mobile, name: val.name, id: val.id });
+            setSelectedMobileData({ mobile: val.mobile, name: val.name, id: val.id, wallet: val.wallet });
         }
     };
 
@@ -222,25 +222,43 @@ const AddManualOrder = props => {
         }
     };
 
-    useEffect(() => {
-        console.log(orderItemRows)
-    })
-
     const handleOrderItemDetailsChange = (e, index) => {
         // console.log('eeeeeeeee handleOrderItemChange', e.target.name)
         // console.clear()
         // console.log('handleOrderItemChange')
         // console.log(e.target.name, e.target.value, { index })
         const orderItemsDetailArr = orderItemRows;
-        orderItemsDetailArr[index][e.target.name] = e.target.value;
-        if (e.target.name === 'quantity' || e.target.name === 'final_price') {
-            orderItemsDetailArr[index].cost = orderItemsDetailArr[index].quantity * orderItemsDetailArr[index].final_price;
+        var orderitem = orderItemsDetailArr[index];
+        orderitem[e.target.name] = e.target.value;
+        console.log(orderitem.qty_discount)
+        if (orderitem && orderitem.length > 0 && Array.isArray(orderitem) && orderitem.qty_discount && orderitem.qty_discount.length > 0 && Array.isArray(orderitem.qty_discount)) {
+            orderitem.qty_discount.forEach((dis_Obj, idx) => {
+                console.log('each iter')
+                if (idx === orderItemsDetailArr.length - 1 && orderitem.quantity >= dis_Obj.lower) {
+                    console.log('A')
+                    orderitem.final_price = (orderitem.post_slash_price - dis_Obj.value) * orderitem.quantity;
+                    return;
+                }
+                if (orderitem.quantity >= dis_Obj.lower && orderitem.quantity <= dis_Obj.upper) {
+                    console.log('B')
+                    orderitem.final_price = (orderitem.post_slash_price - dis_Obj.value) * orderitem.quantity;
+                    return;
+                }
+            })
         }
+        console.log(orderitem)
+
+        if (e.target.name === 'quantity' || e.target.name === 'final_price') {
+            orderitem.cost = orderitem.quantity * orderitem.final_price;
+        }
+        orderItemsDetailArr[index] = orderitem;
+        console.log(orderItemsDetailArr)
         setOrderItemRows(orderItemsDetailArr)
         let subtotal = 0;
         orderItemRows && orderItemRows.length > 0 && Array.isArray(orderItemRows) && orderItemRows.forEach(item => {
             subtotal += item.cost
         })
+
         setSubtotal(subtotal)
         setImpCondition(!impCondition)  // ask before removing
     }
@@ -263,7 +281,6 @@ const AddManualOrder = props => {
             orderItemsDetailArr[index].post_slash_price = val.price;
             orderItemsDetailArr[index].min_price = val.min_price;
             orderItemsDetailArr[index].final_price = val.price;
-            orderItemsDetailArr[index].wallet = val.wallet;
             orderItemsDetailArr[index].qty_discount = val.qty_discount;
             orderItemsDetailArr[index].cost = orderItemsDetailArr[index].quantity > 1 ? (orderItemsDetailArr[index].quantity * val.price) : (orderItemsDetailArr[index].quantity === 0 ? 0 : '')
             setOrderItemRows(orderItemsDetailArr)
