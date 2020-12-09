@@ -230,21 +230,28 @@ const AddManualOrder = props => {
         const orderItemsDetailArr = orderItemRows;
         var orderitem = orderItemsDetailArr[index];
         orderitem[e.target.name] = e.target.value;
-        console.log(orderitem.qty_discount)
-        if (orderitem && orderitem.length > 0 && Array.isArray(orderitem) && orderitem.qty_discount && orderitem.qty_discount.length > 0 && Array.isArray(orderitem.qty_discount)) {
+        var abx = false;
+        if (orderitem && orderitem.qty_discount && orderitem.qty_discount.length > 0 && Array.isArray(orderitem.qty_discount)) {
             orderitem.qty_discount.forEach((dis_Obj, idx) => {
-                console.log('each iter')
-                if (idx === orderItemsDetailArr.length - 1 && orderitem.quantity >= dis_Obj.lower) {
+                // console.log('disObj',idx)
+                // console.log('each iter')
+                if (idx == orderitem.qty_discount.length - 1 && orderitem.quantity >= dis_Obj.lower) {
                     console.log('A')
-                    orderitem.final_price = (orderitem.post_slash_price - dis_Obj.value) * orderitem.quantity;
+                    orderitem.final_price = (orderitem.post_slash_price - dis_Obj.value);
+                    abx = true;
                     return;
                 }
                 if (orderitem.quantity >= dis_Obj.lower && orderitem.quantity <= dis_Obj.upper) {
                     console.log('B')
-                    orderitem.final_price = (orderitem.post_slash_price - dis_Obj.value) * orderitem.quantity;
+                    console.log('order post slash', orderitem.post_slash_price, dis_Obj.value)
+                    orderitem.final_price = (orderitem.post_slash_price - dis_Obj.value);
+                    abx = true;
                     return;
                 }
             })
+        }
+        if (!abx) {
+            orderitem.final_price = orderitem.post_slash_price;
         }
         console.log(orderitem)
 
@@ -279,7 +286,7 @@ const AddManualOrder = props => {
             // orderItemsDetailArr[index].price = val.price;
             orderItemsDetailArr[index].pre_slash_price = val.price + val.discount;
             orderItemsDetailArr[index].post_slash_price = val.price;
-            orderItemsDetailArr[index].min_price = val.min_price;
+            orderItemsDetailArr[index].min_price = val.latest_balance ? val.latest_balance.rate : val.price;
             orderItemsDetailArr[index].final_price = val.price;
             orderItemsDetailArr[index].qty_discount = val.qty_discount;
             orderItemsDetailArr[index].cost = orderItemsDetailArr[index].quantity > 1 ? (orderItemsDetailArr[index].quantity * val.price) : (orderItemsDetailArr[index].quantity === 0 ? 0 : '')
@@ -302,7 +309,7 @@ const AddManualOrder = props => {
             console.log(
                 name, quantity, quantity > 0, final_price, final_price >= min_price, final_price <= post_slash_price, cost
             )
-            if (name && quantity && quantity > 0 && final_price && final_price >= 0 && final_price <= post_slash_price && cost) {
+            if (name && quantity && quantity > 0 && final_price && final_price >= min_price && final_price <= post_slash_price && cost) {
                 rowFilled = true
             } else {
                 setOpenData({ ...openData, openWarning: true });
