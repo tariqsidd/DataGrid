@@ -69,7 +69,7 @@ const AddManualOrder = props => {
 
     const [skuItems, setSkuItems] = useState([])
     const [selectedSkuItems, setSelectedSkuItems] = useState([{ id: null, name: '' }])
-    const [orderItemRows, setOrderItemRows] = useState([{ name: '', quantity: '', price: '', cost: '' }])
+    const [orderItemRows, setOrderItemRows] = useState([{ name: '', quantity: '', pre_slash_price: '', post_slash_price: '', min_price: '', final_price: '', cost: '' }])
 
     var [subTotal, setSubtotal] = useState('');
 
@@ -124,9 +124,9 @@ const AddManualOrder = props => {
 
     const checkErrors = () => {
         console.log("selectedMobData", selectedMobileData)
-        orderItemRows && orderItemRows.length > 0 && Array.isArray(orderItemRows) && orderItemRows.forEach(({ name, quantity, price, cost }, index) => {
+        const err = orderItemRows && orderItemRows.length > 0 && Array.isArray(orderItemRows) && orderItemRows.some(({ name, quantity, pre_slash_price, post_slash_price, min_price, final_price, cost }, index) => {
             if (
-                !name || !quantity || !price || !cost || !selectedSkuItems[index].id || !selectedSkuItems[index].name || selectedMobileData === ''
+                !name || !quantity || quantity <= 0 || !final_price || final_price < 0 || final_price > post_slash_price || !cost || !selectedSkuItems[index].id || !selectedSkuItems[index].name || selectedMobileData === ''
             ) {
                 console.log("errors exist")
                 return true;
@@ -135,6 +135,7 @@ const AddManualOrder = props => {
                 return false;
             }
         })
+        return err;
     };
 
     const handleClose = (event, reason) => {
@@ -150,12 +151,14 @@ const AddManualOrder = props => {
         const errors = await checkErrors() // Hamza you need to redo you error handling. It doesn not work
         if (errors) {
             setOpenData({ ...openData, openError: true });
+        } else if (subTotal < 1000) {
+            setOpenData({ ...openData, openMinOrderValueWarning: true })
         } else {
             setParams({ ...params, submitStatus: true });
             let par = new FormData();
             let orderList = orderItemRows && orderItemRows.filter(x => x.quantity > 0).map((item, index) => ({
                 sku_id: selectedSkuItems[index].id,
-                price: item.price,
+                price: item.final_price,
                 qty: item.quantity
             }))
             if (orderList.length > 0 && selectedMobileData !== '') {
@@ -219,6 +222,10 @@ const AddManualOrder = props => {
         }
     };
 
+    useEffect(() => {
+        console.log(orderItemRows)
+    })
+
     const handleOrderItemDetailsChange = (e, index) => {
         // console.log('eeeeeeeee handleOrderItemChange', e.target.name)
         // console.clear()
@@ -226,8 +233,8 @@ const AddManualOrder = props => {
         // console.log(e.target.name, e.target.value, { index })
         const orderItemsDetailArr = orderItemRows;
         orderItemsDetailArr[index][e.target.name] = e.target.value;
-        if (e.target.name === 'quantity') {
-            orderItemsDetailArr[index].cost = orderItemsDetailArr[index].quantity * orderItemsDetailArr[index].price;
+        if (e.target.name === 'quantity' || e.target.name === 'final_price') {
+            orderItemsDetailArr[index].cost = orderItemsDetailArr[index].quantity * orderItemsDetailArr[index].final_price;
         }
         setOrderItemRows(orderItemsDetailArr)
         let subtotal = 0;
@@ -251,7 +258,13 @@ const AddManualOrder = props => {
             const orderItemsDetailArr = orderItemRows;
             orderItemsDetailArr[index].name = val.name;
             // orderItemsDetailArr[index].quantity = val.quantity;
-            orderItemsDetailArr[index].price = val.price;
+            // orderItemsDetailArr[index].price = val.price;
+            orderItemsDetailArr[index].pre_slash_price = val.price + val.discount;
+            orderItemsDetailArr[index].post_slash_price = val.price;
+            orderItemsDetailArr[index].min_price = val.min_price;
+            orderItemsDetailArr[index].final_price = val.price;
+            orderItemsDetailArr[index].wallet = val.wallet;
+            orderItemsDetailArr[index].qty_discount = val.qty_discount;
             orderItemsDetailArr[index].cost = orderItemsDetailArr[index].quantity > 1 ? (orderItemsDetailArr[index].quantity * val.price) : (orderItemsDetailArr[index].quantity === 0 ? 0 : '')
             setOrderItemRows(orderItemsDetailArr)
 
@@ -267,9 +280,12 @@ const AddManualOrder = props => {
     const addNewOrderItemRow = () => {
         // console.log('add new order row')
         let rowFilled = false;
-        orderItemRows && orderItemRows.length > 0 && Array.isArray(orderItemRows) && orderItemRows.forEach(({ name, quantity, price, cost }, index) => {
+        orderItemRows && orderItemRows.length > 0 && Array.isArray(orderItemRows) && orderItemRows.forEach(({ name, quantity, pre_slash_price, post_slash_price, min_price, final_price, cost }, index) => {
             // console.log(val)
-            if (name && quantity && price && cost) {
+            console.log(
+                name, quantity, quantity > 0, final_price, final_price >= min_price, final_price <= post_slash_price, cost
+            )
+            if (name && quantity && quantity > 0 && final_price && final_price >= 0 && final_price <= post_slash_price && cost) {
                 rowFilled = true
             } else {
                 setOpenData({ ...openData, openWarning: true });
@@ -280,7 +296,10 @@ const AddManualOrder = props => {
         const newOrderItem = {
             name: '',
             quantity: '',
-            price: '',
+            pre_slash_price: '',
+            post_slash_price: '',
+            min_price: '',
+            final_price: '',
             cost: ''
         }
         const newSku = {
@@ -310,45 +329,48 @@ const AddManualOrder = props => {
         // console.log({ orderItemRows, selectedSkuItems })
         // console.log({ values })
         return (
-            <Grid container spacing={4}>
+            <>
+                <Grid container spacing={1} style={{ marginTop: 20 }}>
 
-                <Grid item md={5} xs={12}>
-                    <Autocomplete
-                        id="sku"
-                        // name='Sku_name'
-                        options={skuItems}
-                        getOptionLabel={option => option.name}
-                        renderInput={params => (
-                            <TextField {...params} label="SKU" variant="outlined" margin="dense" placeholder='Search SKU' />
-                        )}
-                        value={selectedSkuItems[index]}
-                        onChange={(e, val) => orderItemHandleChange(e, val, index)}
-                        onInputChange={skuSearch}
-                        loading
-                        loadingText={
-                            params.dataFetchStatus ? 'Loading' : 'No Matches'
-                        }
-                    />
-                </Grid>
+                    <Grid item md={5} xs={12}>
+                        <Autocomplete
+                            id="sku"
+                            // name='Sku_name'
+                            options={skuItems}
+                            getOptionLabel={option => option.name}
+                            renderInput={params => (
+                                <TextField {...params} label="SKU" variant="outlined"
+                                    // margin="dense" 
+                                    placeholder='Search SKU' />
+                            )}
+                            value={selectedSkuItems[index]}
+                            onChange={(e, val) => orderItemHandleChange(e, val, index)}
+                            onInputChange={skuSearch}
+                            loading
+                            loadingText={
+                                params.dataFetchStatus ? 'Loading' : 'No Matches'
+                            }
+                        />
+                    </Grid>
 
-                <Grid item md={2} xs={6}>
-                    <TextField
-                        fullWidth
-                        label="Quantity"
-                        name="quantity"
-                        type='number'
-                        inputProps={{ min: 0 }}
-                        min={0}
-                        onChange={(e) => handleOrderItemDetailsChange(e, index)}
-                        required
-                        margin='dense'
-                        value={values.quantity}
-                        variant="outlined"
-                        placeholder="Quantity"
-                    />
-                </Grid>
+                    <Grid item md={1} xs={6}>
+                        <TextField
+                            fullWidth
+                            label="Qty"
+                            name="quantity"
+                            type='number'
+                            inputProps={{ min: 1 }}
+                            min={1}
+                            onChange={(e) => handleOrderItemDetailsChange(e, index)}
+                            required
+                            // margin='dense'
+                            value={values.quantity}
+                            variant="outlined"
+                            placeholder="Qty"
+                        />
+                    </Grid>
 
-                <Grid item md={2} xs={6}>
+                    {/* <Grid item md={1} xs={6}>
                     <TextField
                         fullWidth
                         label="Price"
@@ -364,32 +386,123 @@ const AddManualOrder = props => {
                         // placeholder="Price"
                         disabled
                     />
+                </Grid> */}
+
+                    <Grid item md={1} xs={6}>
+                        <TextField
+                            fullWidth
+                            label="Pre-Slash Price"
+                            name="pre_slash_price"
+                            type='number'
+                            inputProps={{ min: 0 }}
+                            min={0}
+                            onChange={(e) => handleOrderItemDetailsChange(e, index)}
+                            // required
+                            margin='dense'
+                            value={values.pre_slash_price}
+                            variant="filled"
+                            // placeholder="Pre-Slash Price"
+                            disabled
+                        />
+                    </Grid>
+
+                    <Grid item md={1} xs={6}>
+                        <TextField
+                            fullWidth
+                            label="Post-Slash Price"
+                            name="post_slash_price"
+                            type='number'
+                            inputProps={{ min: 0 }}
+                            min={0}
+                            onChange={(e) => handleOrderItemDetailsChange(e, index)}
+                            // required
+                            margin='dense'
+                            value={values.post_slash_price}
+                            variant="filled"
+                            // placeholder="Post-Slash Price"
+                            disabled
+                        />
+                    </Grid>
+
+                    <Grid item md={1} xs={6}>
+                        <TextField
+                            fullWidth
+                            label="Min. Price"
+                            name="min_price"
+                            type='number'
+                            inputProps={{ min: 0 }}
+                            min={0}
+                            onChange={(e) => handleOrderItemDetailsChange(e, index)}
+                            // required
+                            margin='dense'
+                            value={values.min_price || values.post_slash_price}
+                            variant="filled"
+                            // placeholder="Min. Price"
+                            disabled
+                        />
+                    </Grid>
+
+                    <Grid item md={1} xs={6}>
+                        <TextField
+                            fullWidth
+                            label="Final Price"
+                            name="final_price"
+                            type='number'
+                            inputProps={{ min: values.min_price || values.post_slash_price, max: values.pre_slash_price }}
+                            min={values.min_price || values.post_slash_price}
+                            max={values.pre_slash_price}
+                            onChange={(e) => handleOrderItemDetailsChange(e, index)}
+                            // required
+                            // margin='dense'
+                            value={values.final_price}
+                            variant="outlined"
+                        // placeholder="Final Price"
+                        />
+                    </Grid>
+
+                    <Grid item md={1} xs={6}>
+                        <TextField
+                            fullWidth
+                            label="Cost"
+                            name="cost"
+                            // type='number'
+                            inputProps={{ min: 0 }}
+                            min={0}
+                            onChange={(e) => handleOrderItemDetailsChange(e, index)}
+                            // required
+                            // margin='dense'
+                            value={values.cost}
+                            variant="outlined"
+                            // placeholder="Cost"
+                            disabled
+                        />
+                    </Grid>
+
+
+                    <Grid item md={1} xs={2}>
+                        <Icon color="primary" style={{ fontSize: 40 }} onClick={() => removeOrderItem(index)}>cancel</Icon>
+                    </Grid>
+
                 </Grid>
 
-                <Grid item md={2} xs={6}>
-                    <TextField
-                        fullWidth
-                        label="Cost"
-                        name="cost"
-                        type='number'
-                        inputProps={{ min: 0 }}
-                        min={0}
-                        onChange={(e) => handleOrderItemDetailsChange(e, index)}
-                        required
-                        margin='dense'
-                        value={values.cost}
-                        variant="outlined"
-                        // placeholder="Cost"
-                        disabled
-                    />
+                <Grid container spacing={1}>
+                    {values.qty_discount && values.qty_discount.length > 0 && Array.isArray(values.qty_discount) &&
+                        values.qty_discount.map((x, idx) => (
+                            <Grid item lg={12} md={12} sm={12} xs={12}
+                                style={{ color: 'red', paddingLeft: 20 }}
+                            >
+                                <div>
+                                    {
+                                        idx === values.qty_discount.length - 1 && x.upper === 0 ?
+                                            `More than ${x.lower - 1} units -> ${x.value} Rs. discount/unit` :
+                                            `${x.lower} - ${x.upper} units -> ${x.value} Rs. discount/unit`
+                                    }
+                                </div>
+                            </Grid>
+                        ))
+                    }
                 </Grid>
-
-
-                <Grid item md={1} xs={2}>
-                    <Icon color="primary" style={{ fontSize: 40 }} onClick={() => removeOrderItem(index)}>cancel</Icon>
-                </Grid>
-
-            </Grid>
+            </>
         )
     }
 
@@ -482,7 +595,15 @@ const AddManualOrder = props => {
                             autoHideDuration={6000}
                             onClose={handleClose}>
                             <Alert onClose={handleClose} severity="warning">
-                                Please complete above row(s) by selecting SKU(s), desired quantity, and mobile!
+                                Please complete above row(s) by selecting SKU(s), desired quantity and mobile!
+                            </Alert>
+                        </Snackbar>
+                        <Snackbar
+                            open={openData.openMinOrderValueWarning}
+                            autoHideDuration={6000}
+                            onClose={handleClose}>
+                            <Alert onClose={handleClose} severity="warning">
+                                Order value cannot be less than 1000!
                             </Alert>
                         </Snackbar>
                         <Snackbar

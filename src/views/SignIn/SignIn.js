@@ -137,7 +137,13 @@ const SignIn = props => {
   });
 
 
-  useEffect(async () => {
+  useEffect(() => {
+    if (window.location.href.includes('localhost')) {
+      afterSignInWithGoogle()
+    }
+  }, [])
+
+  const afterSignInWithGoogle = async () => {
     // console.log(props.history.location)
     var paramsString = props.history.location.search;
     var searchParams = new URLSearchParams(paramsString);
@@ -163,7 +169,7 @@ const SignIn = props => {
     } else if (error && error !== 'null') {
       alert(error)
     }
-  }, [])
+  }
 
 
   useEffect(() => {
@@ -233,6 +239,8 @@ const SignIn = props => {
               </IconButton>
             </div> */}
 
+            {/* {window.location.href.includes('localhost')
+              ? */}
             <Button
               // className={classes.signInButton}
               // color="primary"
@@ -253,13 +261,12 @@ const SignIn = props => {
               variant="contained">
               Sign in using Google Account
             </Button>
-
-
-            {/* <div className={classes.contentBody}>
+            {/* : */}
+            <div className={classes.contentBody}>
               <form className={classes.form} onSubmit={handleSignIn}>
                 <Typography className={classes.title} variant="h2">
                   Sign in
-                </Typography>
+                    </Typography>
                 <TextField
                   className={classes.textField}
                   error={hasError('mobile')}
@@ -300,9 +307,12 @@ const SignIn = props => {
                   type="submit"
                   variant="contained">
                   Sign in
-                </Button>
+                    </Button>
               </form>
-            </div> */}
+            </div>
+            {/* } */}
+
+
           </div>
         </Grid>
       </Grid>

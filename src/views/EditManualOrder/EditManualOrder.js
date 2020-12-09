@@ -70,8 +70,8 @@ const EditManualOrder = props => {
     { title: 'Sku name', field: 'skuName', editable: 'never' },
     { title: 'Sku Code', field: 'skuCode', editable: 'never' },
     { title: 'Supplier', field: 'supplier', editable: 'never' },
-    { title: 'Cost Price', field: 'costPrice', editable: 'never' },
-    { title: 'Discount', field: 'discount', editable: 'never' },
+    { title: 'Unit Cost Price', field: 'costPrice', editable: 'never' },
+    { title: 'Discount per unit', field: 'discount', editable: 'never' },
     { title: 'Quantity', field: 'quantity' }
   ]);
   var [orderId, setOrderId] = useState();
