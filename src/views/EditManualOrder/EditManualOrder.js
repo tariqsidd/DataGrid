@@ -83,7 +83,8 @@ const EditManualOrder = props => {
     amount: '',
     status: {},
     openSuccess: false,
-    openError: false
+    openError: false,
+    specialDiscount: ''
   });
 
   const title = `Order Id : ${props.match.params.id}`;
@@ -99,7 +100,7 @@ const EditManualOrder = props => {
     UserModel.getInstance().getOrderDetail(
       props.match.params.id,
       async data => {
-        // console.log("ssssssssssstatus", data)
+        console.log("ssssssssssstatus", data)
         let tempArr = [];
         setParams({
           ...params,
@@ -107,7 +108,8 @@ const EditManualOrder = props => {
           name: data.retailer_name,
           orderDate: new Date(data.created_at).toLocaleDateString(),
           amount: data.total,
-          status: { id: data.status, name: order_status[data.status].name }
+          status: { id: data.status, name: order_status[data.status].name },
+          specialDiscount: data.special_discount
         })
 
         await data.items.forEach((obj, index) => {
@@ -309,6 +311,20 @@ const EditManualOrder = props => {
                   variant="outlined"
                 />
               </Grid>
+              <Grid item md={6} xs={12}>
+                <TextField
+                  disabled={true}
+                  fullWidth
+                  helperText="Special Discount!"
+                  label="special discount"
+                  margin="dense"
+                  name="specialDiscount"
+                  onChange={handleChange}
+                  required
+                  value={params.specialDiscount}
+                  variant="outlined"
+                />
+              </Grid>
 
               <Snackbar
                 open={params.openSuccess}
@@ -415,9 +431,9 @@ const EditManualOrder = props => {
                   )
                   // }, 1000);
                 })
-                  // .then(() =>
-                  //   window.location.reload()
-                  // ),
+              // .then(() =>
+              //   window.location.reload()
+              // ),
             }}
 
           >
