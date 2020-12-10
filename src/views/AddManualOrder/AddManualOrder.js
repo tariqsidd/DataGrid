@@ -194,17 +194,33 @@ const AddManualOrder = props => {
             let orderList = orderItemRows && orderItemRows.filter(x => x.quantity > 0).map((item, index) => ({
                 sku_id: selectedSkuItems[index].id,
                 price: item.final_price,
-                qty: item.quantity
+                qty: +item.quantity
             }))
             if (orderList.length > 0 && selectedMobileData && selectedMobileData.id) {
                 console.log("MAKING")
                 var obj = {
                     user_id: selectedMobileData.id, // retailer ID
                     items: orderList,
-                    special_discount: specialDiscount,
-                    coupon_id: couponId ? couponId : null,
-                    wallet_id: (selectedMobileData && selectedMobileData.wallet && selectedMobileData.wallet[0]) ? selectedMobileData.wallet[0].id : null
                 };
+                if (specialDiscount) {
+                    obj = {
+                        ...obj,
+                        special_discount: +specialDiscount,
+                    }
+                }
+                if (promoCodeDiscount) {
+                    obj = {
+                        ...obj,
+                        coupon_id: couponId ? couponId : null
+                    }
+                }
+                if (selectedMobileData && selectedMobileData.wallet && selectedMobileData.wallet.length > 0 && Array.isArray(selectedMobileData.wallet) && selectedMobileData.wallet[0] && selectedMobileData.wallet[0].amount) {
+                    obj = {
+                        ...obj,
+                        wallet_id: (selectedMobileData && selectedMobileData.wallet && selectedMobileData.wallet[0]) ? selectedMobileData.wallet[0].id : null
+                    }
+                }
+
                 UserModel.getInstance().postManualOrder(
                     obj,
                     succ => {
