@@ -578,7 +578,7 @@ const AddManualOrder = props => {
                             onChange={(e) => handleOrderItemDetailsChange(e, index)}
                             // required
                             margin='dense'
-                            value={values.min_price || values.post_slash_price}
+                            value={values.min_price || 'N/A'}
                             variant="filled"
                             // placeholder="Min. Price"
                             disabled
