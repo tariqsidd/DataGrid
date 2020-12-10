@@ -158,7 +158,7 @@ const AddManualOrder = props => {
         console.log("selectedMobData", selectedMobileData)
         const err = orderItemRows && orderItemRows.length > 0 && Array.isArray(orderItemRows) && orderItemRows.some(({ name, quantity, pre_slash_price, post_slash_price, min_price, final_price, cost }, index) => {
             if (
-                !name || !quantity || quantity <= 0 || !final_price || (min_price > 0 && final_price <= min_price) || final_price > post_slash_price || !cost || !selectedSkuItems[index].id || !selectedSkuItems[index].name || selectedMobileData === ''
+                !name || !quantity || quantity <= 0 || !final_price || (min_price > 0 && final_price <= min_price) || final_price > post_slash_price || !cost || !selectedSkuItems[index].id || !selectedSkuItems[index].name || !selectedMobileData || !selectedMobileData.id
             ) {
                 console.log("errors exist")
                 return true;
@@ -196,7 +196,7 @@ const AddManualOrder = props => {
                 price: item.final_price,
                 qty: item.quantity
             }))
-            if (orderList.length > 0 && selectedMobileData !== '') {
+            if (orderList.length > 0 && selectedMobileData && selectedMobileData.id) {
                 console.log("MAKING")
                 var obj = {
                     user_id: selectedMobileData.id, // retailer ID
