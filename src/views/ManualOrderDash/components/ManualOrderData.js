@@ -71,6 +71,10 @@ const ManualOrderData = props => {
       filtering: false
     },
     { title: 'Amount', field: 'amount', editable: 'never', filtering: false },
+    { title: 'Promo Discount', field: 'coupon_discount', editable: 'never', filtering: false },
+    { title: 'Special Discount', field: 'special_discount', editable: 'never', filtering: false },
+    { title: 'Wallet Discount', field: 'wallet_discount', editable: 'never', filtering: false },
+    { title: 'Total Bill', field: 'total_payable', editable: 'never', filtering: false },
     {
       title: 'Status',
       field: 'status',
@@ -112,11 +116,31 @@ const ManualOrderData = props => {
         let tempArr = [];
 
         data.forEach(obj => {
+          var bill = obj.total;
+          console.log(bill)
+          if (obj.special_discount) {
+            bill = bill - obj.special_discount
+          }
+          console.log(bill)
+
+          if (obj.coupon_discount) {
+            bill = bill - obj.coupon_discount
+          }
+          console.log(bill)
+
+          if (obj.wallet_discount && obj.wallet_discount.amount) {
+            bill = bill - obj.wallet_discount.amount
+          }
+          console.log(bill)
           tempArr.push({
             orderId: obj.id,
             order_number: obj.order_number,
             retailerName: obj.retailer,
             amount: obj.total,
+            coupon_discount: obj.coupon_discount ? obj.coupon_discount : 0,
+            special_discount: obj.special_discount ? obj.special_discount : 0,
+            wallet_discount: obj.wallet_discount ? obj.wallet_discount.amount : 0,
+            total_payable: bill,
             created_at: new Date(obj.created_at).toLocaleDateString(),
             status: obj.status
           });
@@ -154,11 +178,30 @@ const ManualOrderData = props => {
           let tempArr = [];
 
           data.forEach(obj => {
+            var bill = obj.total;
+            if (obj.special_discount) {
+              bill = bill - obj.special_discount
+            }
+            // console.log(bill)
+
+            if (obj.coupon_discount) {
+              bill = bill - obj.coupon_discount
+            }
+            // console.log(bill)
+
+            if (obj.wallet_discount && obj.wallet_discount.amount) {
+              bill = bill - obj.wallet_discount.amount
+            }
+            // console.log(bill)
             tempArr.push({
               orderId: obj.id,
               order_number: obj.order_number,
               retailerName: obj.retailer,
               amount: obj.total,
+              coupon_discount: obj.coupon_discount ? obj.coupon_discount : 0,
+              special_discount: obj.special_discount ? obj.special_discount : 0,
+              wallet_discount: obj.wallet_discount ? obj.wallet_discount.amount : 0,
+              total_payable: bill,
               created_at: new Date(obj.created_at).toLocaleDateString(),
               status: obj.status
             });
@@ -186,11 +229,30 @@ const ManualOrderData = props => {
         let tempArr = [];
 
         data.forEach(obj => {
+          var bill = obj.total;
+          if (obj.special_discount) {
+            bill = bill - obj.special_discount
+          }
+          // console.log(bill)
+
+          if (obj.coupon_discount) {
+            bill = bill - obj.coupon_discount
+          }
+          // console.log(bill)
+
+          if (obj.wallet_discount && obj.wallet_discount.amount) {
+            bill = bill - obj.wallet_discount.amount
+          }
+          // console.log(bill)
           tempArr.push({
             orderId: obj.id,
             order_number: obj.order_number,
             retailerName: obj.retailer,
             amount: obj.total,
+            coupon_discount: obj.coupon_discount ? obj.coupon_discount : 0,
+            special_discount: obj.special_discount ? obj.special_discount : 0,
+            wallet_discount: obj.wallet_discount ? obj.wallet_discount.amount : 0,
+            total_payable: bill,
             created_at: new Date(obj.created_at).toLocaleDateString(),
             status: obj.status
           });
@@ -271,11 +333,30 @@ const ManualOrderData = props => {
 
           await data.forEach(obj => {
             // console.log(obj);
+            var bill = obj.total;
+            if (obj.special_discount) {
+              bill = bill - obj.special_discount
+            }
+            // console.log(bill)
+
+            if (obj.coupon_discount) {
+              bill = bill - obj.coupon_discount
+            }
+            // console.log(bill)
+
+            if (obj.wallet_discount && obj.wallet_discount.amount) {
+              bill = bill - obj.wallet_discount.amount
+            }
+            // console.log(bill)
             tempArr.push({
               orderId: obj.id,
               order_number: obj.order_number,
               retailerName: obj.retailer,
               amount: obj.total,
+              coupon_discount: obj.coupon_discount ? obj.coupon_discount : 0,
+              special_discount: obj.special_discount ? obj.special_discount : 0,
+              wallet_discount: obj.wallet_discount ? obj.wallet_discount.amount : 0,
+              total_payable: bill,
               created_at: new Date(obj.created_at).toLocaleDateString(),
               status: obj.status
             });
@@ -299,11 +380,30 @@ const ManualOrderData = props => {
           let tempArr = [];
 
           data.forEach(obj => {
+            var bill = obj.total;
+            if (obj.special_discount) {
+              bill = bill - obj.special_discount
+            }
+            // console.log(bill)
+
+            if (obj.coupon_discount) {
+              bill = bill - obj.coupon_discount
+            }
+            // console.log(bill)
+
+            if (obj.wallet_discount && obj.wallet_discount.amount) {
+              bill = bill - obj.wallet_discount.amount
+            }
+            // console.log(bill)
             tempArr.push({
               orderId: obj.id,
               order_number: obj.order_number,
               retailerName: obj.retailer,
               amount: obj.total,
+              coupon_discount: obj.coupon_discount ? obj.coupon_discount : 0,
+              special_discount: obj.special_discount ? obj.special_discount : 0,
+              wallet_discount: obj.wallet_discount ? obj.wallet_discount.amount : 0,
+              total_payable: bill,
               created_at: new Date(obj.created_at).toLocaleDateString(),
               status: obj.status
             });
@@ -317,69 +417,6 @@ const ManualOrderData = props => {
         }
       );
     }
-    // if (data.length > 0) {
-    //   setSearchText(data[0].value);
-    //   console.log('data 0', data[0]);
-    //   //  UserModel.getInstance().globalSearchProductSku(
-    //   //   [{
-    //   //      column_name:'product_sku.name',
-    //   //      text: data[0].value
-
-    //   //    }],
-    //   //    null,
-    //   //    async data => {
-    //   //      console.log('data search',data);
-    //   //      let tempArr = [];
-
-    //   //      await data.forEach(obj => {
-    //   //        tempArr.push({
-    //   //         skuId: obj.id,
-    //   //         'product_sku.name': obj.name,
-    //   //         'product_sku.code':(obj.code)?(obj.code):0,
-    //   //         'user.name': obj.supplier ? obj.supplier[0].name : '',
-    //   //         cat: obj.product? obj.product.categories[0].name:'',
-    //   //         subcat: obj.product.subcategories.length ?  obj.product.subcategories[0].name : '',
-    //   //         'product_sku.price': obj.price,
-    //   //         discount: obj.discount,
-    //   //         'products.name': obj.product.name,
-    //   //         'product_sku.is_stock':obj.is_stock
-    //   //         // stock: obj.stock
-    //   //        });
-    //   //      });
-    //   //      // console.log(prodData)
-    //   //      setSkuData(tempArr);
-
-    //   //    },
-    //   //    err => {
-    //   //      console.log('my err',err)
-    //   //    }
-    //   //  )
-    // } else {
-    //   UserModel.getInstance().getOrderLog(
-    //     null,
-    //     data => {
-    //       console.log('order data', data);
-
-    //       let tempArr = [];
-
-    //       data.forEach(obj => {
-    //         tempArr.push({
-    //           orderId: obj.id,
-    //           order_number: obj.order_number,
-    //           retailerName: obj.retailer,
-    //           amount: obj.total,
-    //           created_at: new Date(obj.created_at).toLocaleDateString(),
-    //           status: order_status[obj.status]
-    //         });
-    //       });
-
-    //       setorderData(tempArr);
-    //     },
-    //     err => {
-    //       console.log(err);
-    //     }
-    //   );
-    // }
   };
 
   return (
