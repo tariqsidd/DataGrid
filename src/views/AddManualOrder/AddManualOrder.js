@@ -185,7 +185,7 @@ const AddManualOrder = props => {
             setOpenData({ ...openData, openError: true });
         } else if (subTotal < 1000) {
             setOpenData({ ...openData, openMinOrderValueWarning: true })
-        } else if (specialDiscount + promoCodeDiscount + selectedMobileData.wallet[0].amount > subTotal) {
+        } else if (selectedMobileData && selectedMobileData.wallet && selectedMobileData.wallet.length > 0 && Array.isArray(selectedMobileData.wallet) && specialDiscount + promoCodeDiscount + selectedMobileData.wallet[0].amount > subTotal) {
             setOpenData({ ...openData, openDiscountWarning: true })
         }
         else if (totalBill && Number(totalBill)) {
