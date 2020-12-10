@@ -22,6 +22,7 @@ import {
 import Hidden from '@material-ui/core/Hidden';
 import Paper from '@material-ui/core/Paper';
 import { withStyles } from '@material-ui/core/styles';
+import { validateNumeric } from 'common/validators';
 // import 'antd/dist/antd.css';
 
 const GreenCheckbox = withStyles({
@@ -58,12 +59,18 @@ function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
+const walletDiscountTypes = [
+    {id: 1, name: 'Referral Discount'},
+    {id: 2, name: 'Referral Discount'},
+    {id: 3, name: 'GMV Discount'},
+]
+
 const AddManualOrder = props => {
     const classes = useStyles();
     const { className, ...rest } = props;
 
     var [mobileData, setMobileData] = useState([]);
-    var [selectedMobileData, setSelectedMobileData] = useState('');
+    var [selectedMobileData, setSelectedMobileData] = useState({});
 
     const [impCondition, setImpCondition] = useState(false)  // Ask before removing
 
@@ -72,6 +79,11 @@ const AddManualOrder = props => {
     const [orderItemRows, setOrderItemRows] = useState([{ name: '', quantity: '', pre_slash_price: '', post_slash_price: '', min_price: '', final_price: '', cost: '', qty_discount: [] }])
 
     var [subTotal, setSubtotal] = useState('');
+    var [promoCode, setpromoCode] = useState('');
+    var [couponId, setcouponId] = useState(null);
+    var [promoCodeDiscount, setpromoCodeDiscount] = useState(0);
+    var [specialDiscount, setspecialDiscount] = useState('');
+    var [totalBill, settotalBill] = useState('');
 
     const [openData, setOpenData] = useState({
         openSuccess: false,
@@ -90,7 +102,27 @@ const AddManualOrder = props => {
                 subtotal += item.cost
             })
         setSubtotal(subtotal)
-    }, [orderItemRows])
+        var bill = subtotal;
+        if (specialDiscount) {
+            bill = bill - specialDiscount
+        }
+        // console.log(bill)
+
+        // console.log(specialDiscount, promoCodeDiscount, selectedMobileData.wallet)
+        if (promoCodeDiscount) {
+            // console.log(bill - promoCodeDiscount)
+            bill = bill - promoCodeDiscount
+        }
+        // console.log(bill)
+
+        if (selectedMobileData && selectedMobileData.wallet && selectedMobileData.wallet.length > 0 && Array.isArray(selectedMobileData.wallet) && selectedMobileData.wallet[0] && selectedMobileData.wallet[0].amount) {
+            console.log(selectedMobileData.wallet[0].amount, 'here')
+            bill = bill - selectedMobileData.wallet[0].amount
+        }
+        console.log(bill)
+
+        settotalBill(bill)
+    }, [specialDiscount, orderItemRows, promoCodeDiscount, selectedMobileData])
 
     const mobileHandleChange = async (event, val) => {
         // var arr = event.target.getAttribute('data-option-index');
@@ -126,7 +158,7 @@ const AddManualOrder = props => {
         console.log("selectedMobData", selectedMobileData)
         const err = orderItemRows && orderItemRows.length > 0 && Array.isArray(orderItemRows) && orderItemRows.some(({ name, quantity, pre_slash_price, post_slash_price, min_price, final_price, cost }, index) => {
             if (
-                !name || !quantity || quantity <= 0 || !final_price || final_price < 0 || final_price > post_slash_price || !cost || !selectedSkuItems[index].id || !selectedSkuItems[index].name || selectedMobileData === ''
+                !name || !quantity || quantity <= 0 || !final_price || (min_price > 0 && final_price <= min_price) || final_price > post_slash_price || !cost || !selectedSkuItems[index].id || !selectedSkuItems[index].name || selectedMobileData === ''
             ) {
                 console.log("errors exist")
                 return true;
@@ -142,7 +174,7 @@ const AddManualOrder = props => {
         if (reason === 'clickaway') {
             return;
         }
-        setOpenData({ openSuccess: false, openError: false });
+        setOpenData({ openSuccess: false, openWarning: false, openError: false, openDiscountWarning: false, openMinOrderValueWarning: false });
     };
 
     const handleSubmit = async () => {
@@ -153,7 +185,10 @@ const AddManualOrder = props => {
             setOpenData({ ...openData, openError: true });
         } else if (subTotal < 1000) {
             setOpenData({ ...openData, openMinOrderValueWarning: true })
-        } else {
+        } else if (specialDiscount - promoCodeDiscount > subTotal) {
+            setOpenData({ ...openData, openDiscountWarning: true })
+        }
+        else if (totalBill && Number(totalBill)) {
             setParams({ ...params, submitStatus: true });
             let par = new FormData();
             let orderList = orderItemRows && orderItemRows.filter(x => x.quantity > 0).map((item, index) => ({
@@ -165,7 +200,10 @@ const AddManualOrder = props => {
                 console.log("MAKING")
                 var obj = {
                     user_id: selectedMobileData.id, // retailer ID
-                    items: orderList
+                    items: orderList,
+                    special_discount: specialDiscount,
+                    coupon_id: couponId ? couponId : null,
+                    wallet_id: (selectedMobileData && selectedMobileData.wallet && selectedMobileData.wallet[0]) ? selectedMobileData.wallet[0].id : null
                 };
                 UserModel.getInstance().postManualOrder(
                     obj,
@@ -236,14 +274,14 @@ const AddManualOrder = props => {
                 // console.log('disObj',idx)
                 // console.log('each iter')
                 if (idx == orderitem.qty_discount.length - 1 && orderitem.quantity >= dis_Obj.lower) {
-                    console.log('A')
+                    // console.log('A')
                     orderitem.final_price = (orderitem.post_slash_price - dis_Obj.value);
                     abx = true;
                     return;
                 }
                 if (orderitem.quantity >= dis_Obj.lower && orderitem.quantity <= dis_Obj.upper) {
-                    console.log('B')
-                    console.log('order post slash', orderitem.post_slash_price, dis_Obj.value)
+                    // console.log('B')
+                    // console.log('order post slash', orderitem.post_slash_price, dis_Obj.value)
                     orderitem.final_price = (orderitem.post_slash_price - dis_Obj.value);
                     abx = true;
                     return;
@@ -253,20 +291,40 @@ const AddManualOrder = props => {
         if (!abx) {
             orderitem.final_price = orderitem.post_slash_price;
         }
-        console.log(orderitem)
+        // console.log(orderitem)
 
         if (e.target.name === 'quantity' || e.target.name === 'final_price') {
             orderitem.cost = orderitem.quantity * orderitem.final_price;
         }
         orderItemsDetailArr[index] = orderitem;
-        console.log(orderItemsDetailArr)
+        // console.log(orderItemsDetailArr)
         setOrderItemRows(orderItemsDetailArr)
         let subtotal = 0;
         orderItemRows && orderItemRows.length > 0 && Array.isArray(orderItemRows) && orderItemRows.forEach(item => {
             subtotal += item.cost
         })
-
         setSubtotal(subtotal)
+
+        var bill = subtotal;
+        if (specialDiscount) {
+            bill = bill - specialDiscount
+        }
+        console.log(bill)
+
+        console.log(specialDiscount, promoCodeDiscount, selectedMobileData.wallet)
+        if (promoCodeDiscount) {
+            console.log(bill - promoCodeDiscount)
+            bill = bill - promoCodeDiscount
+        }
+        console.log(bill)
+
+        if (selectedMobileData && selectedMobileData.wallet && selectedMobileData.wallet.length > 0 && Array.isArray(selectedMobileData.wallet) && selectedMobileData.wallet[0] && selectedMobileData.wallet[0].amount) {
+            console.log('wallet')
+            bill = bill - selectedMobileData.wallet[0].amount
+        }
+        console.log(bill)
+
+        settotalBill(bill)
         setImpCondition(!impCondition)  // ask before removing
     }
 
@@ -286,7 +344,7 @@ const AddManualOrder = props => {
             // orderItemsDetailArr[index].price = val.price;
             orderItemsDetailArr[index].pre_slash_price = val.price + val.discount;
             orderItemsDetailArr[index].post_slash_price = val.price;
-            orderItemsDetailArr[index].min_price = val.latest_balance ? val.latest_balance.rate : val.price;
+            orderItemsDetailArr[index].min_price = val.latest_balance ? val.latest_balance.rate : 0;
             orderItemsDetailArr[index].final_price = val.price;
             orderItemsDetailArr[index].qty_discount = val.qty_discount;
             orderItemsDetailArr[index].cost = orderItemsDetailArr[index].quantity > 1 ? (orderItemsDetailArr[index].quantity * val.price) : (orderItemsDetailArr[index].quantity === 0 ? 0 : '')
@@ -297,6 +355,26 @@ const AddManualOrder = props => {
                 subtotal += item.cost
             })
             setSubtotal(subtotal)
+            var bill = subtotal;
+            if (specialDiscount) {
+                bill = bill - specialDiscount
+            }
+            console.log(bill)
+    
+            console.log(specialDiscount, promoCodeDiscount, selectedMobileData.wallet)
+            if (promoCodeDiscount) {
+                console.log(bill - promoCodeDiscount)
+                bill = bill - promoCodeDiscount
+            }
+            console.log(bill)
+    
+            if (selectedMobileData && selectedMobileData.wallet && selectedMobileData.wallet.length > 0 && Array.isArray(selectedMobileData.wallet) && selectedMobileData.wallet[0] && selectedMobileData.wallet[0].amount) {
+                console.log('wallet')
+                bill = bill - selectedMobileData.wallet[0].amount
+            }
+            console.log(bill)
+    
+            settotalBill(bill)
             setImpCondition(!impCondition)  // ask before removing
         }
     };
@@ -348,6 +426,47 @@ const AddManualOrder = props => {
             setImpCondition(!impCondition)  // ask before removing
         }
     }
+
+    const handleSpecialDiscountChange = event => {
+        var spDiscount = event.target.value;
+        console.log(spDiscount)
+        // console.log(validateNumeric(spDiscount))
+        // console.log(validateNumeric('8+4_23%#^&^'))
+        if (!validateNumeric(spDiscount) || spDiscount !== 0 || spDiscount !== '0' || spDiscount !== '' || !spDiscount.includes('+') || !spDiscount.includes('-')) {
+            console.log(spDiscount)
+            setspecialDiscount(spDiscount);
+        } else {
+            setspecialDiscount(0);
+        }
+    };
+
+    // useEffect(() => {
+    //     var bill = subTotal - specialDiscount
+    //     settotalBill(bill)
+    // }, [specialDiscount])
+
+    const handlePromoChange = event => {
+        var promo = event.target.value;
+        setpromoCode(promo);
+        var obj = {
+            code: promo,
+            user_id: selectedMobileData.id
+        }
+        UserModel.getInstance().postCheckPromoExistAndReturnAmount(
+            obj,
+            data => {
+                // console.log(data)
+                setcouponId(data.coupon_id)
+                setpromoCodeDiscount(data.discount)
+            },
+            err => {
+                // console.log(err);
+                setcouponId(null)
+                setpromoCodeDiscount(0)
+            }
+        );
+    };
+
 
     const generateOrderItemsRows = (values, index) => {
         // console.log({ orderItemRows, selectedSkuItems })
@@ -502,7 +621,6 @@ const AddManualOrder = props => {
                         />
                     </Grid>
 
-
                     <Grid item md={1} xs={2}>
                         <Icon color="primary" style={{ fontSize: 40 }} onClick={() => removeOrderItem(index)}>cancel</Icon>
                     </Grid>
@@ -587,32 +705,150 @@ const AddManualOrder = props => {
                                 }
                             </div>
                         }
+
+
                         <br />
+                        <CardActions style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                            <Icon color="primary" style={{ fontSize: 50 }} onClick={() => addNewOrderItemRow()}>add_circle</Icon>
+                        </CardActions>
                         <br />
+
 
 
 
                         <Grid container spacing={3}>
-                            <Grid item md={9} xs={12}>
+                            <Grid item md={7} xs={12}>
                                 <Hidden>{() => { return null }}</Hidden>
+                            </Grid>
+                            <Grid item md={2} xs={12} style={{ position: 'relative' }}>
+                                <div style={{ textAlign: 'center', margin: 0, position: 'absolute', top: '50%' }}>Sub Total :</div>
                             </Grid>
 
                             <Grid item md={2} xs={12}>
                                 <TextField
-                                    label="Sub Total"
+                                    // label="Sub Total"
                                     fullWidth
-                                    onChange={handleChange}
+                                    // onChange={handleChange}
                                     required
                                     value={subTotal}
+                                    margin="dense"
                                     variant="outlined"
                                     disabled
                                 />
                             </Grid>
                         </Grid>
 
-                        <CardActions style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                            <Icon color="primary" style={{ fontSize: 50 }} onClick={() => addNewOrderItemRow()}>add_circle</Icon>
-                        </CardActions>
+                        <br />
+                        <Divider />
+                        <br />
+                        
+                        <Grid container spacing={3}>
+                            <Grid item md={7} xs={12}>
+                                <Hidden>{() => { return null }}</Hidden>
+                            </Grid>
+                            {/* <Grid item md={2} xs={12} style={{position: 'relative'}}>
+                                <div style={{textAlign: 'center', margin: 0, position: 'absolute', top: '50%' }}>Sub Total :</div>
+                            </Grid> */}
+
+                            <Grid item md={2} xs={12}>
+                                <TextField
+                                    label="Promo Code"
+                                    fullWidth
+                                    onChange={handlePromoChange}
+                                    required
+                                    value={promoCode}
+                                    margin="dense"
+                                // variant="outlined"
+                                // disabled
+                                />
+                            </Grid>
+
+                            <Grid item md={2} xs={12} style={{ marginTop: 15 }}>
+                                <TextField
+                                    // label="Promo Code Discount"
+                                    fullWidth
+                                    required
+                                    type="numeric"
+                                    margin="dense"
+                                    value={promoCodeDiscount}
+                                    placeholder="Promo Code Discount"
+                                    variant="standard"
+                                    disabled
+                                />
+                            </Grid>
+                        </Grid>
+
+
+                        {selectedMobileData && selectedMobileData.wallet && selectedMobileData.wallet.length > 0 && Array.isArray(selectedMobileData.wallet) &&
+                            <Grid container spacing={3} style={{marginTop: 10}}>
+                                <Grid item md={7} xs={12}>
+                                    <Hidden>{() => { return null }}</Hidden>
+                                </Grid>
+                                <Grid item md={2} xs={12} style={{ position: 'relative' }}>
+                                    <div>{selectedMobileData.wallet[0].type ? walletDiscountTypes.find(typeobj => typeobj.id == selectedMobileData.wallet[0].type).name : ''} :</div>
+                                </Grid>
+
+                                <Grid item md={2} xs={12}>
+                                    <TextField
+                                        // label="Wallet discount"
+                                        fullWidth
+                                        // onChange={}
+                                        required
+                                        type="numeric"
+                                        value={selectedMobileData.wallet[0].amount}
+                                        variant="standard"
+                                    />
+                                </Grid>
+                            </Grid>
+                        }
+
+                        <Grid container spacing={3} style={{marginTop: 10, marginBottom: 10}}>
+                            <Grid item md={7} xs={12}>
+                                <Hidden>{() => { return null }}</Hidden>
+                            </Grid>
+                            <Grid item md={2} xs={12} style={{ position: 'relative' }}>
+                                <div>Special Discount :</div>
+                            </Grid>
+
+                            <Grid item md={2} xs={12}>
+                                <TextField
+                                    // label="Special Discount"
+                                    fullWidth
+                                    onChange={handleSpecialDiscountChange}
+                                    required
+                                    // type="number"
+                                    value={specialDiscount}
+                                    variant="standard"
+                                />
+                            </Grid>
+                        </Grid>
+
+                        <br />
+                        <Divider />
+                        <br />
+
+                        <Grid container spacing={3}>
+                            <Grid item md={7} xs={12}>
+                                <Hidden>{() => { return null }}</Hidden>
+                            </Grid>
+                            <Grid item md={2} xs={12} style={{ position: 'relative' }}>
+                                <div style={{ textAlign: 'center', margin: 0, position: 'absolute', top: '50%', fontWeight: 600 }}>Total Bill :</div>
+                            </Grid>
+
+                            <Grid item md={2} xs={12}>
+                                <TextField
+                                    // label="Total Bill"
+                                    fullWidth
+                                    // onChange={handleChange}
+                                    required
+                                    type="numeric"
+                                    value={totalBill}
+                                    variant="outlined"
+                                    disabled
+                                />
+                            </Grid>
+                        </Grid>
+
 
                         <Snackbar
                             open={openData.openWarning}
@@ -628,6 +864,14 @@ const AddManualOrder = props => {
                             onClose={handleClose}>
                             <Alert onClose={handleClose} severity="warning">
                                 Order value cannot be less than 1000!
+                            </Alert>
+                        </Snackbar>
+                        <Snackbar
+                            open={openData.openDiscountWarning}
+                            autoHideDuration={6000}
+                            onClose={handleClose}>
+                            <Alert onClose={handleClose} severity="warning">
+                                Discounts cannot be greater than the subtotal!
                             </Alert>
                         </Snackbar>
                         <Snackbar

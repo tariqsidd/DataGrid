@@ -4811,4 +4811,20 @@ export default class Api {
 
 
 
+  postCheckPromoExistAndReturnAmount(token, params, successCallback, failureCallback) {
+    NetworkManger.getInstance().postNetworkRequest(
+      CONSTANT.baseURL + 'order/coupon',
+      token,
+      params,
+      function reqSuccess(data) {
+        successCallback(data);
+      },
+      function reqFailed(error) {
+        failureCallback(error);
+      }
+    );
+  }
+
+
+
 }

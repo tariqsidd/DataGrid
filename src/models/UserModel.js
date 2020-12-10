@@ -2856,5 +2856,21 @@ export default class UserModel {
   }
 
 
+  postCheckPromoExistAndReturnAmount(params, successTrigger, failureTrigger) {
+    let token = UserModel.getInstance().getToken();
+    ApiManager.getInstance().postCheckPromoExistAndReturnAmount(
+      token,
+      params,
+      function resSuccess(data) {
+        successTrigger(data);
+      },
+      function resFailed(msg) {
+        // alert(msg)
+        failureTrigger(msg);
+      }
+    );
+  }
+
+
 
 }
