@@ -138,9 +138,9 @@ const SignIn = props => {
 
 
   useEffect(() => {
-    if (window.location.href.includes('localhost')) {
+    // if (window.location.href.includes('localhost')) {
       afterSignInWithGoogle()
-    }
+    // }
   }, [])
 
   const afterSignInWithGoogle = async () => {
