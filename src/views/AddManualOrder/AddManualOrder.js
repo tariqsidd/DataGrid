@@ -60,9 +60,9 @@ function Alert(props) {
 }
 
 const walletDiscountTypes = [
-    {id: 1, name: 'Referral Discount'},
-    {id: 2, name: 'Referral Discount'},
-    {id: 3, name: 'GMV Discount'},
+    { id: 1, name: 'Referral Discount' },
+    { id: 2, name: 'Referral Discount' },
+    { id: 3, name: 'GMV Discount' },
 ]
 
 const AddManualOrder = props => {
@@ -94,6 +94,10 @@ const AddManualOrder = props => {
         submitStatus: false,
         name: "",
     });
+
+    useEffect(() => {
+        console.log( orderItemRows[0].quantity, orderItemRows[0].final_price )
+    })
 
     useEffect(() => {
         let subtotal = 0;
@@ -158,13 +162,20 @@ const AddManualOrder = props => {
         console.log("selectedMobData", selectedMobileData)
         const err = orderItemRows && orderItemRows.length > 0 && Array.isArray(orderItemRows) && orderItemRows.some(({ name, quantity, pre_slash_price, post_slash_price, min_price, final_price, cost }, index) => {
             if (
-                !name || !quantity || quantity <= 0 || !final_price || (min_price > 0 && final_price <= min_price) || final_price > post_slash_price || !cost || !selectedSkuItems[index].id || !selectedSkuItems[index].name || !selectedMobileData || !selectedMobileData.id
+                !name || !quantity || quantity <= 0 || !final_price || !cost || !selectedSkuItems[index].id || !selectedSkuItems[index].name || !selectedMobileData || !selectedMobileData.id
             ) {
-                console.log("errors exist")
                 return true;
             } else {
-                console.log("errors don't exist")
-                return false;
+                // if (min_price > 0) {
+                if (final_price >= min_price) {
+                    return false;
+                }
+                //     return true;
+                // } 
+                // else if (final_price >= post_slash_price) {
+                //     return false;
+                // }
+                return true;
             }
         })
         return err;
@@ -188,7 +199,7 @@ const AddManualOrder = props => {
         } else if (selectedMobileData && selectedMobileData.wallet && selectedMobileData.wallet.length > 0 && Array.isArray(selectedMobileData.wallet) && specialDiscount + promoCodeDiscount + selectedMobileData.wallet[0].amount > subTotal) {
             setOpenData({ ...openData, openDiscountWarning: true })
         }
-        else if (totalBill && Number(totalBill)) {
+        else if (totalBill && Number(totalBill) && totalBill > 0) {
             setParams({ ...params, submitStatus: true });
             let par = new FormData();
             let orderList = orderItemRows && orderItemRows.filter(x => x.quantity > 0).map((item, index) => ({
@@ -241,6 +252,9 @@ const AddManualOrder = props => {
             }
             // }
         }
+        else {
+            alert('Kindly check all fields')
+        }
     }
 
 
@@ -281,32 +295,42 @@ const AddManualOrder = props => {
         // console.clear()
         // console.log('handleOrderItemChange')
         // console.log(e.target.name, e.target.value, { index })
+        console.log(e.target.name, e.target.value)
         const orderItemsDetailArr = orderItemRows;
         var orderitem = orderItemsDetailArr[index];
-        orderitem[e.target.name] = e.target.value;
-        var abx = false;
+        if ((e.target.name === 'quantity' || e.target.name === 'final_price')) {
+            if (validateNumeric(parseInt(e.target.value)) || e.target.value === '') {
+                console.log('vladatenumeric')
+                console.log('vladatenumeric', e.target.value)
+                orderitem[e.target.name] = e.target.value;
+            } 
+        }
+
+        var disc_Threshold_Found = false;
         if (orderitem && orderitem.qty_discount && orderitem.qty_discount.length > 0 && Array.isArray(orderitem.qty_discount)) {
             orderitem.qty_discount.forEach((dis_Obj, idx) => {
                 // console.log('disObj',idx)
-                // console.log('each iter')
+                console.log('each iter')
                 if (idx == orderitem.qty_discount.length - 1 && orderitem.quantity >= dis_Obj.lower) {
                     // console.log('A')
                     orderitem.final_price = (orderitem.post_slash_price - dis_Obj.value);
-                    abx = true;
+                    disc_Threshold_Found = true;
                     return;
                 }
                 if (orderitem.quantity >= dis_Obj.lower && orderitem.quantity <= dis_Obj.upper) {
                     // console.log('B')
                     // console.log('order post slash', orderitem.post_slash_price, dis_Obj.value)
                     orderitem.final_price = (orderitem.post_slash_price - dis_Obj.value);
-                    abx = true;
+                    disc_Threshold_Found = true;
                     return;
                 }
             })
+
+            if (!disc_Threshold_Found) {
+                orderitem.final_price = orderitem.post_slash_price;
+            }
         }
-        if (!abx) {
-            orderitem.final_price = orderitem.post_slash_price;
-        }
+
         // console.log(orderitem)
 
         if (e.target.name === 'quantity' || e.target.name === 'final_price') {
@@ -325,20 +349,20 @@ const AddManualOrder = props => {
         if (specialDiscount) {
             bill = bill - specialDiscount
         }
-        console.log(bill)
+        // console.log(bill)
 
         console.log(specialDiscount, promoCodeDiscount, selectedMobileData.wallet)
         if (promoCodeDiscount) {
             console.log(bill - promoCodeDiscount)
             bill = bill - promoCodeDiscount
         }
-        console.log(bill)
+        // console.log(bill)
 
         if (selectedMobileData && selectedMobileData.wallet && selectedMobileData.wallet.length > 0 && Array.isArray(selectedMobileData.wallet) && selectedMobileData.wallet[0] && selectedMobileData.wallet[0].amount) {
             console.log('wallet')
             bill = bill - selectedMobileData.wallet[0].amount
         }
-        console.log(bill)
+        // console.log(bill)
 
         settotalBill(bill)
         setImpCondition(!impCondition)  // ask before removing
@@ -355,12 +379,39 @@ const AddManualOrder = props => {
             setSelectedSkuItems(skuItemsDetailArr);
 
             const orderItemsDetailArr = orderItemRows;
+            var orderitem = orderItemsDetailArr[index];
+            var disc_Threshold_Found = false;
+            if (orderitem && orderitem.qty_discount && orderitem.qty_discount.length > 0 && Array.isArray(orderitem.qty_discount)) {
+                orderitem.qty_discount.forEach((dis_Obj, idx) => {
+                    // console.log('disObj',idx)
+                    // console.log('each iter')
+                    if (idx == orderitem.qty_discount.length - 1 && orderitem.quantity >= dis_Obj.lower) {
+                        // console.log('A')
+                        orderitem.final_price = (orderitem.post_slash_price - dis_Obj.value);
+                        disc_Threshold_Found = true;
+                        return;
+                    }
+                    if (orderitem.quantity >= dis_Obj.lower && orderitem.quantity <= dis_Obj.upper) {
+                        // console.log('B')
+                        // console.log('order post slash', orderitem.post_slash_price, dis_Obj.value)
+                        orderitem.final_price = (orderitem.post_slash_price - dis_Obj.value);
+                        disc_Threshold_Found = true;
+                        return;
+                    }
+                })
+                
+                if (!disc_Threshold_Found) {
+                    orderitem.final_price = orderitem.post_slash_price;
+                }
+            }
+
             orderItemsDetailArr[index].name = val.name;
             // orderItemsDetailArr[index].quantity = val.quantity;
             // orderItemsDetailArr[index].price = val.price;
             orderItemsDetailArr[index].pre_slash_price = val.price + val.discount;
             orderItemsDetailArr[index].post_slash_price = val.price;
-            orderItemsDetailArr[index].min_price = val.latest_balance ? val.latest_balance.rate : 0;
+            // console.log(val.latest_balance);
+            orderItemsDetailArr[index].min_price = val.latest_balance ? val.latest_balance.rate : val.post_slash_price;
             orderItemsDetailArr[index].final_price = val.price;
             orderItemsDetailArr[index].qty_discount = val.qty_discount;
             orderItemsDetailArr[index].cost = orderItemsDetailArr[index].quantity > 1 ? (orderItemsDetailArr[index].quantity * val.price) : (orderItemsDetailArr[index].quantity === 0 ? 0 : '')
@@ -376,20 +427,64 @@ const AddManualOrder = props => {
                 bill = bill - specialDiscount
             }
             console.log(bill)
-    
+
             console.log(specialDiscount, promoCodeDiscount, selectedMobileData.wallet)
             if (promoCodeDiscount) {
                 console.log(bill - promoCodeDiscount)
                 bill = bill - promoCodeDiscount
             }
             console.log(bill)
-    
+
             if (selectedMobileData && selectedMobileData.wallet && selectedMobileData.wallet.length > 0 && Array.isArray(selectedMobileData.wallet) && selectedMobileData.wallet[0] && selectedMobileData.wallet[0].amount) {
                 console.log('wallet')
                 bill = bill - selectedMobileData.wallet[0].amount
             }
             console.log(bill)
-    
+
+            settotalBill(bill)
+            setImpCondition(!impCondition)  // ask before removing
+        } else {
+            const skuItemsDetailArr = selectedSkuItems;
+            delete skuItemsDetailArr[index]
+            console.log(skuItemsDetailArr)
+            setSelectedSkuItems(skuItemsDetailArr);
+
+            const orderItemsDetailArr = orderItemRows;
+            orderItemsDetailArr[index].name = '';
+            orderItemsDetailArr[index].quantity = '';
+            // orderItemsDetailArr[index].price = '';
+            orderItemsDetailArr[index].pre_slash_price = '';
+            orderItemsDetailArr[index].post_slash_price = '';
+            orderItemsDetailArr[index].min_price = '';
+            orderItemsDetailArr[index].final_price = '';
+            orderItemsDetailArr[index].qty_discount = '';
+            orderItemsDetailArr[index].cost = '';
+            setOrderItemRows(orderItemsDetailArr)
+
+            let subtotal = 0;
+            orderItemsDetailArr && orderItemsDetailArr.length > 0 && Array.isArray(orderItemsDetailArr) && orderItemsDetailArr.forEach(item => {
+                subtotal += item.cost
+            })
+            setSubtotal(subtotal)
+            var bill = subtotal;
+            if (specialDiscount) {
+                bill = bill - specialDiscount
+            }
+            console.log(bill)
+
+            console.log(specialDiscount, promoCodeDiscount, selectedMobileData.wallet)
+            if (promoCodeDiscount) {
+                console.log(bill - promoCodeDiscount)
+                bill = bill - promoCodeDiscount
+            }
+            console.log(bill)
+
+            if (selectedMobileData && selectedMobileData.wallet && selectedMobileData.wallet.length > 0 && Array.isArray(selectedMobileData.wallet) && selectedMobileData.wallet[0] && selectedMobileData.wallet[0].amount) {
+                console.log('wallet')
+                bill = bill - selectedMobileData.wallet[0].amount
+            }
+            console.log(bill)
+
             settotalBill(bill)
             setImpCondition(!impCondition)  // ask before removing
         }
@@ -397,19 +492,47 @@ const AddManualOrder = props => {
 
     const addNewOrderItemRow = () => {
         // console.log('add new order row')
-        let rowFilled = false;
-        orderItemRows && orderItemRows.length > 0 && Array.isArray(orderItemRows) && orderItemRows.forEach(({ name, quantity, pre_slash_price, post_slash_price, min_price, final_price, cost }, index) => {
+        // let rowFilled = false;
+        const err = orderItemRows && orderItemRows.length > 0 && Array.isArray(orderItemRows) && orderItemRows.some(({ name, quantity, pre_slash_price, post_slash_price, min_price, final_price, cost }, index) => {
             // console.log(val)
             console.log(
                 name, quantity, quantity > 0, final_price, final_price >= min_price, final_price <= post_slash_price, cost
             )
-            if (name && quantity && quantity > 0 && final_price && final_price >= min_price && final_price <= post_slash_price && cost) {
-                rowFilled = true
+
+            if (
+                !name || !quantity || quantity <= 0 || !final_price || !cost || !selectedSkuItems[index].id || !selectedSkuItems[index].name
+            ) {
+                return true;
             } else {
-                setOpenData({ ...openData, openWarning: true });
-                rowFilled = false
-                return;
+                // if (min_price > 0) {
+                if (final_price >= min_price) {
+                    return false;
+                }
+                //     return true;
+                // } 
+                // else if (final_price >= post_slash_price) {
+                //     return false;
+                // }
+                return true;
             }
+
+            // final_price >= min_price && final_price <= post_slash_price 
+
+            // if (name && quantity && quantity > 0 && final_price && cost) {
+            //     if (min_price > 0) {
+            //         if (final_price >= min_price) {
+            //             rowFilled = true;
+            //         } else {
+            //             rowFilled = false;
+            //         }
+            //     } else if (final_price >= post_slash_price) {
+            //         rowFilled = true;
+            //     }
+            // } else {
+            //     setOpenData({ ...openData, openWarning: true });
+            //     rowFilled = false
+            //     return;
+            // }
         })
         const newOrderItem = {
             name: '',
@@ -424,8 +547,12 @@ const AddManualOrder = props => {
             id: null,
             name: '',
         }
-        rowFilled && setOrderItemRows([...orderItemRows, newOrderItem])
-        rowFilled && setSelectedSkuItems([...selectedSkuItems, newSku])
+        if (err) {
+            setOpenData({ openSuccess: false, openWarning: true, openError: false, openDiscountWarning: false, openMinOrderValueWarning: false });
+        } else {
+            setOrderItemRows([...orderItemRows, newOrderItem])
+            setSelectedSkuItems([...selectedSkuItems, newSku])
+        }
         setImpCondition(!impCondition)  // ask before removing
     }
 
@@ -448,7 +575,7 @@ const AddManualOrder = props => {
         console.log(spDiscount)
         // console.log(validateNumeric(spDiscount))
         // console.log(validateNumeric('8+4_23%#^&^'))
-        if (!validateNumeric(spDiscount) || spDiscount !== 0 || spDiscount !== '0' || spDiscount !== '' || !spDiscount.includes('+') || !spDiscount.includes('-')) {
+        if (validateNumeric(spDiscount) && spDiscount !== 0 && spDiscount !== '0' && spDiscount !== '' && !spDiscount.includes('+') && !spDiscount.includes('-')) {
             console.log(spDiscount)
             setspecialDiscount(spDiscount);
         } else {
@@ -491,7 +618,7 @@ const AddManualOrder = props => {
             <>
                 <Grid container spacing={1} style={{ marginTop: 20 }}>
 
-                    <Grid item md={5} xs={12}>
+                    <Grid item md={4} xs={12}>
                         <Autocomplete
                             id="sku"
                             // name='Sku_name'
@@ -547,44 +674,43 @@ const AddManualOrder = props => {
                     />
                 </Grid> */}
 
-                    <Grid item md={1} xs={6}>
+                    <Grid item md={7} xs={6} style={{ display: 'flex' }}>
                         <TextField
+                            style={{ marginLeft: 5, marginRight: 5 }}
                             fullWidth
-                            label="Pre-Slash Price"
+                            label="Pre Slash Price"
                             name="pre_slash_price"
                             type='number'
                             inputProps={{ min: 0 }}
                             min={0}
                             onChange={(e) => handleOrderItemDetailsChange(e, index)}
                             // required
-                            margin='dense'
+                            // margin='dense'
                             value={values.pre_slash_price}
-                            variant="filled"
+                            variant="outlined"
                             // placeholder="Pre-Slash Price"
                             disabled
                         />
-                    </Grid>
 
-                    <Grid item md={1} xs={6}>
                         <TextField
+                            style={{ marginLeft: 5, marginRight: 5 }}
                             fullWidth
-                            label="Post-Slash Price"
+                            label="Post Slash Price"
                             name="post_slash_price"
                             type='number'
                             inputProps={{ min: 0 }}
                             min={0}
                             onChange={(e) => handleOrderItemDetailsChange(e, index)}
                             // required
-                            margin='dense'
+                            // margin='dense'
                             value={values.post_slash_price}
-                            variant="filled"
+                            variant="outlined"
                             // placeholder="Post-Slash Price"
                             disabled
                         />
-                    </Grid>
 
-                    <Grid item md={1} xs={6}>
                         <TextField
+                            style={{ marginLeft: 5, marginRight: 5 }}
                             fullWidth
                             label="Min. Price"
                             name="min_price"
@@ -593,23 +719,22 @@ const AddManualOrder = props => {
                             min={0}
                             onChange={(e) => handleOrderItemDetailsChange(e, index)}
                             // required
-                            margin='dense'
-                            value={values.min_price || 'N/A'}
-                            variant="filled"
+                            // margin='dense'
+                            value={values.min_price}
+                            variant="outlined"
                             // placeholder="Min. Price"
                             disabled
                         />
-                    </Grid>
 
-                    <Grid item md={1} xs={6}>
                         <TextField
+                            style={{ marginLeft: 5, marginRight: 5 }}
                             fullWidth
                             label="Final Price"
                             name="final_price"
                             type='number'
-                            inputProps={{ min: values.min_price || values.post_slash_price, max: values.pre_slash_price }}
-                            min={values.min_price || values.post_slash_price}
-                            max={values.pre_slash_price}
+                            inputProps={{ min: values.min_price, max: values.pre_slash_price }}
+                            min={values.min_price}
+                            max={values.post_slash_price}
                             onChange={(e) => handleOrderItemDetailsChange(e, index)}
                             // required
                             // margin='dense'
@@ -617,10 +742,9 @@ const AddManualOrder = props => {
                             variant="outlined"
                         // placeholder="Final Price"
                         />
-                    </Grid>
 
-                    <Grid item md={1} xs={6}>
                         <TextField
+                            style={{ marginLeft: 5, marginRight: 5 }}
                             fullWidth
                             label="Cost"
                             name="cost"
@@ -635,10 +759,8 @@ const AddManualOrder = props => {
                             // placeholder="Cost"
                             disabled
                         />
-                    </Grid>
 
-                    <Grid item md={1} xs={2}>
-                        <Icon color="primary" style={{ fontSize: 40 }} onClick={() => removeOrderItem(index)}>cancel</Icon>
+                        <Icon color="primary" style={{ fontSize: 40, marginLeft: 5, marginRight: 5 }} onClick={() => removeOrderItem(index)}>cancel</Icon>
                     </Grid>
 
                 </Grid>
@@ -757,7 +879,7 @@ const AddManualOrder = props => {
                         <br />
                         <Divider />
                         <br />
-                        
+
                         <Grid container spacing={3}>
                             <Grid item md={7} xs={12}>
                                 <Hidden>{() => { return null }}</Hidden>
@@ -796,7 +918,7 @@ const AddManualOrder = props => {
 
 
                         {selectedMobileData && selectedMobileData.wallet && selectedMobileData.wallet.length > 0 && Array.isArray(selectedMobileData.wallet) &&
-                            <Grid container spacing={3} style={{marginTop: 10}}>
+                            <Grid container spacing={3} style={{ marginTop: 10 }}>
                                 <Grid item md={7} xs={12}>
                                     <Hidden>{() => { return null }}</Hidden>
                                 </Grid>
@@ -818,7 +940,7 @@ const AddManualOrder = props => {
                             </Grid>
                         }
 
-                        <Grid container spacing={3} style={{marginTop: 10, marginBottom: 10}}>
+                        <Grid container spacing={3} style={{ marginTop: 10, marginBottom: 10 }}>
                             <Grid item md={7} xs={12}>
                                 <Hidden>{() => { return null }}</Hidden>
                             </Grid>

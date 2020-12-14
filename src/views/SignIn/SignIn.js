@@ -168,6 +168,7 @@ const SignIn = props => {
       // setTimeout(() => props.history.push('/dashboard'), 5000)
     } else if (error && error !== 'null') {
       alert(error)
+      window.location.replace('/sign-in')
     }
   }
 
