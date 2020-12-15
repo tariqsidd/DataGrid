@@ -81,7 +81,7 @@ const AddManualOrder = props => {
     var [subTotal, setSubtotal] = useState('');
     var [promoCode, setpromoCode] = useState('');
     var [couponId, setcouponId] = useState(null);
-    var [promoCodeDiscount, setpromoCodeDiscount] = useState(0);
+    var [promoCodeDiscount, setpromoCodeDiscount] = useState('');
     var [specialDiscount, setspecialDiscount] = useState('');
     var [totalBill, settotalBill] = useState('');
 
@@ -201,7 +201,11 @@ const AddManualOrder = props => {
             setOpenData({ ...openData, openError: true });
         } else if (subTotal < 1000) {
             setOpenData({ ...openData, openMinOrderValueWarning: true })
-        } else if (selectedMobileData && selectedMobileData.wallet && selectedMobileData.wallet.length > 0 && Array.isArray(selectedMobileData.wallet) && specialDiscount + promoCodeDiscount + selectedMobileData.wallet[0].amount > subTotal) {
+        } 
+        else if (specialDiscount + promoCodeDiscount > subTotal) {
+            setOpenData({ ...openData, openDiscountWarning: true })
+        }
+        else if (selectedMobileData && selectedMobileData.wallet && selectedMobileData.wallet.length > 0 && Array.isArray(selectedMobileData.wallet) && specialDiscount + promoCodeDiscount + selectedMobileData.wallet[0].amount > subTotal) {
             setOpenData({ ...openData, openDiscountWarning: true })
         }
         else if (totalBill && Number(totalBill) && totalBill > 0) {
@@ -589,7 +593,7 @@ const AddManualOrder = props => {
             console.log(spDiscount)
             setspecialDiscount(spDiscount);
         } else {
-            setspecialDiscount(0);
+            setspecialDiscount('');
         }
     };
 
@@ -615,7 +619,7 @@ const AddManualOrder = props => {
             err => {
                 // console.log(err);
                 setcouponId(null)
-                setpromoCodeDiscount(0)
+                setpromoCodeDiscount('')
             }
         );
     };
