@@ -23,6 +23,7 @@ import Hidden from '@material-ui/core/Hidden';
 import Paper from '@material-ui/core/Paper';
 import { withStyles } from '@material-ui/core/styles';
 import { validateNumeric } from 'common/validators';
+import MaterialTable from 'material-table';
 // import 'antd/dist/antd.css';
 
 const GreenCheckbox = withStyles({
@@ -81,7 +82,7 @@ const AddManualOrder = props => {
     var [subTotal, setSubtotal] = useState('');
     var [promoCode, setpromoCode] = useState('');
     var [couponId, setcouponId] = useState(null);
-    var [promoCodeDiscount, setpromoCodeDiscount] = useState(0);
+    var [promoCodeDiscount, setpromoCodeDiscount] = useState('');
     var [specialDiscount, setspecialDiscount] = useState('');
     var [totalBill, settotalBill] = useState('');
 
@@ -95,8 +96,15 @@ const AddManualOrder = props => {
         name: "",
     });
 
+    const [state, setState] = React.useState([
+        { title: 'SKU', field: 'name', editable: 'never' },
+        { title: 'Qty', field: 'quantity', editable: 'never' },
+        { title: 'Final Price', field: 'final_price', editable: 'never' },
+        { title: 'Total', field: 'cost', editable: 'never' },
+    ]);
+
     useEffect(() => {
-        console.log( orderItemRows[0].quantity, orderItemRows[0].final_price )
+        console.log(orderItemRows[0].quantity, orderItemRows[0].final_price)
     })
 
     useEffect(() => {
@@ -132,7 +140,12 @@ const AddManualOrder = props => {
         // var arr = event.target.getAttribute('data-option-index');
         // console.log('mobile val', val);
         if (val) {
-            setSelectedMobileData({ mobile: val.mobile, name: val.name, id: val.id, wallet: val.wallet });
+            setSelectedMobileData({
+                mobile: val.mobile,
+                name: val.name,
+                id: val.id,
+                // wallet: val.wallet // Wallet Discount needs to be enabled later
+            });
         }
     };
 
@@ -166,7 +179,7 @@ const AddManualOrder = props => {
             ) {
                 // console.log('A')
                 return true;
-            } 
+            }
             // else {
             //     console.log('B')
             //     // if (min_price > 0) {
@@ -201,7 +214,13 @@ const AddManualOrder = props => {
             setOpenData({ ...openData, openError: true });
         } else if (subTotal < 1000) {
             setOpenData({ ...openData, openMinOrderValueWarning: true })
-        } else if (selectedMobileData && selectedMobileData.wallet && selectedMobileData.wallet.length > 0 && Array.isArray(selectedMobileData.wallet) && specialDiscount + promoCodeDiscount + selectedMobileData.wallet[0].amount > subTotal) {
+        }
+        else if (
+            (specialDiscount > subTotal) ||
+            (specialDiscount + promoCodeDiscount > subTotal) ||
+            (selectedMobileData && selectedMobileData.wallet && selectedMobileData.wallet.length > 0 && Array.isArray(selectedMobileData.wallet) &&
+                (specialDiscount + promoCodeDiscount + selectedMobileData.wallet[0].amount > subTotal))
+        ) {
             setOpenData({ ...openData, openDiscountWarning: true })
         }
         else if (totalBill && Number(totalBill) && totalBill > 0) {
@@ -308,7 +327,7 @@ const AddManualOrder = props => {
                 console.log('vladatenumeric')
                 console.log('vladatenumeric', e.target.value)
                 orderitem[e.target.name] = e.target.value;
-            } 
+            }
         }
 
         var disc_Threshold_Found = false;
@@ -404,15 +423,15 @@ const AddManualOrder = props => {
                         return;
                     }
                 })
-                
+
                 if (!disc_Threshold_Found) {
                     orderitem.final_price = orderitem.post_slash_price;
                 }
             }
-            console.log(val.latest_balance ? val.latest_balance.rate : val.post_slash_price)
-            if (val.latest_balance)
-            console.log('balrate', val.latest_balance.rate)
-            else console.log('postslash', val.post_slash_price)
+            // console.log(val.latest_balance ? val.latest_balance.rate : val.post_slash_price)
+            // if (val.latest_balance)
+            //     console.log('balrate', val.latest_balance.rate)
+            // else console.log('postslash', val.post_slash_price)
 
             orderItemsDetailArr[index].name = val.name;
             // orderItemsDetailArr[index].quantity = val.quantity;
@@ -421,8 +440,8 @@ const AddManualOrder = props => {
             orderItemsDetailArr[index].post_slash_price = val.price - val.discount;
             // console.log(val.latest_balance);
             orderItemsDetailArr[index].min_price = val.latest_balance ? val.latest_balance.rate : (val.price - val.discount); // if VIC calculated rate is not available, display post slash as min value (maximum possible discounted value).
-            orderItemsDetailArr[index].final_price = val.price;
-            orderItemsDetailArr[index].qty_discount = val.qty_discount;
+            orderItemsDetailArr[index].final_price = val.price - val.discount;
+            // orderItemsDetailArr[index].qty_discount = val.qty_discount; // Bulk Discount to be enabled later
             orderItemsDetailArr[index].cost = orderItemsDetailArr[index].quantity > 1 ? (orderItemsDetailArr[index].quantity * val.price) : (orderItemsDetailArr[index].quantity === 0 ? 0 : '')
             setOrderItemRows(orderItemsDetailArr)
 
@@ -505,14 +524,14 @@ const AddManualOrder = props => {
         const err = orderItemRows && orderItemRows.length > 0 && Array.isArray(orderItemRows) && orderItemRows.some(({ name, quantity, pre_slash_price, post_slash_price, min_price, final_price, cost }, index) => {
             // console.log(val)
             console.log(
-                name, quantity, quantity > 0, final_price, final_price >= min_price, final_price <= post_slash_price, cost
+                !name, !quantity, quantity <= 0, !final_price, final_price > post_slash_price, final_price >= min_price, !cost, !selectedSkuItems[index].id, !selectedSkuItems[index].name
             )
 
             if (
-                !name || !quantity || quantity <= 0 || !final_price || final_price > post_slash_price || final_price >= min_price || !cost || !selectedSkuItems[index].id || !selectedSkuItems[index].name
+                !name || !quantity || quantity <= 0 || !final_price || final_price > post_slash_price || final_price < min_price || !cost || !selectedSkuItems[index].id || !selectedSkuItems[index].name
             ) {
                 return true;
-            } 
+            }
             // else {
             //     // if (min_price > 0) {
             //     if (final_price >= min_price) {
@@ -589,7 +608,7 @@ const AddManualOrder = props => {
             console.log(spDiscount)
             setspecialDiscount(spDiscount);
         } else {
-            setspecialDiscount(0);
+            setspecialDiscount('');
         }
     };
 
@@ -615,7 +634,7 @@ const AddManualOrder = props => {
             err => {
                 // console.log(err);
                 setcouponId(null)
-                setpromoCodeDiscount(0)
+                setpromoCodeDiscount('')
             }
         );
     };
@@ -775,7 +794,9 @@ const AddManualOrder = props => {
 
                 </Grid>
 
-                <Grid container spacing={1}>
+                {/* Bulk Discount logic to be enabled later */}
+
+                {/* <Grid container spacing={1}>
                     {values.qty_discount && values.qty_discount.length > 0 && Array.isArray(values.qty_discount) &&
                         values.qty_discount.map((x, idx) => (
                             <Grid item lg={12} md={12} sm={12} xs={12}
@@ -791,7 +812,7 @@ const AddManualOrder = props => {
                             </Grid>
                         ))
                     }
-                </Grid>
+                </Grid> */}
             </>
         )
     }
@@ -843,7 +864,7 @@ const AddManualOrder = props => {
 
                         {
                             <div id="orderSkuItems">
-                                <h4 style={{color: '#606060'}}>Order Items</h4>
+                                <h4 style={{ color: '#606060' }}>Order Items</h4>
                                 {/* <br /> */}
                                 {orderItemRows && orderItemRows.length > 0 &&
                                     Array.isArray(orderItemRows) &&
@@ -860,11 +881,27 @@ const AddManualOrder = props => {
                             <Icon color="primary" style={{ fontSize: 50 }} onClick={() => addNewOrderItemRow()}>add_circle</Icon>
                         </CardActions>
                         <br />
+                        <br />
+                        <br />
+                        <br />
+
+                        {orderItemRows && orderItemRows.length > 0 && Array.isArray(orderItemRows) &&
+                            <MaterialTable
+                                title={<b style={{ fontSize: 16 }}>Final Bill Table</b>}
+                                columns={state}
+                                options={{
+                                    filtering: false,
+                                    paging: false,
+                                    search: false
+                                }}
+                                data={orderItemRows}
+                                className={clsx(classes.root, className)}
+                            >
+                            </MaterialTable>
+                        }
 
 
-
-
-                        <Grid container spacing={3}>
+                        <Grid container spacing={3} style={{ paddingTop: 20 }}>
                             <Grid item md={7} xs={12}>
                                 <Hidden>{() => { return null }}</Hidden>
                             </Grid>
@@ -886,17 +923,16 @@ const AddManualOrder = props => {
                             </Grid>
                         </Grid>
 
-                        <br />
+                        {/* <br />
                         <Divider />
-                        <br />
+                        <br /> */}
 
-                        <Grid container spacing={3}>
+                        {/* Promo Code need to be enabled later */}
+
+                        {/* <Grid container spacing={3}>
                             <Grid item md={7} xs={12}>
                                 <Hidden>{() => { return null }}</Hidden>
                             </Grid>
-                            {/* <Grid item md={2} xs={12} style={{position: 'relative'}}>
-                                <div style={{textAlign: 'center', margin: 0, position: 'absolute', top: '50%' }}>Sub Total :</div>
-                            </Grid> */}
 
                             <Grid item md={2} xs={12}>
                                 <TextField
@@ -924,10 +960,12 @@ const AddManualOrder = props => {
                                     disabled
                                 />
                             </Grid>
-                        </Grid>
+                        </Grid> */}
 
 
-                        {selectedMobileData && selectedMobileData.wallet && selectedMobileData.wallet.length > 0 && Array.isArray(selectedMobileData.wallet) &&
+                        {/* Wallet discount (Refferal/GMV) need to be enabled later */}
+
+                        {/* {selectedMobileData && selectedMobileData.wallet && selectedMobileData.wallet.length > 0 && Array.isArray(selectedMobileData.wallet) &&
                             <Grid container spacing={3} style={{ marginTop: 10 }}>
                                 <Grid item md={7} xs={12}>
                                     <Hidden>{() => { return null }}</Hidden>
@@ -948,7 +986,7 @@ const AddManualOrder = props => {
                                     />
                                 </Grid>
                             </Grid>
-                        }
+                        } */}
 
                         <Grid container spacing={3} style={{ marginTop: 10, marginBottom: 10 }}>
                             <Grid item md={7} xs={12}>
@@ -964,16 +1002,16 @@ const AddManualOrder = props => {
                                     fullWidth
                                     onChange={handleSpecialDiscountChange}
                                     required
-                                    // type="number"
+                                    type="numeric"
                                     value={specialDiscount}
                                     variant="standard"
                                 />
                             </Grid>
                         </Grid>
 
-                        <br />
+                        {/* <br />
                         <Divider />
-                        <br />
+                        <br /> */}
 
                         <Grid container spacing={3}>
                             <Grid item md={7} xs={12}>
