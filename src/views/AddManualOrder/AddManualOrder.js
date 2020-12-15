@@ -162,21 +162,26 @@ const AddManualOrder = props => {
         console.log("selectedMobData", selectedMobileData)
         const err = orderItemRows && orderItemRows.length > 0 && Array.isArray(orderItemRows) && orderItemRows.some(({ name, quantity, pre_slash_price, post_slash_price, min_price, final_price, cost }, index) => {
             if (
-                !name || !quantity || quantity <= 0 || !final_price || !cost || !selectedSkuItems[index].id || !selectedSkuItems[index].name || !selectedMobileData || !selectedMobileData.id
+                !name || !quantity || quantity <= 0 || !final_price || final_price > post_slash_price || final_price < min_price || !cost || !selectedSkuItems[index].id || !selectedSkuItems[index].name || !selectedMobileData || !selectedMobileData.id
             ) {
+                // console.log('A')
                 return true;
-            } else {
-                // if (min_price > 0) {
-                if (final_price >= min_price) {
-                    return false;
-                }
-                //     return true;
-                // } 
-                // else if (final_price >= post_slash_price) {
-                //     return false;
-                // }
-                return true;
-            }
+            } 
+            // else {
+            //     console.log('B')
+            //     // if (min_price > 0) {
+            //     if (final_price >= min_price) {
+            //         console.log('D')
+            //         return false;
+            //     }
+            //     //     return true;
+            //     // } 
+            //     // else if (final_price >= post_slash_price) {
+            //     //     return false;
+            //     // }
+            //     console.log('C')
+            //     return true;
+            // }
         })
         return err;
     };
@@ -404,14 +409,18 @@ const AddManualOrder = props => {
                     orderitem.final_price = orderitem.post_slash_price;
                 }
             }
+            console.log(val.latest_balance ? val.latest_balance.rate : val.post_slash_price)
+            if (val.latest_balance)
+            console.log('balrate', val.latest_balance.rate)
+            else console.log('postslash', val.post_slash_price)
 
             orderItemsDetailArr[index].name = val.name;
             // orderItemsDetailArr[index].quantity = val.quantity;
             // orderItemsDetailArr[index].price = val.price;
-            orderItemsDetailArr[index].pre_slash_price = val.price + val.discount;
-            orderItemsDetailArr[index].post_slash_price = val.price;
+            orderItemsDetailArr[index].pre_slash_price = val.price;
+            orderItemsDetailArr[index].post_slash_price = val.price - val.discount;
             // console.log(val.latest_balance);
-            orderItemsDetailArr[index].min_price = val.latest_balance ? val.latest_balance.rate : val.post_slash_price;
+            orderItemsDetailArr[index].min_price = val.latest_balance ? val.latest_balance.rate : (val.price - val.discount); // if VIC calculated rate is not available, display post slash as min value (maximum possible discounted value).
             orderItemsDetailArr[index].final_price = val.price;
             orderItemsDetailArr[index].qty_discount = val.qty_discount;
             orderItemsDetailArr[index].cost = orderItemsDetailArr[index].quantity > 1 ? (orderItemsDetailArr[index].quantity * val.price) : (orderItemsDetailArr[index].quantity === 0 ? 0 : '')
@@ -500,21 +509,22 @@ const AddManualOrder = props => {
             )
 
             if (
-                !name || !quantity || quantity <= 0 || !final_price || !cost || !selectedSkuItems[index].id || !selectedSkuItems[index].name
+                !name || !quantity || quantity <= 0 || !final_price || final_price > post_slash_price || final_price >= min_price || !cost || !selectedSkuItems[index].id || !selectedSkuItems[index].name
             ) {
                 return true;
-            } else {
-                // if (min_price > 0) {
-                if (final_price >= min_price) {
-                    return false;
-                }
-                //     return true;
-                // } 
-                // else if (final_price >= post_slash_price) {
-                //     return false;
-                // }
-                return true;
-            }
+            } 
+            // else {
+            //     // if (min_price > 0) {
+            //     if (final_price >= min_price) {
+            //         return false;
+            //     }
+            //     //     return true;
+            //     // } 
+            //     // else if (final_price >= post_slash_price) {
+            //     //     return false;
+            //     // }
+            //     return true;
+            // }
 
             // final_price >= min_price && final_price <= post_slash_price 
 
@@ -833,8 +843,8 @@ const AddManualOrder = props => {
 
                         {
                             <div id="orderSkuItems">
-                                <h5>Order Items</h5>
-                                <br />
+                                <h4 style={{color: '#606060'}}>Order Items</h4>
+                                {/* <br /> */}
                                 {orderItemRows && orderItemRows.length > 0 &&
                                     Array.isArray(orderItemRows) &&
                                     orderItemRows.map((val, index) => {
