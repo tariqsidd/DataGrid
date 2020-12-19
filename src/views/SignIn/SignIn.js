@@ -257,7 +257,7 @@ const SignIn = props => {
                 console.log(baseurl)
                 baseurl = baseurl.slice(0, baseurl.lastIndexOf('/'))
                 console.log(baseurl)
-                window.location.replace(`${baseurl}/auth/login?next=${myURL}`)
+                window.location.replace(`${baseurl}/auth/login?role_id=${5}&next=${myURL}`)
               }}
               variant="contained">
               Sign in using Google Account
