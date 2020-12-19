@@ -15,6 +15,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import NotificationsIcon from '@material-ui/icons/NotificationsOutlined';
 import InputIcon from '@material-ui/icons/Input';
 import UserModel from '../../../../models/UserModel';
+import CONSTANT from '../../../../constants';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -75,7 +76,19 @@ const Topbar = props => {
           <IconButton
             className={classes.signOutButton}
             color="inherit"
-            onClick={onSignOut}>
+            onClick={() => {
+              // const myURL = window.location.href;
+              // console.log({ myURL })
+              var baseurl = CONSTANT.baseURL;
+              baseurl = baseurl.slice(0, baseurl.lastIndexOf('/'))
+              console.log(baseurl)
+              baseurl = baseurl.slice(0, baseurl.lastIndexOf('/'))
+              console.log(baseurl)
+              window.location.replace(`${baseurl}/auth/logout`)
+              onSignOut()
+            }}
+            // onClick={onSignOut}
+            >
             <InputIcon />
           </IconButton>
         </Hidden>
