@@ -71,9 +71,9 @@ const ManualOrderData = props => {
       filtering: false
     },
     { title: 'Amount', field: 'amount', editable: 'never', filtering: false },
-    { title: 'Promo Discount', field: 'coupon_discount', editable: 'never', filtering: false },
+    // { title: 'Promo Discount', field: 'coupon_discount', editable: 'never', filtering: false },
     { title: 'Special Discount', field: 'special_discount', editable: 'never', filtering: false },
-    { title: 'Wallet Discount', field: 'wallet_discount', editable: 'never', filtering: false },
+    // { title: 'Wallet Discount', field: 'wallet_discount', editable: 'never', filtering: false },
     { title: 'Total Bill', field: 'total_payable', editable: 'never', filtering: false },
     {
       title: 'Status',

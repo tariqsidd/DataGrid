@@ -22,7 +22,7 @@ import {
 import Hidden from '@material-ui/core/Hidden';
 import Paper from '@material-ui/core/Paper';
 import { withStyles } from '@material-ui/core/styles';
-import { validateNumeric } from 'common/validators';
+import { validateNumeric, validateInteger, validateNumericNoDecimal } from 'common/validators';
 import MaterialTable from 'material-table';
 // import 'antd/dist/antd.css';
 
@@ -329,9 +329,9 @@ const AddManualOrder = props => {
                     let itemsInStockArr = [];
                     data && data.length > 0 && Array.isArray(data) && data.forEach((item) => {
                         // console.log(item.is_stock, item.name)
-                        if (!item.is_stock) {
+                        if (!item.is_stock && item.latest_balance && item.latest_balance.rate && item.latest_balance.rate > 0) {
                             if (item.is_deal) {
-                                console.log({ item })
+                                // console.log({ item })
                                 var tempItem = { ...item, name: item.name + " - DEAL" }
                                 itemsInStockArr.push(tempItem)
                             } else {
@@ -357,20 +357,23 @@ const AddManualOrder = props => {
         console.log(e.target.name, e.target.value)
         const orderItemsDetailArr = orderItemRows;
         var orderitem = orderItemsDetailArr[index];
+        var valuue = e.target.value;
         if ((e.target.name === 'quantity' || e.target.name === 'final_price')) {
-            if (validateNumeric(parseInt(e.target.value)) || e.target.value === '') {
-                console.log('vladatenumeric')
-                console.log('vladatenumeric', e.target.value)
-                orderitem[e.target.name] = e.target.value;
+            // if (validateNumeric(parseInt(valuue)) || valuue === '') {
+            if (valuue == '' || (validateNumeric(+valuue) && validateNumericNoDecimal(+valuue) && !valuue.includes('.'))) {
+                // console.log('vladatenumeric')
+                console.log('vladatenumeric', valuue)
+                orderitem[e.target.name] = valuue;
             }
         }
 
         orderitem = applyBulkDiscounts(orderitem)
 
         // console.log(orderitem)
-
         if (e.target.name === 'quantity' || e.target.name === 'final_price') {
-            orderitem.cost = orderitem.quantity * orderitem.final_price;
+            if (valuue == '' || (validateNumeric(+valuue) && validateNumericNoDecimal(+valuue) && !valuue.includes('.'))) {
+                orderitem.cost = orderitem.quantity * orderitem.final_price;
+            }
         }
         orderItemsDetailArr[index] = orderitem;
         // console.log(orderItemsDetailArr)
@@ -671,14 +674,28 @@ const AddManualOrder = props => {
 
     const handleSpecialDiscountChange = event => {
         var spDiscount = event.target.value;
-        console.log(spDiscount)
+        // console.log(typeof(spDiscount))
+        // console.log(spDiscount)
         // console.log(validateNumeric(spDiscount))
         // console.log(validateNumeric('8+4_23%#^&^'))
-        if (validateNumeric(spDiscount) && spDiscount !== 0 && spDiscount !== '0' && spDiscount !== '' && !spDiscount.includes('+') && !spDiscount.includes('-')) {
-            console.log(spDiscount)
+        // // console.log(validateNumeric(spDiscount), spDiscount !== 0, spDiscount !== '0', !spDiscount.includes('+'), !spDiscount.includes('-'))
+        // // console.log(spDiscount == '', validateNumeric(spDiscount))
+        // console.log(spDiscount == '', validateNumeric(spDiscount), spDiscount !== 0, spDiscount !== '0', !spDiscount.includes('+'), !spDiscount.includes('-'))
+        // if (spDiscount == '' || (validateNumeric(spDiscount) && spDiscount !== 0 && spDiscount !== '0' && !spDiscount.includes('+') && !spDiscount.includes('-'))) {
+        //     console.log(spDiscount)
+        //     setspecialDiscount(spDiscount);
+        // } 
+        // else {
+        //     // alert('helo')
+        //     setspecialDiscount(specialDiscount);
+        // }
+
+        // console.log(validateNumeric(spDiscount))
+        // console.log(validateInteger(+spDiscount))
+        // console.log(validateNumericNoDecimal(+spDiscount))
+        if (spDiscount == '' || (validateNumeric(+spDiscount) && validateNumericNoDecimal(+spDiscount) && !spDiscount.includes('.'))) {
+            // console.log(spDiscount, +spDiscount)
             setspecialDiscount(spDiscount);
-        } else {
-            setspecialDiscount('');
         }
     };
 
@@ -743,7 +760,7 @@ const AddManualOrder = props => {
                             fullWidth
                             label="Qty"
                             name="quantity"
-                            type='number'
+                            type='text'
                             inputProps={{ min: 1 }}
                             min={1}
                             onChange={(e) => handleOrderItemDetailsChange(e, index)}
@@ -830,7 +847,7 @@ const AddManualOrder = props => {
                             fullWidth
                             label="Final Price"
                             name="final_price"
-                            type='number'
+                            type='text'
                             inputProps={{ min: values.min_price, max: values.pre_slash_price }}
                             min={values.min_price}
                             max={values.post_slash_price}
@@ -1072,7 +1089,7 @@ const AddManualOrder = props => {
                                     fullWidth
                                     onChange={handleSpecialDiscountChange}
                                     required
-                                    type="number"
+                                    type="text"
                                     value={specialDiscount}
                                     variant="standard"
                                 />
