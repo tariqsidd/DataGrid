@@ -24,6 +24,7 @@ import Paper from '@material-ui/core/Paper';
 import { withStyles } from '@material-ui/core/styles';
 import { validateNumeric, validateInteger, validateNumericNoDecimal } from 'common/validators';
 import MaterialTable from 'material-table';
+import style from './style.css';
 // import 'antd/dist/antd.css';
 
 const GreenCheckbox = withStyles({
@@ -339,7 +340,16 @@ const AddManualOrder = props => {
                             }
                         }
                     })
-                    setSkuItems([...itemsInStockArr]);
+                    console.log(itemsInStockArr)
+                    console.log(selectedSkuItems)
+                    var newItemsOnly = [];
+                    // checked len > than 1, so that there is atleast some item to check (if it already exist) otherwise gives error of cannot access property of undefined.
+                    // cuz 1st index is already empty line genrated by default, acc to logic.
+                    if (selectedSkuItems && selectedSkuItems.length > 0 && Array.isArray(selectedSkuItems)) { 
+                        newItemsOnly = itemsInStockArr.filter(item => selectedSkuItems.every(selectedskus => selectedskus.id != item.id))
+                    }
+                    console.log(newItemsOnly)
+                    setSkuItems([...newItemsOnly]);
                     setParams({ ...params, dataFetchStatus: true });
                 },
                 err => {
@@ -348,6 +358,19 @@ const AddManualOrder = props => {
             );
         }
     };
+
+    const handlePlusMinusFinalPrice = (e, index, sign) => {
+        var myevent = e;
+        const copyOrderItems = orderItemRows;
+        var thisItem = copyOrderItems[index];
+        if (sign === 'minus') {
+            myevent.target.value = +thisItem.final_price - 1;
+        } else if (sign === 'plus') {
+            myevent.target.value = +thisItem.final_price + 1;
+        }
+        
+        handleOrderItemDetailsChange(myevent, index)
+    }
 
     const handleOrderItemDetailsChange = (e, index) => {
         // console.log('eeeeeeeee handleOrderItemChange', e.target.name)
@@ -549,6 +572,7 @@ const AddManualOrder = props => {
             settotalBill(bill)
             setImpCondition(!impCondition)  // ask before removing
         }
+        setSkuItems([])
     };
 
     const applyPromoReferralGMVDiscounts = (subtotal) => {
@@ -842,6 +866,15 @@ const AddManualOrder = props => {
                             disabled
                         />
 
+                        <button 
+                            type="button" 
+                            name='final_price' 
+                            onClick={(e) => handlePlusMinusFinalPrice(e, index, 'minus')} 
+                            // value="-" 
+                            disabled={!values.final_price || values.final_price <= values.min_price} 
+                            data-field="final_price" 
+                            style={{backgroundColor: '#DCDCDC', borderRadius: 3, padding: 5}}
+                        >-</button>
                         <TextField
                             style={{ marginLeft: 5, marginRight: 5 }}
                             fullWidth
@@ -858,6 +891,15 @@ const AddManualOrder = props => {
                             variant="outlined"
                         // placeholder="Final Price"
                         />
+                        <button 
+                            type="button" 
+                            name='final_price' 
+                            onClick={(e) => handlePlusMinusFinalPrice(e, index, 'plus')} 
+                            // value="+" 
+                            disabled={!values.final_price || values.final_price >= values.post_slash_price} 
+                            data-field="final_price" 
+                            style={{backgroundColor: '#DCDCDC', borderRadius: 3, padding: 5}}
+                        >+</button>
 
                         <TextField
                             style={{ marginLeft: 5, marginRight: 5 }}
