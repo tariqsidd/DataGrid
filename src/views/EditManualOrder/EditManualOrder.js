@@ -116,8 +116,8 @@ const EditManualOrder = props => {
           tempArr.push({
             number: index + 1,
             skuId: obj.sku_id,
-            category: obj.categories[0].name,
-            subCategory: obj.sub_categories[0] ? obj.sub_categories[0].name : '',
+            category: (obj.categories && obj.categories[0]) ? obj.categories[0].name : '',
+            subCategory: (obj.sub_categories && obj.sub_categories[0]) ? obj.sub_categories[0].name : '',
             brand: obj.brand ? obj.brand : "",
             product: obj.product_name,
             skuName: obj.sku_name,
