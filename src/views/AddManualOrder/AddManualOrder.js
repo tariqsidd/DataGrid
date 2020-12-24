@@ -873,7 +873,7 @@ const AddManualOrder = props => {
                             // value="-" 
                             disabled={!values.final_price || values.final_price <= values.min_price} 
                             data-field="final_price" 
-                            style={{backgroundColor: '#DCDCDC', borderRadius: 3, padding: 5}}
+                            style={{backgroundColor: '#DCDCDC', borderRadius: 3, padding: 6}}
                         >-</button>
                         <TextField
                             style={{ marginLeft: 5, marginRight: 5 }}
