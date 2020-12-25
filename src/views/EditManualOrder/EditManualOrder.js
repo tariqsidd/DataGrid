@@ -306,24 +306,25 @@ const EditManualOrder = props => {
                   value={params.specialDiscount}
                   variant="outlined"
                 />
-                <Grid item md={6} xs={12}>
-                  <Autocomplete
-                    id="Order Status"
-                    options={order_status}
-                    getOptionLabel={option => option.name}
-                    style={{ width: 300 }}
-                    renderInput={params => (
-                      <TextField
-                        {...params}
-                        label="Order Status"
-                        margin="dense"
-                        variant="outlined"
-                      />
-                    )}
-                    onChange={orderStatusChange}
-                    value={params.status}
-                  />
-                </Grid>
+              </Grid>
+
+              <Grid item md={6} xs={12}>
+                <Autocomplete
+                  id="Order Status"
+                  options={order_status}
+                  getOptionLabel={option => option.name}
+                  // style={{ width: 300 }}
+                  renderInput={params => (
+                    <TextField
+                      {...params}
+                      label="Order Status"
+                      margin="dense"
+                      variant="outlined"
+                    />
+                  )}
+                  onChange={orderStatusChange}
+                  value={params.status}
+                />
               </Grid>
 
               <Snackbar
