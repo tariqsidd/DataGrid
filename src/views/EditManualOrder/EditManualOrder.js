@@ -116,8 +116,8 @@ const EditManualOrder = props => {
           tempArr.push({
             number: index + 1,
             skuId: obj.sku_id,
-            category: obj.categories[0].name,
-            subCategory: obj.sub_categories[0] ? obj.sub_categories[0].name : '',
+            category: (obj.categories && obj.categories[0]) ? obj.categories[0].name : '',
+            subCategory: (obj.sub_categories && obj.sub_categories[0]) ? obj.sub_categories[0].name : '',
             brand: obj.brand ? obj.brand : "",
             product: obj.product_name,
             skuName: obj.sku_name,
@@ -306,24 +306,25 @@ const EditManualOrder = props => {
                   value={params.specialDiscount}
                   variant="outlined"
                 />
-                <Grid item md={6} xs={12}>
-                  <Autocomplete
-                    id="Order Status"
-                    options={order_status}
-                    getOptionLabel={option => option.name}
-                    style={{ width: 300 }}
-                    renderInput={params => (
-                      <TextField
-                        {...params}
-                        label="Order Status"
-                        margin="dense"
-                        variant="outlined"
-                      />
-                    )}
-                    onChange={orderStatusChange}
-                    value={params.status}
-                  />
-                </Grid>
+              </Grid>
+
+              <Grid item md={6} xs={12}>
+                <Autocomplete
+                  id="Order Status"
+                  options={order_status}
+                  getOptionLabel={option => option.name}
+                  // style={{ width: 300 }}
+                  renderInput={params => (
+                    <TextField
+                      {...params}
+                      label="Order Status"
+                      margin="dense"
+                      variant="outlined"
+                    />
+                  )}
+                  onChange={orderStatusChange}
+                  value={params.status}
+                />
               </Grid>
 
               <Snackbar

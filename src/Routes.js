@@ -113,7 +113,7 @@ const Routes = () => {
         layout={MainLayout}
         path="/users"
       /> */}
-      <RouteWithLayout
+      {/* <RouteWithLayout
         component={SkuRequestsDash}
         exact
         layout={MainLayout}
@@ -148,7 +148,7 @@ const Routes = () => {
         exact
         layout={MainLayout}
         path="/settings"
-      />
+      /> */}
       <RouteWithLayout
         component={SignUpView}
         exact
@@ -161,7 +161,7 @@ const Routes = () => {
         layout={MinimalLayout}
         path="/sign-in"
       />
-      <RouteWithLayout
+      {/* <RouteWithLayout
         component={SkuDash}
         exact
         layout={MainLayout}
@@ -489,7 +489,7 @@ const Routes = () => {
         exact
         layout={MainLayout}
         path="/add-broadcast-message"
-      />
+      /> */}
       {/* <RouteWithLayout
         component={EditBroadcastMessage}
         exact
@@ -497,7 +497,7 @@ const Routes = () => {
         path="/edit-broadcast-message/:BroadcastMessageId"
       /> */}
 
-      <RouteWithLayout
+      {/* <RouteWithLayout
         component={UserDash}
         exact
         layout={MainLayout}
@@ -520,7 +520,7 @@ const Routes = () => {
         exact
         layout={MainLayout}
         path="/add-user"
-      />
+      /> */}
       <RouteWithLayout
         component={NotFoundView}
         exact

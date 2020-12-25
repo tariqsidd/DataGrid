@@ -104,9 +104,9 @@ const AddManualOrder = props => {
         { title: 'Total', field: 'cost', editable: 'never' },
     ]);
 
-    useEffect(() => {
-        console.log(orderItemRows[0].quantity, orderItemRows[0].final_price)
-    })
+    // useEffect(() => {
+    //     console.log(orderItemRows[0].quantity, orderItemRows[0].final_price)
+    // })
 
     useEffect(() => {
         let subtotal = 0;
@@ -181,9 +181,9 @@ const AddManualOrder = props => {
         var err = false;
         var warning = false;
         orderItemRows && orderItemRows.length > 0 && Array.isArray(orderItemRows) && orderItemRows.forEach(({ name, quantity, pre_slash_price, post_slash_price, min_price, final_price, cost }, index) => {
-            console.log(!name, !quantity, quantity <= 0, !final_price, !cost, !selectedSkuItems[index].id, !selectedSkuItems[index].name)
+            // console.log(!name, !quantity, quantity <= 0, !final_price, !cost, !selectedSkuItems[index].id, !selectedSkuItems[index].name)
             if (
-                !name || !quantity || quantity <= 0 || !final_price || !cost || !selectedSkuItems[index].id || !selectedSkuItems[index].name
+                !name || !quantity || quantity <= 0 || !final_price || !cost || !selectedSkuItems[index] || !selectedSkuItems[index].id || !selectedSkuItems[index].name
             ) {
                 err = true;
             }
@@ -340,15 +340,15 @@ const AddManualOrder = props => {
                             }
                         }
                     })
-                    console.log(itemsInStockArr)
-                    console.log(selectedSkuItems)
+                    // console.log(itemsInStockArr)
+                    // console.log(selectedSkuItems)
                     var newItemsOnly = [];
                     // checked len > than 1, so that there is atleast some item to check (if it already exist) otherwise gives error of cannot access property of undefined.
                     // cuz 1st index is already empty line genrated by default, acc to logic.
                     if (selectedSkuItems && selectedSkuItems.length > 0 && Array.isArray(selectedSkuItems)) { 
                         newItemsOnly = itemsInStockArr.filter(item => selectedSkuItems.every(selectedskus => selectedskus.id != item.id))
                     }
-                    console.log(newItemsOnly)
+                    // console.log(newItemsOnly)
                     setSkuItems([...newItemsOnly]);
                     setParams({ ...params, dataFetchStatus: true });
                 },
@@ -572,7 +572,7 @@ const AddManualOrder = props => {
             settotalBill(bill)
             setImpCondition(!impCondition)  // ask before removing
         }
-        setSkuItems([])
+        setSkuItems([]) // important to empty it, so that list doesnot repeat the already added sku.
     };
 
     const applyPromoReferralGMVDiscounts = (subtotal) => {
@@ -685,12 +685,14 @@ const AddManualOrder = props => {
     const removeOrderItem = (index) => {
         if (orderItemRows.length > 1) {
             let orderItemsDetailArr = [...orderItemRows];
+            console.log(orderItemRows)
             orderItemsDetailArr.splice(index, 1)
-            // console.log(orderItemsDetailArr)
+            console.log(orderItemsDetailArr)
             setOrderItemRows([...orderItemsDetailArr])
             let skuSelectedDetailsArr = [...selectedSkuItems];
+            console.log(selectedSkuItems)
             skuSelectedDetailsArr.splice(index, 1)
-            // console.log(skuSelectedDetailsArr)
+            console.log(skuSelectedDetailsArr)
             setSelectedSkuItems([...skuSelectedDetailsArr])
             setImpCondition(!impCondition)  // ask before removing
         }
@@ -754,22 +756,22 @@ const AddManualOrder = props => {
     const generateOrderItemsRows = (values, index) => {
         // console.log({ orderItemRows, selectedSkuItems })
         // console.log({ values })
+        console.log('dropdown SKU item', index, selectedSkuItems[index])
+        let thisSku = selectedSkuItems[index]  // {id: 1, name: 'Prince biscuit'} new sahi
         return (
             <>
                 <Grid container spacing={1} style={{ marginTop: 20 }}>
 
                     <Grid item md={4} xs={12}>
                         <Autocomplete
-                            id="sku"
-                            // name='Sku_name'
                             options={skuItems}
                             getOptionLabel={option => option.name}
                             renderInput={params => (
-                                <TextField {...params} label="SKU" variant="outlined"
+                                <TextField {...params} label="SKU" variant="outlined" 
                                     // margin="dense" 
                                     placeholder='Search SKU' />
                             )}
-                            value={selectedSkuItems[index]}
+                            value={selectedSkuItems[index] || {}}
                             onChange={(e, val) => orderItemHandleChange(e, val, index)}
                             onInputChange={skuSearch}
                             loading
@@ -873,7 +875,7 @@ const AddManualOrder = props => {
                             // value="-" 
                             disabled={!values.final_price || values.final_price <= values.min_price} 
                             data-field="final_price" 
-                            style={{backgroundColor: '#DCDCDC', borderRadius: 3, padding: 5}}
+                            style={{backgroundColor: '#DCDCDC', borderRadius: 3, padding: 6}}
                         >-</button>
                         <TextField
                             style={{ marginLeft: 5, marginRight: 5 }}
@@ -918,7 +920,13 @@ const AddManualOrder = props => {
                             disabled
                         />
 
-                        <Icon color="primary" style={{ fontSize: 40, marginLeft: 5, marginRight: 5 }} onClick={() => removeOrderItem(index)}>cancel</Icon>
+                        {/* These consitions were a backup plan if autocomplete didnt work, then tried to show remove button only on last index */}
+                        {/* {selectedSkuItems && selectedSkuItems.length > 0 && Array.isArray(selectedSkuItems) && index+1 == selectedSkuItems.length 
+                        ? */}
+                            <Icon color="primary" style={{ fontSize: 40, marginLeft: 5, marginRight: 5 }} onClick={() => removeOrderItem(index)}>cancel</Icon>
+                        {/* :
+                            <span style={{margin: 23}}></span>
+                        } */}
                     </Grid>
 
                 </Grid>
