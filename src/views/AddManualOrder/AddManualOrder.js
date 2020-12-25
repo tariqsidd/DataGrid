@@ -757,22 +757,21 @@ const AddManualOrder = props => {
         // console.log({ orderItemRows, selectedSkuItems })
         // console.log({ values })
         console.log('dropdown SKU item', index, selectedSkuItems[index])
+        let thisSku = selectedSkuItems[index]  // {id: 1, name: 'Prince biscuit'} new sahi
         return (
             <>
                 <Grid container spacing={1} style={{ marginTop: 20 }}>
 
                     <Grid item md={4} xs={12}>
                         <Autocomplete
-                            id="sku"
-                            // name='Sku_name'
                             options={skuItems}
                             getOptionLabel={option => option.name}
                             renderInput={params => (
-                                <TextField {...params} label="SKU" variant="outlined"
+                                <TextField {...params} label="SKU" variant="outlined" 
                                     // margin="dense" 
                                     placeholder='Search SKU' />
                             )}
-                            value={selectedSkuItems[index]}
+                            value={selectedSkuItems[index] || {}}
                             onChange={(e, val) => orderItemHandleChange(e, val, index)}
                             onInputChange={skuSearch}
                             loading
@@ -921,7 +920,13 @@ const AddManualOrder = props => {
                             disabled
                         />
 
-                        <Icon color="primary" style={{ fontSize: 40, marginLeft: 5, marginRight: 5 }} onClick={() => removeOrderItem(index)}>cancel</Icon>
+                        {/* These consitions were a backup plan if autocomplete didnt work, then tried to show remove button only on last index */}
+                        {/* {selectedSkuItems && selectedSkuItems.length > 0 && Array.isArray(selectedSkuItems) && index+1 == selectedSkuItems.length 
+                        ? */}
+                            <Icon color="primary" style={{ fontSize: 40, marginLeft: 5, marginRight: 5 }} onClick={() => removeOrderItem(index)}>cancel</Icon>
+                        {/* :
+                            <span style={{margin: 23}}></span>
+                        } */}
                     </Grid>
 
                 </Grid>
