@@ -63,16 +63,16 @@ const EditManualOrder = props => {
   var [orderData, setorderData] = useState([]);
   const [state, setState] = React.useState([
     { title: 'No.', field: 'number', editable: 'never' },
-    { title: 'Category', field: 'category', editable: 'never' },
-    { title: 'Sub Category', field: 'subCategory', editable: 'never' },
-    { title: 'Brands', field: 'brand', editable: 'never' },
-    { title: 'Product', field: 'product', editable: 'never' },
-    { title: 'Sku name', field: 'skuName', editable: 'never' },
     { title: 'Sku Code', field: 'skuCode', editable: 'never' },
+    { title: 'Sku name', field: 'skuName', editable: 'never' },
     { title: 'Supplier', field: 'supplier', editable: 'never' },
     { title: 'Unit Cost Price', field: 'costPrice', editable: 'never' },
     { title: 'Discount per unit', field: 'discount', editable: 'never' },
-    { title: 'Quantity', field: 'quantity' }
+    { title: 'Quantity', field: 'quantity' },
+    { title: 'Product', field: 'product', editable: 'never' },
+    { title: 'Brand', field: 'brand', editable: 'never' },
+    { title: 'Category', field: 'category', editable: 'never' },
+    { title: 'Subcategory', field: 'subCategory', editable: 'never' },
   ]);
   var [orderId, setOrderId] = useState();
   var [selectedOrderStatus, setSelectedOrderStatus] = useState();
@@ -97,6 +97,15 @@ const EditManualOrder = props => {
     // const id = props.match.params.id;
     // console.log('props id is.....: ', props.match.params);
     // console.log('props', props.location.state);
+    getOrderInfo();
+    return () => {
+      setOrderId(null);
+      setSelectedOrderStatus(null);
+      setParams(null);
+    };
+  }, []);
+
+  const getOrderInfo = () => {
     UserModel.getInstance().getOrderDetail(
       props.match.params.id,
       async data => {
@@ -136,12 +145,7 @@ const EditManualOrder = props => {
         console.log('detail err', err);
       }
     );
-    return () => {
-      setOrderId(null);
-      setSelectedOrderStatus(null);
-      setParams(null);
-    };
-  }, []);
+  }
 
   let history = useHistory();
 
@@ -200,7 +204,7 @@ const EditManualOrder = props => {
           // console.log(succ);
           setParams({ ...params, openSuccess: true });
           setTimeout(() => {
-            props.history.push('/orders');
+            props.history.push('/manual-orders');
 
             // console.log('props', props);
           }, 3000);
@@ -361,18 +365,9 @@ const EditManualOrder = props => {
             columns={state}
             options={{
               filtering: true,
-              paging: false
+              paging: false,
+              search: false
             }}
-            actions={[
-              {
-                icon: 'add',
-                tooltip: 'Add order Item',
-                isFreeAction: true,
-                onClick: () => {
-                  history.push(`/orders/add-order-detail/${props.match.params.id}`);
-                }
-              },
-            ]}
             data={orderData}
             className={clsx(classes.root, className)}
             editable={{
@@ -423,8 +418,9 @@ const EditManualOrder = props => {
                   UserModel.getInstance().addOrderDetail(
                     obj,
                     succ => {
-                      console.log('succ', succ)
-                      // window.location.reload();
+                      // console.log('succ', succ)
+                      setParams({ openError: false, openSuccess: true });
+                      window.location.reload();
                     },
                     err => {
                       console.log('err', err)
