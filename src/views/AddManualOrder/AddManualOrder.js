@@ -771,7 +771,7 @@ const AddManualOrder = props => {
                                     // margin="dense" 
                                     placeholder='Search SKU' />
                             )}
-                            value={selectedSkuItems[index] || {}}
+                            value={selectedSkuItems[index] ? selectedSkuItems[index] : {id: null, name: ''}}
                             onChange={(e, val) => orderItemHandleChange(e, val, index)}
                             onInputChange={skuSearch}
                             loading
