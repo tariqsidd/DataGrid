@@ -86,9 +86,9 @@ const Topbar = props => {
               // console.log({ myURL })
               var baseurl = CONSTANT.baseURL;
               baseurl = baseurl.slice(0, baseurl.lastIndexOf('/'))
-              console.log(baseurl)
+              // console.log(baseurl)
               baseurl = baseurl.slice(0, baseurl.lastIndexOf('/'))
-              console.log(baseurl)
+              // console.log(baseurl)
               window.location.replace(`${baseurl}/auth/logout`)
               onSignOut()
             }}

@@ -153,7 +153,7 @@ const ManualOrderData = props => {
         setorderData(tempArr);
       },
       err => {
-        console.log(err);
+        // console.log(err);
       }
     );
   }, []);
@@ -216,7 +216,7 @@ const ManualOrderData = props => {
           setParams({ ...params, offset: newOffset, page: newPage });
         },
         err => {
-          console.log(err);
+          // console.log(err);
         }
       );
     }
@@ -268,7 +268,7 @@ const ManualOrderData = props => {
         setParams({ ...params, offset: newOffset, page: newPage });
       },
       err => {
-        console.log(err);
+        // console.log(err);
       }
     );
   };
@@ -372,7 +372,7 @@ const ManualOrderData = props => {
           await setorderData(tempArr);
         },
         err => {
-          console.log('my err', err);
+          // console.log('my err', err);
         }
       );
       // console.log('order data filter', orderData);
@@ -419,7 +419,7 @@ const ManualOrderData = props => {
           // console.log('222222', tempArr);
         },
         err => {
-          console.log(err);
+          // console.log(err);
         }
       );
     }

@@ -178,7 +178,7 @@ const AddManualOrder = props => {
     // };
 
     const checkErrors = () => {
-        console.log("selectedMobData", selectedMobileData)
+        // console.log("selectedMobData", selectedMobileData)
         var err = false;
         var warning = false;
         orderItemRows && orderItemRows.length > 0 && Array.isArray(orderItemRows) && orderItemRows.forEach(({ name, quantity, pre_slash_price, post_slash_price, min_price, final_price, cost }, index) => {
@@ -219,7 +219,7 @@ const AddManualOrder = props => {
             //     return true;
             // }
         })
-        console.log(err, warning)
+        // console.log(err, warning)
         if (err)
             return 'err';
         else if (warning)
@@ -234,19 +234,19 @@ const AddManualOrder = props => {
     };
 
     const handleSubmit = async () => {
-        console.log(params.submitStatus)
+        // console.log(params.submitStatus)
         // if (!params.submitStatus) { //Commented this because it is being handles in render method
         const validationCheck = await checkErrors() // Hamza you need to redo you error handling. It doesn not work
         if (validationCheck === 'err') {
-            console.log('A')
+            // console.log('A')
             setOpenData({ openError: true, openSuccess: false, openWarning: false, openDiscountWarning: false, openMinOrderValueWarning: false, openMobileNotSelectedWarning: false, openFinalPriceNotWithinRangeWarning: false });
         } 
         else if (validationCheck === 'warning') {
-            console.log('B')
+            // console.log('B')
             setOpenData({ openFinalPriceNotWithinRangeWarning: true, openError: false, openSuccess: false, openWarning: false, openDiscountWarning: false, openMinOrderValueWarning: false, openMobileNotSelectedWarning: false });
         }
         else if (!selectedMobileData || !selectedMobileData.id) {
-            console.log('C')
+            // console.log('C')
             setOpenData({ openMobileNotSelectedWarning: true, openSuccess: false, openWarning: false, openError: false, openDiscountWarning: false, openMinOrderValueWarning: false, openFinalPriceNotWithinRangeWarning: false })
         }
         else if (subTotal < 1000) {
@@ -269,7 +269,7 @@ const AddManualOrder = props => {
                 qty: +item.quantity
             }))
             if (orderList.length > 0 && selectedMobileData && selectedMobileData.id) {
-                console.log("MAKING")
+                // console.log("MAKING")
                 var obj = {
                     user_id: selectedMobileData.id, // retailer ID
                     items: orderList,
@@ -303,7 +303,7 @@ const AddManualOrder = props => {
                     },
                     err => {
                         setParams({ ...params, submitStatus: false });
-                        console.log(err);
+                        // console.log(err);
                     }
                 );
             }
@@ -354,7 +354,7 @@ const AddManualOrder = props => {
                     setParams({ ...params, dataFetchStatus: true });
                 },
                 err => {
-                    console.log(err);
+                    // console.log(err);
                 }
             );
         }
@@ -378,7 +378,7 @@ const AddManualOrder = props => {
         // console.clear()
         // console.log('handleOrderItemChange')
         // console.log(e.target.name, e.target.value, { index })
-        console.log(e.target.name, e.target.value)
+        // console.log(e.target.name, e.target.value)
         const orderItemsDetailArr = orderItemRows;
         var orderitem = orderItemsDetailArr[index];
         var valuue = e.target.value;
@@ -386,7 +386,7 @@ const AddManualOrder = props => {
             // if (validateNumeric(parseInt(valuue)) || valuue === '') {
             if (valuue === '' || (validateNumeric(+valuue) && validateNumericNoDecimal(+valuue) && !valuue.includes('.'))) {
                 // console.log('vladatenumeric')
-                console.log('vladatenumeric', valuue)
+                // console.log('vladatenumeric', valuue)
                 orderitem[e.target.name] = valuue;
             }
         }
@@ -526,7 +526,7 @@ const AddManualOrder = props => {
         } else {
             const skuItemsDetailArr = selectedSkuItems;
             delete skuItemsDetailArr[index]
-            console.log(skuItemsDetailArr)
+            // console.log(skuItemsDetailArr)
             setSelectedSkuItems(skuItemsDetailArr);
 
             const orderItemsDetailArr = orderItemRows;
@@ -686,14 +686,14 @@ const AddManualOrder = props => {
     const removeOrderItem = (index) => {
         if (orderItemRows.length > 1) {
             let orderItemsDetailArr = [...orderItemRows];
-            console.log(orderItemRows)
+            // console.log(orderItemRows)
             orderItemsDetailArr.splice(index, 1)
-            console.log(orderItemsDetailArr)
+            // console.log(orderItemsDetailArr)
             setOrderItemRows([...orderItemsDetailArr])
             let skuSelectedDetailsArr = [...selectedSkuItems];
-            console.log(selectedSkuItems)
+            // console.log(selectedSkuItems)
             skuSelectedDetailsArr.splice(index, 1)
-            console.log(skuSelectedDetailsArr)
+            // console.log(skuSelectedDetailsArr)
             setSelectedSkuItems([...skuSelectedDetailsArr])
             setImpCondition(!impCondition)  // ask before removing
         }
@@ -757,7 +757,7 @@ const AddManualOrder = props => {
     const generateOrderItemsRows = (values, index) => {
         // console.log({ orderItemRows, selectedSkuItems })
         // console.log({ values })
-        console.log('dropdown SKU item', index, selectedSkuItems[index])
+        // console.log('dropdown SKU item', index, selectedSkuItems[index])
         // let thisSku = selectedSkuItems[index] 
         return (
             <>

@@ -110,7 +110,7 @@ const EditManualOrder = props => {
     UserModel.getInstance().getOrderDetail(
       props.match.params.id,
       async data => {
-        console.log("ssssssssssstatus", data)
+        // console.log("ssssssssssstatus", data)
         let tempArr = [];
         setParams({
           ...params,
@@ -143,7 +143,7 @@ const EditManualOrder = props => {
 
       },
       err => {
-        console.log('detail err', err);
+        // console.log('detail err', err);
       }
     );
   }
@@ -198,7 +198,7 @@ const EditManualOrder = props => {
           }, 3000);
         },
         err => {
-          console.log(err);
+          // console.log(err);
           setParams({ ...params, openError: true });
         }
       );
@@ -375,7 +375,7 @@ const EditManualOrder = props => {
                         window.location.reload();
                       },
                       err => {
-                        console.log(err);
+                        // console.log(err);
                       }
                     );
                   }, 600);
@@ -394,7 +394,7 @@ const EditManualOrder = props => {
 
                   resolve();
                   // console.log('old data', oldData)
-                  console.log('new data', newData)
+                  // console.log('new data', newData)
                   var obj = {
                     order_id: params.id,
                     sku_id: newData.skuId,
@@ -411,7 +411,7 @@ const EditManualOrder = props => {
                       window.location.reload();
                     },
                     err => {
-                      console.log('err', err)
+                      // console.log('err', err)
                     }
                   )
                   // }, 1000);

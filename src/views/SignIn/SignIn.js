@@ -162,9 +162,9 @@ const SignIn = props => {
     const auth = await localStorage.getItem('sales-auth-token')
     const refresh = await localStorage.getItem('sales-refresh-token')
 
-    console.log({ auth, refresh })
+    // console.log({ auth, refresh })
     if (auth && refresh && auth !== 'null' && refresh !== 'null') {
-      console.log('auth and refresh token exists')
+      // console.log('auth and refresh token exists')
       // console.log(props.history.push)
       // console.log(props)
       window.location.replace('/dashboard')
@@ -191,7 +191,7 @@ const SignIn = props => {
   // };
 
   const handleChange = event => {
-    console.log(event.target.value);
+    // console.log(event.target.value);
     event.persist();
 
     setFormState(formState => ({
@@ -212,16 +212,16 @@ const SignIn = props => {
 
   const handleSignIn = event => {
     event.preventDefault();
-    console.log(formState.values);
+    // console.log(formState.values);
     UserModel.getInstance().Login(
       formState.values.mobile,
       formState.values.password,
       data => {
-        console.log(data);
+        // console.log(data);
         history.push('/dashboard');
       },
       err => {
-        console.log(err);
+        // console.log(err);
         invalidCredentials.boolean = true;
         invalidAuthText = 'Incorrect credentials';
         alert(invalidAuthText);
@@ -257,9 +257,9 @@ const SignIn = props => {
                 // console.log({ myURL })
                 var baseurl = CONSTANT.baseURL;
                 baseurl = baseurl.slice(0, baseurl.lastIndexOf('/'))
-                console.log(baseurl)
+                // console.log(baseurl)
                 baseurl = baseurl.slice(0, baseurl.lastIndexOf('/'))
-                console.log(baseurl)
+                // console.log(baseurl)
                 window.location.replace(`${baseurl}/auth/login?role_id=${5}&next=${myURL}`)
               }}
               variant="contained">
