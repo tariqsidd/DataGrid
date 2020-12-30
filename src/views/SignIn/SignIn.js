@@ -1,20 +1,22 @@
-import React, { useState, useEffect, Component } from 'react';
-import { Link as RouterLink, withRouter } from 'react-router-dom';
-import Card from '@material-ui/core/Card';
+import React, { useState, useEffect } from 'react';
+import { 
+  // Link as RouterLink, 
+  withRouter } from 'react-router-dom';
+// import Card from '@material-ui/core/Card';
 import PropTypes from 'prop-types';
 import validate from 'validate.js';
 import { makeStyles } from '@material-ui/styles';
 import {
   Grid,
   Button,
-  IconButton,
+  // IconButton,
   TextField,
-  Link,
+  // Link,
   Typography,
-  CardContent,
+  // CardContent,
   colors
 } from '@material-ui/core';
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+// import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import UserModel from '../../models/UserModel';
 import CONSTANT from '../../constants';
 
@@ -52,9 +54,9 @@ const schema = {
     }
   }
 };
-const inputProps = {
-  step: 300,
-};
+// const inputProps = {
+//   step: 300,
+// };
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -141,6 +143,7 @@ const SignIn = props => {
     // if (window.location.href.includes('localhost')) {
       afterSignInWithGoogle()
     // }
+    // eslint-disable-next-line
   }, [])
 
   const afterSignInWithGoogle = async () => {
@@ -183,9 +186,9 @@ const SignIn = props => {
     }));
   }, [formState.values]);
 
-  const handleBack = () => {
-    history.goBack();
-  };
+  // const handleBack = () => {
+  //   history.goBack();
+  // };
 
   const handleChange = event => {
     console.log(event.target.value);

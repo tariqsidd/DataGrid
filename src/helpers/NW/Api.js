@@ -107,7 +107,7 @@ export default class Api {
     params &&
       params.length > 0 &&
       Array.isArray(params) &&
-      params.map((item, index) => {
+      params.forEach((item, index) => {
         console.log(index, item);
         searchParamsURL +=
           `${item.column_name}=${item.text}` +
@@ -298,7 +298,7 @@ export default class Api {
     params &&
       params.length > 0 &&
       Array.isArray(params) &&
-      params.map((item, index) => {
+      params.forEach((item, index) => {
         console.log(index, item);
         searchParamsURL +=
           `${item.column_name}=${item.text}` +
@@ -472,7 +472,7 @@ export default class Api {
     params &&
       params.length > 0 &&
       Array.isArray(params) &&
-      params.map((item, index) => {
+      params.forEach((item, index) => {
         console.log(index, item);
         searchParamsURL +=
           `${item.column_name}=${item.text}` +
@@ -4789,7 +4789,7 @@ export default class Api {
     params &&
       params.length > 0 &&
       Array.isArray(params) &&
-      params.map((item, index) => {
+      params.forEach((item, index) => {
         console.log(index, item);
         searchParamsURL +=
           `${item.column_name}=${item.text}` +

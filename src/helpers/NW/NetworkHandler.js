@@ -171,7 +171,7 @@ export default class NetworkHandler {
     // console.log('parameters are : ' + JSON.stringify(serviceParams));
 
     if (serviceParams != null && !url.includes('?')) {
-      url = url;
+      // url = url;
       for (const [key, value] of Object.entries(serviceParams)) {
         // console.log('obj enn', Object.entries(serviceParams));
         url = url + '&' + key + '=' + value;

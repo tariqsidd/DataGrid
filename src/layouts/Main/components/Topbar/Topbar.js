@@ -2,14 +2,17 @@ import React, { useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import { makeStyles, ThemeProvider } from '@material-ui/styles';
+import { 
+  makeStyles, 
+  // ThemeProvider
+ } from '@material-ui/styles';
 import {
   AppBar,
   Toolbar,
   Badge,
   Hidden,
   IconButton,
-  Typography
+  // Typography
 } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import NotificationsIcon from '@material-ui/icons/NotificationsOutlined';
@@ -40,7 +43,9 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const Topbar = props => {
-  const { className, onSidebarOpen, ...rest } = props;
+  const { className, onSidebarOpen,
+    //  ...rest
+     } = props;
 
   const classes = useStyles();
 
