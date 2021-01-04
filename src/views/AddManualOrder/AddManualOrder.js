@@ -481,11 +481,11 @@ const AddManualOrder = props => {
             orderitem.name = val.name;
             // orderitem.quantity = val.quantity;
             // orderitem.price = val.price;
-            orderitem.pre_slash_price = val.price;
-            orderitem.post_slash_price = val.price - val.discount;
+            orderitem.pre_slash_price = val.price + val.discount;
+            orderitem.post_slash_price = val.price;
             // console.log(val.latest_balance);
-            orderitem.min_price = val.latest_balance ? val.latest_balance.rate : (val.price - val.discount); // if VIC calculated rate is not available, display post slash as min value (maximum possible discounted value).
-            orderitem.final_price = val.price - val.discount;
+            orderitem.min_price = val.latest_balance ? val.latest_balance.rate : (val.price); // if VIC calculated rate is not available, display post slash as min value (maximum possible discounted value).
+            orderitem.final_price = val.price;
             // orderitem.qty_discount = val.qty_discount; // Bulk Discount to be enabled later
             orderitem.cost = orderitem.quantity > 1 ? (orderitem.quantity * val.price) : (orderitem.quantity === 0 ? 0 : '')
 
