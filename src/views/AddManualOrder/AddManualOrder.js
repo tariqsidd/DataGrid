@@ -10,32 +10,32 @@ import {
     CardHeader,
     CardContent,
     CardActions,
-    CardActionArea,
-    CardMedia,
+    // CardActionArea,
+    // CardMedia,
     Divider,
     Grid,
     Button,
     TextField,
-    Checkbox,
+    // Checkbox,
     Icon
 } from '@material-ui/core';
 import Hidden from '@material-ui/core/Hidden';
-import Paper from '@material-ui/core/Paper';
-import { withStyles } from '@material-ui/core/styles';
-import { validateNumeric, validateInteger, validateNumericNoDecimal } from 'common/validators';
+// import Paper from '@material-ui/core/Paper';
+// import { withStyles } from '@material-ui/core/styles';
+import { validateNumeric, validateNumericNoDecimal } from 'common/validators';
 import MaterialTable from 'material-table';
-import style from './style.css';
+// import style from './style.css';
 // import 'antd/dist/antd.css';
 
-const GreenCheckbox = withStyles({
-    root: {
-        color: 'orange',
-        '&$checked': {
-            color: 'orange',
-        },
-    },
-    checked: {},
-})((props) => <Checkbox color="default" {...props} />);
+// const GreenCheckbox = withStyles({
+//     root: {
+//         color: 'orange',
+//         '&$checked': {
+//             color: 'orange',
+//         },
+//     },
+//     checked: {},
+// })((props) => <Checkbox color="default" {...props} />);
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -138,6 +138,7 @@ const AddManualOrder = props => {
         // // console.log(bill)
 
         settotalBill(bill)
+        // eslint-disable-next-line
     }, [specialDiscount, orderItemRows, promoCodeDiscount, selectedMobileData])
 
     const mobileHandleChange = async (event, val) => {
@@ -169,15 +170,15 @@ const AddManualOrder = props => {
         );
     };
 
-    const handleChange = event => {
-        setParams({
-            ...params,
-            [event.target.name]: event.target.value
-        });
-    };
+    // const handleChange = event => {
+    //     setParams({
+    //         ...params,
+    //         [event.target.name]: event.target.value
+    //     });
+    // };
 
     const checkErrors = () => {
-        console.log("selectedMobData", selectedMobileData)
+        // console.log("selectedMobData", selectedMobileData)
         var err = false;
         var warning = false;
         orderItemRows && orderItemRows.length > 0 && Array.isArray(orderItemRows) && orderItemRows.forEach(({ name, quantity, pre_slash_price, post_slash_price, min_price, final_price, cost }, index) => {
@@ -218,7 +219,7 @@ const AddManualOrder = props => {
             //     return true;
             // }
         })
-        console.log(err, warning)
+        // console.log(err, warning)
         if (err)
             return 'err';
         else if (warning)
@@ -233,19 +234,19 @@ const AddManualOrder = props => {
     };
 
     const handleSubmit = async () => {
-        console.log(params.submitStatus)
+        // console.log(params.submitStatus)
         // if (!params.submitStatus) { //Commented this because it is being handles in render method
         const validationCheck = await checkErrors() // Hamza you need to redo you error handling. It doesn not work
-        if (validationCheck == 'err') {
-            console.log('A')
+        if (validationCheck === 'err') {
+            // console.log('A')
             setOpenData({ openError: true, openSuccess: false, openWarning: false, openDiscountWarning: false, openMinOrderValueWarning: false, openMobileNotSelectedWarning: false, openFinalPriceNotWithinRangeWarning: false });
         } 
-        else if (validationCheck == 'warning') {
-            console.log('B')
+        else if (validationCheck === 'warning') {
+            // console.log('B')
             setOpenData({ openFinalPriceNotWithinRangeWarning: true, openError: false, openSuccess: false, openWarning: false, openDiscountWarning: false, openMinOrderValueWarning: false, openMobileNotSelectedWarning: false });
         }
         else if (!selectedMobileData || !selectedMobileData.id) {
-            console.log('C')
+            // console.log('C')
             setOpenData({ openMobileNotSelectedWarning: true, openSuccess: false, openWarning: false, openError: false, openDiscountWarning: false, openMinOrderValueWarning: false, openFinalPriceNotWithinRangeWarning: false })
         }
         else if (subTotal < 1000) {
@@ -261,14 +262,14 @@ const AddManualOrder = props => {
         }
         else if (totalBill && Number(totalBill) && totalBill > 0) {
             setParams({ ...params, submitStatus: true });
-            let par = new FormData();
+            // let par = new FormData();
             let orderList = orderItemRows && orderItemRows.filter(x => x.quantity > 0).map((item, index) => ({
                 sku_id: selectedSkuItems[index].id,
                 price: item.final_price,
                 qty: +item.quantity
             }))
             if (orderList.length > 0 && selectedMobileData && selectedMobileData.id) {
-                console.log("MAKING")
+                // console.log("MAKING")
                 var obj = {
                     user_id: selectedMobileData.id, // retailer ID
                     items: orderList,
@@ -302,7 +303,7 @@ const AddManualOrder = props => {
                     },
                     err => {
                         setParams({ ...params, submitStatus: false });
-                        console.log(err);
+                        // console.log(err);
                     }
                 );
             }
@@ -353,7 +354,7 @@ const AddManualOrder = props => {
                     setParams({ ...params, dataFetchStatus: true });
                 },
                 err => {
-                    console.log(err);
+                    // console.log(err);
                 }
             );
         }
@@ -377,15 +378,15 @@ const AddManualOrder = props => {
         // console.clear()
         // console.log('handleOrderItemChange')
         // console.log(e.target.name, e.target.value, { index })
-        console.log(e.target.name, e.target.value)
+        // console.log(e.target.name, e.target.value)
         const orderItemsDetailArr = orderItemRows;
         var orderitem = orderItemsDetailArr[index];
         var valuue = e.target.value;
         if ((e.target.name === 'quantity' || e.target.name === 'final_price')) {
             // if (validateNumeric(parseInt(valuue)) || valuue === '') {
-            if (valuue == '' || (validateNumeric(+valuue) && validateNumericNoDecimal(+valuue) && !valuue.includes('.'))) {
+            if (valuue === '' || (validateNumeric(+valuue) && validateNumericNoDecimal(+valuue) && !valuue.includes('.'))) {
                 // console.log('vladatenumeric')
-                console.log('vladatenumeric', valuue)
+                // console.log('vladatenumeric', valuue)
                 orderitem[e.target.name] = valuue;
             }
         }
@@ -394,7 +395,7 @@ const AddManualOrder = props => {
 
         // console.log(orderitem)
         if (e.target.name === 'quantity' || e.target.name === 'final_price') {
-            if (valuue == '' || (validateNumeric(+valuue) && validateNumericNoDecimal(+valuue) && !valuue.includes('.'))) {
+            if (valuue === '' || (validateNumeric(+valuue) && validateNumericNoDecimal(+valuue) && !valuue.includes('.'))) {
                 orderitem.cost = orderitem.quantity * orderitem.final_price;
             }
         }
@@ -525,7 +526,7 @@ const AddManualOrder = props => {
         } else {
             const skuItemsDetailArr = selectedSkuItems;
             delete skuItemsDetailArr[index]
-            console.log(skuItemsDetailArr)
+            // console.log(skuItemsDetailArr)
             setSelectedSkuItems(skuItemsDetailArr);
 
             const orderItemsDetailArr = orderItemRows;
@@ -601,10 +602,10 @@ const AddManualOrder = props => {
         // console.log('add new order row')
         // let rowFilled = false;
         const validationCheck = await checkErrors() // Hamza you need to redo you error handling. It doesn not work
-        if (validationCheck == 'err') {
+        if (validationCheck === 'err') {
             setOpenData({ openError: true, openSuccess: false, openWarning: false, openDiscountWarning: false, openMinOrderValueWarning: false, openMobileNotSelectedWarning: false, openFinalPriceNotWithinRangeWarning: false });
         } 
-        else if (validationCheck == 'warning') {
+        else if (validationCheck === 'warning') {
             setOpenData({ openFinalPriceNotWithinRangeWarning: true, openError: false, openSuccess: false, openWarning: false, openDiscountWarning: false, openMinOrderValueWarning: false, openMobileNotSelectedWarning: false });
         }
         else if (!selectedMobileData || !selectedMobileData.id) {
@@ -685,14 +686,14 @@ const AddManualOrder = props => {
     const removeOrderItem = (index) => {
         if (orderItemRows.length > 1) {
             let orderItemsDetailArr = [...orderItemRows];
-            console.log(orderItemRows)
+            // console.log(orderItemRows)
             orderItemsDetailArr.splice(index, 1)
-            console.log(orderItemsDetailArr)
+            // console.log(orderItemsDetailArr)
             setOrderItemRows([...orderItemsDetailArr])
             let skuSelectedDetailsArr = [...selectedSkuItems];
-            console.log(selectedSkuItems)
+            // console.log(selectedSkuItems)
             skuSelectedDetailsArr.splice(index, 1)
-            console.log(skuSelectedDetailsArr)
+            // console.log(skuSelectedDetailsArr)
             setSelectedSkuItems([...skuSelectedDetailsArr])
             setImpCondition(!impCondition)  // ask before removing
         }
@@ -719,7 +720,7 @@ const AddManualOrder = props => {
         // console.log(validateNumeric(spDiscount))
         // console.log(validateInteger(+spDiscount))
         // console.log(validateNumericNoDecimal(+spDiscount))
-        if (spDiscount == '' || (validateNumeric(+spDiscount) && validateNumericNoDecimal(+spDiscount) && !spDiscount.includes('.'))) {
+        if (spDiscount === '' || (validateNumeric(+spDiscount) && validateNumericNoDecimal(+spDiscount) && !spDiscount.includes('.'))) {
             // console.log(spDiscount, +spDiscount)
             setspecialDiscount(spDiscount);
         }
@@ -756,8 +757,8 @@ const AddManualOrder = props => {
     const generateOrderItemsRows = (values, index) => {
         // console.log({ orderItemRows, selectedSkuItems })
         // console.log({ values })
-        console.log('dropdown SKU item', index, selectedSkuItems[index])
-        let thisSku = selectedSkuItems[index]  // {id: 1, name: 'Prince biscuit'} new sahi
+        // console.log('dropdown SKU item', index, selectedSkuItems[index])
+        // let thisSku = selectedSkuItems[index] 
         return (
             <>
                 <Grid container spacing={1} style={{ marginTop: 20 }}>

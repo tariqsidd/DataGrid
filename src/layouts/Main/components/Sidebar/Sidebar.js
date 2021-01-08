@@ -4,19 +4,18 @@ import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/styles';
 import { Divider, Drawer } from '@material-ui/core';
 import DashboardIcon from '@material-ui/icons/Dashboard';
-import PeopleIcon from '@material-ui/icons/People';
-import ShoppingBasketIcon from '@material-ui/icons/ShoppingBasket';
-import TextFieldsIcon from '@material-ui/icons/TextFields';
-import ImageIcon from '@material-ui/icons/Image';
-import AccountBoxIcon from '@material-ui/icons/AccountBox';
-import SettingsIcon from '@material-ui/icons/Settings';
-import LockOpenIcon from '@material-ui/icons/LockOpen';
-import DriveEtaIcon from '@material-ui/icons/DriveEta';
+// import PeopleIcon from '@material-ui/icons/People';
+// import ShoppingBasketIcon from '@material-ui/icons/ShoppingBasket';
+// import TextFieldsIcon from '@material-ui/icons/TextFields';
+// import ImageIcon from '@material-ui/icons/Image';
+// import AccountBoxIcon from '@material-ui/icons/AccountBox';
+// import SettingsIcon from '@material-ui/icons/Settings';
+// import LockOpenIcon from '@material-ui/icons/LockOpen';
+// import DriveEtaIcon from '@material-ui/icons/DriveEta';
 import ListAltIcon from '@material-ui/icons/ListAlt';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { Profile, SidebarNav } from './components';
 import Version from './components/Version/version';
-import { DealSkuAdd } from 'views';
 
 const useStyles = makeStyles(theme => ({
   drawer: {
@@ -57,92 +56,6 @@ const Sidebar = props => {
       href: '/manual-orders',
       icon: <ListAltIcon />
     },
-    // {
-    //   title: 'Products',
-    //   href: '/products',
-    //   icon: <ShoppingBasketIcon />
-    // },
-    // {
-    //   title: 'SKUs',
-    //   href: '/skus',
-    //   icon: <ShoppingBasketIcon />
-    // },
-    // {
-    //   title: 'Deal SKUs',
-    //   href: '/deal-sku-add'
-    // },
-    // {
-    //   title: 'Deals',
-    //   href: '/deal-manager',
-    //   icon: <ShoppingBasketIcon />
-    // },
-    // {
-    //   title: 'Orders',
-    //   href: '/orders',
-    //   icon: <ListAltIcon />
-    // },
-    // {
-    //   title: 'Vehicles',
-    //   href: '/vehicles',
-    //   icon: <DriveEtaIcon />
-    // },
-    // {
-    //   title: 'Drivers',
-    //   href: '/drivers',
-    //   icon: <DriveEtaIcon />
-    // },
-    // {
-    //   title: 'Brands',
-    //   href: '/brands'
-    // },
-    // {
-    //   title: 'Subcategories',
-    //   href: '/subcategories'
-    // },
-    // {
-    //   title: 'Categories',
-    //   href: '/categories'
-    // },
-    // {
-    //   title: 'Cities',
-    //   href: '/cities'
-    // },
-    // {
-    //   title: 'Retailers',
-    //   href: '/retailers'
-    // },
-    // {
-    //   title: 'Users',
-    //   href: '/users'
-    // },
-    // {
-    //   title: 'Suppliers',
-    //   href: '/supplier'
-    // },
-    // {
-    //   title: 'Daily Sku Aggregates',
-    //   href: '/sku-aggregates'
-    // },
-    // {
-    //   title: 'Routes',
-    //   href: '/routes'
-    // },
-    // {
-    //   title: 'Batch Update SKU',
-    //   href: '/batch-upload'
-    // },
-    // {
-    //   title: 'Banners',
-    //   href: '/banners'
-    // },
-    // {
-    //   title: 'SKU Requests',
-    //   href: '/sku-requests'
-    // },
-    // {
-    //   title: 'Broadcast Messages',
-    //   href: '/broadcast-messages'
-    // }
   ];
 
   return (

@@ -1,4 +1,4 @@
-import React,{useEffect,useState} from 'react';
+import React,{useEffect} from 'react';
 import { makeStyles } from '@material-ui/styles';
 import { Grid } from '@material-ui/core';
 import UserModel from '../../models/UserModel'
@@ -23,15 +23,16 @@ const useStyles = makeStyles(theme => ({
 const Dashboard = (props) => {
   const classes = useStyles();
 
-  useEffect(()=>{
+  useEffect(() => {
     const isToken = UserModel.getInstance().isAuth();
     // UserModel.getInstance().signOut();
-    console.log('token',isToken);
-    console.log('is token')
+    // console.log('token',isToken);
+    // console.log('is token')
     if(!isToken){
      props.history.push('/sign-in');
     }
-    },[])
+    // eslint-disable-next-line
+  }, [])
     
 
   return (
