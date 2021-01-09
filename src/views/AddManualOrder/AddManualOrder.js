@@ -10,31 +10,32 @@ import {
     CardHeader,
     CardContent,
     CardActions,
-    CardActionArea,
-    CardMedia,
+    // CardActionArea,
+    // CardMedia,
     Divider,
     Grid,
     Button,
     TextField,
-    Checkbox,
+    // Checkbox,
     Icon
 } from '@material-ui/core';
 import Hidden from '@material-ui/core/Hidden';
-import Paper from '@material-ui/core/Paper';
-import { withStyles } from '@material-ui/core/styles';
-import { validateNumeric } from 'common/validators';
+// import Paper from '@material-ui/core/Paper';
+// import { withStyles } from '@material-ui/core/styles';
+import { validateNumeric, validateNumericNoDecimal } from 'common/validators';
 import MaterialTable from 'material-table';
+// import style from './style.css';
 // import 'antd/dist/antd.css';
 
-const GreenCheckbox = withStyles({
-    root: {
-        color: 'orange',
-        '&$checked': {
-            color: 'orange',
-        },
-    },
-    checked: {},
-})((props) => <Checkbox color="default" {...props} />);
+// const GreenCheckbox = withStyles({
+//     root: {
+//         color: 'orange',
+//         '&$checked': {
+//             color: 'orange',
+//         },
+//     },
+//     checked: {},
+// })((props) => <Checkbox color="default" {...props} />);
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -103,9 +104,9 @@ const AddManualOrder = props => {
         { title: 'Total', field: 'cost', editable: 'never' },
     ]);
 
-    useEffect(() => {
-        console.log(orderItemRows[0].quantity, orderItemRows[0].final_price)
-    })
+    // useEffect(() => {
+    //     console.log(orderItemRows[0].quantity, orderItemRows[0].final_price)
+    // })
 
     useEffect(() => {
         let subtotal = 0;
@@ -137,6 +138,7 @@ const AddManualOrder = props => {
         // // console.log(bill)
 
         settotalBill(bill)
+        // eslint-disable-next-line
     }, [specialDiscount, orderItemRows, promoCodeDiscount, selectedMobileData])
 
     const mobileHandleChange = async (event, val) => {
@@ -168,21 +170,21 @@ const AddManualOrder = props => {
         );
     };
 
-    const handleChange = event => {
-        setParams({
-            ...params,
-            [event.target.name]: event.target.value
-        });
-    };
+    // const handleChange = event => {
+    //     setParams({
+    //         ...params,
+    //         [event.target.name]: event.target.value
+    //     });
+    // };
 
     const checkErrors = () => {
-        console.log("selectedMobData", selectedMobileData)
+        // console.log("selectedMobData", selectedMobileData)
         var err = false;
         var warning = false;
         orderItemRows && orderItemRows.length > 0 && Array.isArray(orderItemRows) && orderItemRows.forEach(({ name, quantity, pre_slash_price, post_slash_price, min_price, final_price, cost }, index) => {
-            console.log(!name, !quantity, quantity <= 0, !final_price, !cost, !selectedSkuItems[index].id, !selectedSkuItems[index].name)
+            // console.log(!name, !quantity, quantity <= 0, !final_price, !cost, !selectedSkuItems[index].id, !selectedSkuItems[index].name)
             if (
-                !name || !quantity || quantity <= 0 || !final_price || !cost || !selectedSkuItems[index].id || !selectedSkuItems[index].name
+                !name || !quantity || quantity <= 0 || !final_price || !cost || !selectedSkuItems[index] || !selectedSkuItems[index].id || !selectedSkuItems[index].name
             ) {
                 err = true;
             }
@@ -217,7 +219,7 @@ const AddManualOrder = props => {
             //     return true;
             // }
         })
-        console.log(err, warning)
+        // console.log(err, warning)
         if (err)
             return 'err';
         else if (warning)
@@ -232,19 +234,19 @@ const AddManualOrder = props => {
     };
 
     const handleSubmit = async () => {
-        console.log(params.submitStatus)
+        // console.log(params.submitStatus)
         // if (!params.submitStatus) { //Commented this because it is being handles in render method
         const validationCheck = await checkErrors() // Hamza you need to redo you error handling. It doesn not work
-        if (validationCheck == 'err') {
-            console.log('A')
+        if (validationCheck === 'err') {
+            // console.log('A')
             setOpenData({ openError: true, openSuccess: false, openWarning: false, openDiscountWarning: false, openMinOrderValueWarning: false, openMobileNotSelectedWarning: false, openFinalPriceNotWithinRangeWarning: false });
         } 
-        else if (validationCheck == 'warning') {
-            console.log('B')
+        else if (validationCheck === 'warning') {
+            // console.log('B')
             setOpenData({ openFinalPriceNotWithinRangeWarning: true, openError: false, openSuccess: false, openWarning: false, openDiscountWarning: false, openMinOrderValueWarning: false, openMobileNotSelectedWarning: false });
         }
         else if (!selectedMobileData || !selectedMobileData.id) {
-            console.log('C')
+            // console.log('C')
             setOpenData({ openMobileNotSelectedWarning: true, openSuccess: false, openWarning: false, openError: false, openDiscountWarning: false, openMinOrderValueWarning: false, openFinalPriceNotWithinRangeWarning: false })
         }
         else if (subTotal < 1000) {
@@ -260,14 +262,14 @@ const AddManualOrder = props => {
         }
         else if (totalBill && Number(totalBill) && totalBill > 0) {
             setParams({ ...params, submitStatus: true });
-            let par = new FormData();
+            // let par = new FormData();
             let orderList = orderItemRows && orderItemRows.filter(x => x.quantity > 0).map((item, index) => ({
                 sku_id: selectedSkuItems[index].id,
                 price: item.final_price,
                 qty: +item.quantity
             }))
             if (orderList.length > 0 && selectedMobileData && selectedMobileData.id) {
-                console.log("MAKING")
+                // console.log("MAKING")
                 var obj = {
                     user_id: selectedMobileData.id, // retailer ID
                     items: orderList,
@@ -301,7 +303,7 @@ const AddManualOrder = props => {
                     },
                     err => {
                         setParams({ ...params, submitStatus: false });
-                        console.log(err);
+                        // console.log(err);
                     }
                 );
             }
@@ -317,10 +319,11 @@ const AddManualOrder = props => {
     }
 
 
-    const skuSearch = async (event, value) => {
-        // console.log('skusearch', { event, value })
+    const skuSearch = async (event, value, index) => {
+        console.log('skusearch', { event, value })
         // console.log({ event, value })
         if (value) {
+            console.log('YES')
             await setParams({ ...params, dataFetchStatus: false });
             await UserModel.getInstance().getSkuByName(
                 { 'q': value },
@@ -329,9 +332,9 @@ const AddManualOrder = props => {
                     let itemsInStockArr = [];
                     data && data.length > 0 && Array.isArray(data) && data.forEach((item) => {
                         // console.log(item.is_stock, item.name)
-                        if (!item.is_stock) {
+                        if (!item.is_stock && item.latest_balance && item.latest_balance.rate && item.latest_balance.rate > 0) {
                             if (item.is_deal) {
-                                console.log({ item })
+                                // console.log({ item })
                                 var tempItem = { ...item, name: item.name + " - DEAL" }
                                 itemsInStockArr.push(tempItem)
                             } else {
@@ -339,38 +342,68 @@ const AddManualOrder = props => {
                             }
                         }
                     })
-                    setSkuItems([...itemsInStockArr]);
+                    // console.log(itemsInStockArr)
+                    // console.log(selectedSkuItems)
+                    var newItemsOnly = [];
+                    // checked len > than 1, so that there is atleast some item to check (if it already exist) otherwise gives error of cannot access property of undefined.
+                    // cuz 1st index is already empty line genrated by default, acc to logic.
+                    if (selectedSkuItems && selectedSkuItems.length > 0 && Array.isArray(selectedSkuItems)) { 
+                        newItemsOnly = itemsInStockArr.filter(item => selectedSkuItems.every(selectedskus => selectedskus.id != item.id))
+                    }
+                    // console.log(newItemsOnly)
+                    setSkuItems([...newItemsOnly]);
                     setParams({ ...params, dataFetchStatus: true });
                 },
                 err => {
-                    console.log(err);
+                    // console.log(err);
                 }
             );
+        } else {
+            console.log('NO')
+            let selectedSkus = selectedSkuItems
+            selectedSkus[index] = {id: '', name: ''}
+            setSelectedSkuItems([...selectedSkus])
         }
     };
+
+    const handlePlusMinusFinalPrice = (e, index, sign) => {
+        var myevent = e;
+        const copyOrderItems = orderItemRows;
+        var thisItem = copyOrderItems[index];
+        if (sign === 'minus') {
+            myevent.target.value = +thisItem.final_price - 1;
+        } else if (sign === 'plus') {
+            myevent.target.value = +thisItem.final_price + 1;
+        }
+        
+        handleOrderItemDetailsChange(myevent, index)
+    }
 
     const handleOrderItemDetailsChange = (e, index) => {
         // console.log('eeeeeeeee handleOrderItemChange', e.target.name)
         // console.clear()
         // console.log('handleOrderItemChange')
         // console.log(e.target.name, e.target.value, { index })
-        console.log(e.target.name, e.target.value)
+        // console.log(e.target.name, e.target.value)
         const orderItemsDetailArr = orderItemRows;
         var orderitem = orderItemsDetailArr[index];
+        var valuue = e.target.value;
         if ((e.target.name === 'quantity' || e.target.name === 'final_price')) {
-            if (validateNumeric(parseInt(e.target.value)) || e.target.value === '') {
-                console.log('vladatenumeric')
-                console.log('vladatenumeric', e.target.value)
-                orderitem[e.target.name] = e.target.value;
+            // if (validateNumeric(parseInt(valuue)) || valuue === '') {
+            if (valuue === '' || (validateNumeric(+valuue) && validateNumericNoDecimal(+valuue) && !valuue.includes('.'))) {
+                // console.log('vladatenumeric')
+                // console.log('vladatenumeric', valuue)
+                orderitem[e.target.name] = valuue;
             }
         }
 
         orderitem = applyBulkDiscounts(orderitem)
 
         // console.log(orderitem)
-
         if (e.target.name === 'quantity' || e.target.name === 'final_price') {
-            orderitem.cost = orderitem.quantity * orderitem.final_price;
+            if (valuue === '' || (validateNumeric(+valuue) && validateNumericNoDecimal(+valuue) && !valuue.includes('.'))) {
+                orderitem.cost = orderitem.quantity * orderitem.final_price;
+            }
         }
         orderItemsDetailArr[index] = orderitem;
         // console.log(orderItemsDetailArr)
@@ -455,11 +488,11 @@ const AddManualOrder = props => {
             orderitem.name = val.name;
             // orderitem.quantity = val.quantity;
             // orderitem.price = val.price;
-            orderitem.pre_slash_price = val.price;
-            orderitem.post_slash_price = val.price - val.discount;
+            orderitem.pre_slash_price = val.price + val.discount;
+            orderitem.post_slash_price = val.price;
             // console.log(val.latest_balance);
-            orderitem.min_price = val.latest_balance ? val.latest_balance.rate : (val.price - val.discount); // if VIC calculated rate is not available, display post slash as min value (maximum possible discounted value).
-            orderitem.final_price = val.price - val.discount;
+            orderitem.min_price = val.latest_balance ? val.latest_balance.rate : (val.price); // if VIC calculated rate is not available, display post slash as min value (maximum possible discounted value).
+            orderitem.final_price = val.price;
             // orderitem.qty_discount = val.qty_discount; // Bulk Discount to be enabled later
             orderitem.cost = orderitem.quantity > 1 ? (orderitem.quantity * val.price) : (orderitem.quantity === 0 ? 0 : '')
 
@@ -499,7 +532,7 @@ const AddManualOrder = props => {
         } else {
             const skuItemsDetailArr = selectedSkuItems;
             delete skuItemsDetailArr[index]
-            console.log(skuItemsDetailArr)
+            // console.log(skuItemsDetailArr)
             setSelectedSkuItems(skuItemsDetailArr);
 
             const orderItemsDetailArr = orderItemRows;
@@ -546,6 +579,7 @@ const AddManualOrder = props => {
             settotalBill(bill)
             setImpCondition(!impCondition)  // ask before removing
         }
+        setSkuItems([]) // important to empty it, so that list doesnot repeat the already added sku.
     };
 
     const applyPromoReferralGMVDiscounts = (subtotal) => {
@@ -574,10 +608,10 @@ const AddManualOrder = props => {
         // console.log('add new order row')
         // let rowFilled = false;
         const validationCheck = await checkErrors() // Hamza you need to redo you error handling. It doesn not work
-        if (validationCheck == 'err') {
+        if (validationCheck === 'err') {
             setOpenData({ openError: true, openSuccess: false, openWarning: false, openDiscountWarning: false, openMinOrderValueWarning: false, openMobileNotSelectedWarning: false, openFinalPriceNotWithinRangeWarning: false });
         } 
-        else if (validationCheck == 'warning') {
+        else if (validationCheck === 'warning') {
             setOpenData({ openFinalPriceNotWithinRangeWarning: true, openError: false, openSuccess: false, openWarning: false, openDiscountWarning: false, openMinOrderValueWarning: false, openMobileNotSelectedWarning: false });
         }
         else if (!selectedMobileData || !selectedMobileData.id) {
@@ -658,10 +692,12 @@ const AddManualOrder = props => {
     const removeOrderItem = (index) => {
         if (orderItemRows.length > 1) {
             let orderItemsDetailArr = [...orderItemRows];
+            // console.log(orderItemRows)
             orderItemsDetailArr.splice(index, 1)
             // console.log(orderItemsDetailArr)
             setOrderItemRows([...orderItemsDetailArr])
             let skuSelectedDetailsArr = [...selectedSkuItems];
+            // console.log(selectedSkuItems)
             skuSelectedDetailsArr.splice(index, 1)
             // console.log(skuSelectedDetailsArr)
             setSelectedSkuItems([...skuSelectedDetailsArr])
@@ -671,14 +707,28 @@ const AddManualOrder = props => {
 
     const handleSpecialDiscountChange = event => {
         var spDiscount = event.target.value;
-        console.log(spDiscount)
+        // console.log(typeof(spDiscount))
+        // console.log(spDiscount)
         // console.log(validateNumeric(spDiscount))
         // console.log(validateNumeric('8+4_23%#^&^'))
-        if (validateNumeric(spDiscount) && spDiscount !== 0 && spDiscount !== '0' && spDiscount !== '' && !spDiscount.includes('+') && !spDiscount.includes('-')) {
-            console.log(spDiscount)
+        // // console.log(validateNumeric(spDiscount), spDiscount !== 0, spDiscount !== '0', !spDiscount.includes('+'), !spDiscount.includes('-'))
+        // // console.log(spDiscount == '', validateNumeric(spDiscount))
+        // console.log(spDiscount == '', validateNumeric(spDiscount), spDiscount !== 0, spDiscount !== '0', !spDiscount.includes('+'), !spDiscount.includes('-'))
+        // if (spDiscount == '' || (validateNumeric(spDiscount) && spDiscount !== 0 && spDiscount !== '0' && !spDiscount.includes('+') && !spDiscount.includes('-'))) {
+        //     console.log(spDiscount)
+        //     setspecialDiscount(spDiscount);
+        // } 
+        // else {
+        //     // alert('helo')
+        //     setspecialDiscount(specialDiscount);
+        // }
+
+        // console.log(validateNumeric(spDiscount))
+        // console.log(validateInteger(+spDiscount))
+        // console.log(validateNumericNoDecimal(+spDiscount))
+        if (spDiscount === '' || (validateNumeric(+spDiscount) && validateNumericNoDecimal(+spDiscount) && !spDiscount.includes('.'))) {
+            // console.log(spDiscount, +spDiscount)
             setspecialDiscount(spDiscount);
-        } else {
-            setspecialDiscount('');
         }
     };
 
@@ -713,24 +763,24 @@ const AddManualOrder = props => {
     const generateOrderItemsRows = (values, index) => {
         // console.log({ orderItemRows, selectedSkuItems })
         // console.log({ values })
+        // console.log('dropdown SKU item', index, selectedSkuItems[index])
+        let thisSku = selectedSkuItems[index]  // {id: 1, name: 'Prince biscuit'} new sahi
         return (
             <>
                 <Grid container spacing={1} style={{ marginTop: 20 }}>
 
                     <Grid item md={4} xs={12}>
                         <Autocomplete
-                            id="sku"
-                            // name='Sku_name'
                             options={skuItems}
                             getOptionLabel={option => option.name}
                             renderInput={params => (
-                                <TextField {...params} label="SKU" variant="outlined"
+                                <TextField {...params} label="SKU" variant="outlined" 
                                     // margin="dense" 
                                     placeholder='Search SKU' />
                             )}
-                            value={selectedSkuItems[index]}
+                            value={selectedSkuItems[index] ? selectedSkuItems[index] : {id: null, name: ''}}
                             onChange={(e, val) => orderItemHandleChange(e, val, index)}
-                            onInputChange={skuSearch}
+                            onInputChange={(e, val) => skuSearch(e, val, index)}
                             loading
                             loadingText={
                                 params.dataFetchStatus ? 'Loading' : 'No Matches'
@@ -743,7 +793,7 @@ const AddManualOrder = props => {
                             fullWidth
                             label="Qty"
                             name="quantity"
-                            type='number'
+                            type='text'
                             inputProps={{ min: 1 }}
                             min={1}
                             onChange={(e) => handleOrderItemDetailsChange(e, index)}
@@ -825,12 +875,21 @@ const AddManualOrder = props => {
                             disabled
                         />
 
+                        <button 
+                            type="button" 
+                            name='final_price' 
+                            onClick={(e) => handlePlusMinusFinalPrice(e, index, 'minus')} 
+                            // value="-" 
+                            disabled={!values.final_price || values.final_price <= values.min_price} 
+                            data-field="final_price" 
+                            style={{backgroundColor: '#DCDCDC', borderRadius: 3, padding: 6}}
+                        >-</button>
                         <TextField
                             style={{ marginLeft: 5, marginRight: 5 }}
                             fullWidth
                             label="Final Price"
                             name="final_price"
-                            type='number'
+                            type='text'
                             inputProps={{ min: values.min_price, max: values.pre_slash_price }}
                             min={values.min_price}
                             max={values.post_slash_price}
@@ -841,6 +900,15 @@ const AddManualOrder = props => {
                             variant="outlined"
                         // placeholder="Final Price"
                         />
+                        <button 
+                            type="button" 
+                            name='final_price' 
+                            onClick={(e) => handlePlusMinusFinalPrice(e, index, 'plus')} 
+                            // value="+" 
+                            disabled={!values.final_price || values.final_price >= values.post_slash_price} 
+                            data-field="final_price" 
+                            style={{backgroundColor: '#DCDCDC', borderRadius: 3, padding: 5}}
+                        >+</button>
 
                         <TextField
                             style={{ marginLeft: 5, marginRight: 5 }}
@@ -859,7 +927,13 @@ const AddManualOrder = props => {
                             disabled
                         />
 
-                        <Icon color="primary" style={{ fontSize: 40, marginLeft: 5, marginRight: 5 }} onClick={() => removeOrderItem(index)}>cancel</Icon>
+                        {/* These consitions were a backup plan if autocomplete didnt work, then tried to show remove button only on last index */}
+                        {/* {selectedSkuItems && selectedSkuItems.length > 0 && Array.isArray(selectedSkuItems) && index+1 == selectedSkuItems.length 
+                        ? */}
+                            <Icon color="primary" style={{ fontSize: 40, marginLeft: 5, marginRight: 5 }} onClick={() => removeOrderItem(index)}>cancel</Icon>
+                        {/* :
+                            <span style={{margin: 23}}></span>
+                        } */}
                     </Grid>
 
                 </Grid>
@@ -1072,7 +1146,7 @@ const AddManualOrder = props => {
                                     fullWidth
                                     onChange={handleSpecialDiscountChange}
                                     required
-                                    type="number"
+                                    type="text"
                                     value={specialDiscount}
                                     variant="standard"
                                 />
