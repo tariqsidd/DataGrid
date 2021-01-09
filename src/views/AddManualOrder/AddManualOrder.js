@@ -319,10 +319,11 @@ const AddManualOrder = props => {
     }
 
 
-    const skuSearch = async (event, value) => {
-        // console.log('skusearch', { event, value })
+    const skuSearch = async (event, value, index) => {
+        console.log('skusearch', { event, value })
         // console.log({ event, value })
         if (value) {
+            console.log('YES')
             await setParams({ ...params, dataFetchStatus: false });
             await UserModel.getInstance().getSkuByName(
                 { 'q': value },
@@ -357,6 +358,11 @@ const AddManualOrder = props => {
                     // console.log(err);
                 }
             );
+        } else {
+            console.log('NO')
+            let selectedSkus = selectedSkuItems
+            selectedSkus[index] = {id: '', name: ''}
+            setSelectedSkuItems([...selectedSkus])
         }
     };
 
@@ -758,7 +764,7 @@ const AddManualOrder = props => {
         // console.log({ orderItemRows, selectedSkuItems })
         // console.log({ values })
         // console.log('dropdown SKU item', index, selectedSkuItems[index])
-        // let thisSku = selectedSkuItems[index] 
+        let thisSku = selectedSkuItems[index]  // {id: 1, name: 'Prince biscuit'} new sahi
         return (
             <>
                 <Grid container spacing={1} style={{ marginTop: 20 }}>
@@ -774,7 +780,7 @@ const AddManualOrder = props => {
                             )}
                             value={selectedSkuItems[index] ? selectedSkuItems[index] : {id: null, name: ''}}
                             onChange={(e, val) => orderItemHandleChange(e, val, index)}
-                            onInputChange={skuSearch}
+                            onInputChange={(e, val) => skuSearch(e, val, index)}
                             loading
                             loadingText={
                                 params.dataFetchStatus ? 'Loading' : 'No Matches'
