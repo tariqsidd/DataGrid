@@ -30,6 +30,21 @@ export default class Api {
   }
 
 
+  getUserProfile(token, params, successCallback, failureCallback) {
+    NetworkManger.getInstance().getNetworkRequest(
+      CONSTANT.baseURL + 'user/profile',
+      token,
+      params,
+      function reqSuccess(data) {
+        successCallback(data);
+      },
+      function reqFailed(error) {
+        failureCallback(error);
+      }
+    );
+  }
+
+
   // Manual Orders
   getUsersListFromMobile(token, params, successCallback, failureCallback) {
     NetworkManger.getInstance().getNetworkRequest(
@@ -4810,7 +4825,6 @@ export default class Api {
   }
 
 
-
   postCheckPromoExistAndReturnAmount(token, params, successCallback, failureCallback) {
     NetworkManger.getInstance().postNetworkRequest(
       CONSTANT.baseURL + 'order/coupon',
@@ -4825,6 +4839,20 @@ export default class Api {
     );
   }
 
+  
+  getFutureDatesOfDelivery(token, cityid, successCallback, failureCallback) {
+    NetworkManger.getInstance().getNetworkRequest(
+      CONSTANT.baseURL.replace('sales/', '') + 'setting/calendar/' + cityid,
+      token,
+      null,
+      function reqSuccess(data) {
+        successCallback(data);
+      },
+      function reqFailed(error) {
+        failureCallback(error);
+      }
+    );
+  }
 
 
 }

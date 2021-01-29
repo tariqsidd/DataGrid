@@ -25,6 +25,7 @@ const Dashboard = (props) => {
 
   useEffect(() => {
     const isToken = UserModel.getInstance().isAuth();
+    UserModel.getInstance().getUserProfile();
     // UserModel.getInstance().signOut();
     // console.log('token',isToken);
     // console.log('is token')

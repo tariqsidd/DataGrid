@@ -68,6 +68,7 @@ const ManualOrderData = props => {
       editable: 'never',
       filtering: false
     },
+    { title: 'Delivery Date', field: 'delivered_at', editable: 'never', filtering: false },
     {
       title: 'Retailer',
       field: 'retailerName',
@@ -146,6 +147,7 @@ const ManualOrderData = props => {
             wallet_discount: obj.wallet_discount ? obj.wallet_discount.amount : 0,
             total_payable: bill,
             created_at: new Date(obj.created_at).toLocaleDateString(),
+            delivered_at: new Date(obj.delivered_at).toLocaleDateString(),
             status: obj.status
           });
         });
@@ -209,6 +211,7 @@ const ManualOrderData = props => {
               wallet_discount: obj.wallet_discount ? obj.wallet_discount.amount : 0,
               total_payable: bill,
               created_at: new Date(obj.created_at).toLocaleDateString(),
+              delivered_at: new Date(obj.delivered_at).toLocaleDateString(),
               status: obj.status
             });
           });
@@ -260,6 +263,7 @@ const ManualOrderData = props => {
             wallet_discount: obj.wallet_discount ? obj.wallet_discount.amount : 0,
             total_payable: bill,
             created_at: new Date(obj.created_at).toLocaleDateString(),
+            delivered_at: new Date(obj.delivered_at).toLocaleDateString(),
             status: obj.status
           });
         });
@@ -364,6 +368,7 @@ const ManualOrderData = props => {
               wallet_discount: obj.wallet_discount ? obj.wallet_discount.amount : 0,
               total_payable: bill,
               created_at: new Date(obj.created_at).toLocaleDateString(),
+              delivered_at: new Date(obj.delivered_at).toLocaleDateString(),
               status: obj.status
             });
           });
@@ -411,6 +416,7 @@ const ManualOrderData = props => {
               wallet_discount: obj.wallet_discount ? obj.wallet_discount.amount : 0,
               total_payable: bill,
               created_at: new Date(obj.created_at).toLocaleDateString(),
+              delivered_at: new Date(obj.delivered_at).toLocaleDateString(),
               status: obj.status
             });
           });
