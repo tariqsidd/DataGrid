@@ -221,7 +221,7 @@ const AddManualOrder = props => {
             ) {
                 err = true;
             }
-            if (final_price > post_slash_price || final_price < min_price) {
+            if (/*final_price > post_slash_price || */ final_price < min_price) {
                 // setOpenData({ openFinalPriceNotWithinRangeWarning: true, openMinOrderValueWarning: false, openSuccess: false, openWarning: false, openError: false, openDiscountWarning: false, openMobileNotSelectedWarning: false })
                 warning = true;
             } 
@@ -232,7 +232,7 @@ const AddManualOrder = props => {
         //         // console.log('A')
         //         return true;
         //     }
-        //     if (final_price > post_slash_price || final_price < min_price) {
+        //     if (/*final_price > post_slash_price || */ final_price < min_price) {
         //         setOpenData({ openFinalPriceNotWithinRangeWarning: true, openMinOrderValueWarning: false, openSuccess: false, openWarning: false, openError: false, openDiscountWarning: false, openMobileNotSelectedWarning: false })
         //         return true;
         //     } 
@@ -939,7 +939,7 @@ const AddManualOrder = props => {
                             name='final_price' 
                             onClick={(e) => handlePlusMinusFinalPrice(e, index, 'plus')} 
                             // value="+" 
-                            disabled={!values.final_price || values.final_price >= values.post_slash_price} 
+                            disabled={!values.final_price /* || values.final_price >= values.post_slash_price */} 
                             data-field="final_price" 
                             style={{backgroundColor: '#DCDCDC', borderRadius: 3, padding: 5}}
                         >+</button>
