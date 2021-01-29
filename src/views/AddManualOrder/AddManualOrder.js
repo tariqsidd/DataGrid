@@ -74,6 +74,9 @@ const AddManualOrder = props => {
     var [mobileData, setMobileData] = useState([]);
     var [selectedMobileData, setSelectedMobileData] = useState({});
 
+    const [futureDatesOfDelivery, setFutureDatesOfDelivery] = useState([]);
+    const [selectedDeliveryDate, setSelectedDeliveryDate] = useState({});
+
     const [impCondition, setImpCondition] = useState(false)  // Ask before removing
 
     const [skuItems, setSkuItems] = useState([])
@@ -107,6 +110,28 @@ const AddManualOrder = props => {
     // useEffect(() => {
     //     console.log(orderItemRows[0].quantity, orderItemRows[0].final_price)
     // })
+
+    useEffect(() => {
+        let userprofile = JSON.parse(localStorage.getItem('sales-profile'))
+        let cityId = userprofile.city_id;
+
+        UserModel.getInstance().getFutureDatesOfDelivery(
+            cityId,
+            data => {
+              console.log('GET future DOD', data)
+              let futureDates = []
+              let id = 0;
+              data && data.length > 0 && Array.isArray(data) && data.forEach(date => {
+                futureDates.push({ id, name: date })
+                id++;
+              })
+              setFutureDatesOfDelivery(futureDates)
+            },
+            err => {
+              // console.log('err', err)
+            }
+          );
+    }, [])
 
     useEffect(() => {
         let subtotal = 0;
@@ -168,6 +193,14 @@ const AddManualOrder = props => {
                 // console.log(err);
             }
         );
+    };
+
+    const deliveryDateChange = async (event, val) => {
+        // var arr = event.target.getAttribute('data-option-index');
+        // console.log('mobile val', val);
+        if (val) {
+            setSelectedDeliveryDate(val);
+        }
     };
 
     // const handleChange = event => {
@@ -273,6 +306,7 @@ const AddManualOrder = props => {
                 var obj = {
                     user_id: selectedMobileData.id, // retailer ID
                     items: orderList,
+                    delivered_at: selectedDeliveryDate.name
                 };
                 if (specialDiscount) {
                     obj = {
@@ -1000,6 +1034,24 @@ const AddManualOrder = props => {
                                     value={selectedMobileData.name}
                                     variant="outlined"
                                     disabled
+                                />
+                            </Grid>
+
+                            <Grid item md={6} xs={12}>
+                                <Autocomplete
+                                    id="future_DoD"
+                                    options={futureDatesOfDelivery}
+                                    getOptionLabel={option => option.name}
+                                    renderInput={params => (
+                                        <TextField {...params} label="Delivery Date" variant="outlined" required margin="dense" placeholder='Select delivery date' />
+                                    )}
+                                    value={selectedDeliveryDate}
+                                    onChange={deliveryDateChange}
+                                    // onInputChange={mobileSearch}
+                                    loading
+                                    loadingText={
+                                        params.dataFetchStatus ? 'Loading' : 'No Matches'
+                                    }
                                 />
                             </Grid>
                         </Grid>

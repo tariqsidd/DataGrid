@@ -19,6 +19,7 @@ export default class UserModel {
   signOut() {
     localStorage.removeItem('sales-auth-token');
     localStorage.removeItem('sales-refresh-token');
+    localStorage.removeItem('sales-profile');
     window.location.href = '/sign-in';
   }
 
@@ -42,6 +43,7 @@ export default class UserModel {
         // console.log('user', user);
         UserModel.getInstance().saveToken(user.token, user.refreshToken);
         successTrigger(user);
+        UserModel.getInstance().getUserProfile();
       },
 
       function resFailed(msg) {
@@ -50,6 +52,23 @@ export default class UserModel {
       }
     );
   }
+
+  
+  getUserProfile() {
+    let token = UserModel.getInstance().getToken();
+    ApiManager.getInstance().getUserProfile(
+      token,
+      null,
+      function resSuccess(data) {
+        console.log(data);
+        localStorage.setItem('sales-profile', JSON.stringify(data))
+      },
+      function resFailed(msg) {
+        console.log(msg);
+      }
+    );
+  }
+
 
   getUsersListFromMobile(params, successTrigger, failureTrigger) {
     let token = UserModel.getInstance().getToken();
@@ -2867,6 +2886,21 @@ export default class UserModel {
       function resFailed(msg) {
         // alert(msg)
         failureTrigger(msg);
+      }
+    );
+  }
+
+
+  getFutureDatesOfDelivery(cityid, successTrigger, failureTrigger) {
+    let token = UserModel.getInstance().getToken();
+    ApiManager.getInstance().getFutureDatesOfDelivery(
+      token,
+      cityid,
+      function resSuccess(data) {
+        successTrigger(data);
+      },
+      function resFailed(error) {
+        failureTrigger(error);
       }
     );
   }
