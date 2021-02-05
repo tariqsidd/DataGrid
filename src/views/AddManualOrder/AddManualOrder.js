@@ -5,6 +5,7 @@ import clsx from 'clsx';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
+import moment from 'moment';
 import {
     Card,
     CardHeader,
@@ -120,10 +121,10 @@ const AddManualOrder = props => {
             data => {
               console.log('GET future DOD', data)
               let futureDates = []
-              let id = 0;
+            //   let id = 0;
               data && data.length > 0 && Array.isArray(data) && data.forEach(date => {
-                futureDates.push({ id, name: date })
-                id++;
+                futureDates.push({ id: date, name: moment(date).format('dddd - Do MMM YYYY') })
+                // id++;
               })
               setFutureDatesOfDelivery(futureDates)
             },
@@ -306,7 +307,7 @@ const AddManualOrder = props => {
                 var obj = {
                     user_id: selectedMobileData.id, // retailer ID
                     items: orderList,
-                    delivered_at: selectedDeliveryDate.name
+                    delivered_at: selectedDeliveryDate.id
                 };
                 if (specialDiscount) {
                     obj = {
