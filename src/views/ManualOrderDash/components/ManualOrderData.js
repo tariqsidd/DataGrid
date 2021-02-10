@@ -91,7 +91,10 @@ const ManualOrderData = props => {
         3: 'In Transit',
         4: 'Delivered',
         5: 'Closed',
-        6: 'Cancelled'
+        6: 'Cancelled',
+        7: 'Returned',
+        8: 'Shop Closed',
+        9: 'On Hold'
       }
     }
   ]);
