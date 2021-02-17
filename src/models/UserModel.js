@@ -19,6 +19,7 @@ export default class UserModel {
   signOut() {
     localStorage.removeItem('sales-auth-token');
     localStorage.removeItem('sales-refresh-token');
+    localStorage.removeItem('sales-profile');
     window.location.href = '/sign-in';
   }
 
@@ -39,17 +40,35 @@ export default class UserModel {
       mobile,
       password,
       function resSuccess(user) {
-        console.log('user', user);
+        // console.log('user', user);
         UserModel.getInstance().saveToken(user.token, user.refreshToken);
         successTrigger(user);
+        UserModel.getInstance().getUserProfile();
       },
 
       function resFailed(msg) {
-        console.log('Error: ' + msg);
+        // console.log('Error: ' + msg);
         failureTrigger(msg);
       }
     );
   }
+
+  
+  getUserProfile() {
+    let token = UserModel.getInstance().getToken();
+    ApiManager.getInstance().getUserProfile(
+      token,
+      null,
+      function resSuccess(data) {
+        console.log(data);
+        localStorage.setItem('sales-profile', JSON.stringify(data))
+      },
+      function resFailed(msg) {
+        console.log(msg);
+      }
+    );
+  }
+
 
   getUsersListFromMobile(params, successTrigger, failureTrigger) {
     let token = UserModel.getInstance().getToken();
@@ -124,7 +143,7 @@ export default class UserModel {
 
   globalSearchOrder(params, paramObj, successTrigger, failureTrigger) {
     let token = UserModel.getInstance().getToken();
-    console.log('param usermodel', params);
+    // console.log('param usermodel', params);
     ApiManager.getInstance().globalSearchOrder(
       token,
       params,
@@ -225,7 +244,7 @@ export default class UserModel {
         successTrigger(data);
       },
       function resFailed(msg) {
-        console.log(msg);
+        // console.log(msg);
         failureTrigger(msg);
       }
     );
@@ -338,13 +357,13 @@ export default class UserModel {
 
   globalSearchRetailer(params, paramObj, successTrigger, failureTrigger) {
     let token = UserModel.getInstance().getToken();
-    console.log('param usermodel', params);
+    // console.log('param usermodel', params);
     ApiManager.getInstance().globalSearchRetailer(
       token,
       params,
       paramObj,
       function resSuccess(data) {
-        console.log({ data });
+        // console.log({ data });
         // UserModel.getInstance().productList = data.categories.data
         successTrigger(data);
       },
@@ -476,13 +495,13 @@ export default class UserModel {
   }
   globalSearchProductSku(params, paramObj, successTrigger, failureTrigger) {
     let token = UserModel.getInstance().getToken();
-    console.log('param usermodel', params[0].column_name);
+    // console.log('param usermodel', params[0].column_name);
     ApiManager.getInstance().globalSearchProductSku(
       token,
       params,
       paramObj,
       function resSuccess(data) {
-        console.log({ data });
+        // console.log({ data });
         // UserModel.getInstance().productList = data.categories.data
         successTrigger(data);
       },
@@ -777,7 +796,7 @@ export default class UserModel {
 
   getBrandDetail(brand_ID, successTrigger, failureTrigger) {
     let token = UserModel.getInstance().getToken();
-    console.log({ token, brand_ID, successTrigger, failureTrigger });
+    // console.log({ token, brand_ID, successTrigger, failureTrigger });
     ApiManager.getInstance().getBrandDetail(
       token,
       brand_ID,
@@ -2159,7 +2178,7 @@ export default class UserModel {
         successTrigger(data);
       },
       function resFailed(msg) {
-        console.log(msg);
+        // console.log(msg);
         failureTrigger(msg);
       }
     );
@@ -2175,7 +2194,7 @@ export default class UserModel {
         successTrigger(data);
       },
       function resFailed(msg) {
-        console.log(msg);
+        // console.log(msg);
         failureTrigger(msg);
       }
     );
@@ -2191,7 +2210,7 @@ export default class UserModel {
         successTrigger(data);
       },
       function resFailed(msg) {
-        console.log(msg);
+        // console.log(msg);
         failureTrigger(msg);
       }
     );
@@ -2214,12 +2233,12 @@ export default class UserModel {
 
   uploadImage(params, successTrigger, failureTrigger) {
     let token = UserModel.getInstance().getToken();
-    console.log('para image', params);
+    // console.log('para image', params);
     ApiManager.getInstance().uploadImage(
       token,
       params,
       function resSuccess(data) {
-        console.log('succ', data);
+        // console.log('succ', data);
         successTrigger(data);
       },
       function resFailed(error) {
@@ -2266,14 +2285,14 @@ export default class UserModel {
         successTrigger(data);
       },
       function resFailed(msg) {
-        console.log(msg);
+        // console.log(msg);
         failureTrigger(msg);
       }
     );
   }
 
   getEditVehicle(vehicleId, successTrigger, failureTrigger) {
-    console.log('vehicle ud ', vehicleId);
+    // console.log('vehicle ud ', vehicleId);
     let token = UserModel.getInstance().getToken();
     ApiManager.getInstance().getEditVehicle(
       token,
@@ -2299,7 +2318,7 @@ export default class UserModel {
         successTrigger(data);
       },
       function resFailed(msg) {
-        console.log(msg);
+        // console.log(msg);
         failureTrigger(msg);
       }
     );
@@ -2349,7 +2368,7 @@ export default class UserModel {
   }
   getDriver(params, successTrigger, failureTrigger) {
     let token = UserModel.getInstance().getToken();
-    console.log('params driver', params);
+    // console.log('params driver', params);
     ApiManager.getInstance().getDriver(
       token,
       params,
@@ -2364,7 +2383,7 @@ export default class UserModel {
 
   searchDriver(params, successTrigger, failureTrigger) {
     let token = UserModel.getInstance().getToken();
-    console.log('params driver', params);
+    // console.log('params driver', params);
     ApiManager.getInstance().searchDriver(
       token,
       params,
@@ -2531,7 +2550,7 @@ export default class UserModel {
         successTrigger(data);
       },
       function resFailed(msg) {
-        console.log(msg);
+        // console.log(msg);
         failureTrigger(msg);
       }
     );
@@ -2582,7 +2601,7 @@ export default class UserModel {
 
   getBanner(params, successTrigger, failureTrigger) {
     let token = UserModel.getInstance().getToken();
-    console.log('params Banner', params);
+    // console.log('params Banner', params);
     ApiManager.getInstance().getBanner(
       token,
       params,
@@ -2597,7 +2616,7 @@ export default class UserModel {
 
   getBanner(params, successTrigger, failureTrigger) {
     let token = UserModel.getInstance().getToken();
-    console.log('params Banner', params);
+    // console.log('params Banner', params);
     ApiManager.getInstance().getBanner(
       token,
       params,
@@ -2665,7 +2684,7 @@ export default class UserModel {
 
   getBroadcastMessages(params, successTrigger, failureTrigger) {
     let token = UserModel.getInstance().getToken();
-    console.log('params BroadcastMessages', params);
+    // console.log('params BroadcastMessages', params);
     ApiManager.getInstance().getBroadcastMessages(
       token,
       params,
@@ -2687,7 +2706,7 @@ export default class UserModel {
         successTrigger(data);
       },
       function resFailed(msg) {
-        console.log(msg);
+        // console.log(msg);
         failureTrigger(msg);
       }
     );
@@ -2695,7 +2714,7 @@ export default class UserModel {
 
   getCities(params, successTrigger, failureTrigger) {
     let token = UserModel.getInstance().getToken();
-    console.log('params Cities', params);
+    // console.log('params Cities', params);
     ApiManager.getInstance().getCities(
       token,
       params,
@@ -2720,7 +2739,7 @@ export default class UserModel {
         successTrigger(data);
       },
       function resFailed(msg) {
-        console.log(msg);
+        // console.log(msg);
         failureTrigger(msg);
       }
     );
@@ -2839,13 +2858,13 @@ export default class UserModel {
 
   globalSearchUsers(params, paramObj, successTrigger, failureTrigger) {
     let token = UserModel.getInstance().getToken();
-    console.log('param usermodel', params);
+    // console.log('param usermodel', params);
     ApiManager.getInstance().globalSearchUsers(
       token,
       params,
       paramObj,
       function resSuccess(data) {
-        console.log({ data });
+        // console.log({ data });
         // UserModel.getInstance().productList = data.categories.data
         successTrigger(data);
       },
@@ -2867,6 +2886,21 @@ export default class UserModel {
       function resFailed(msg) {
         // alert(msg)
         failureTrigger(msg);
+      }
+    );
+  }
+
+
+  getFutureDatesOfDelivery(cityid, successTrigger, failureTrigger) {
+    let token = UserModel.getInstance().getToken();
+    ApiManager.getInstance().getFutureDatesOfDelivery(
+      token,
+      cityid,
+      function resSuccess(data) {
+        successTrigger(data);
+      },
+      function resFailed(error) {
+        failureTrigger(error);
       }
     );
   }

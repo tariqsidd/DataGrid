@@ -1,12 +1,12 @@
-import React, { useEffect, useState, Fragment } from 'react';
+import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/styles';
 import UserModel from 'models/UserModel';
 import clsx from 'clsx';
-import { useHistory } from 'react-router-dom';
+// import { useHistory } from 'react-router-dom';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
-import Switch from '@material-ui/core/Switch';
+// import Switch from '@material-ui/core/Switch';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core';
 import MaterialTable from 'material-table';
 
@@ -19,10 +19,10 @@ import {
   Grid,
   Button,
   TextField,
-  CardActionArea,
-  CardMedia
+  // CardActionArea,
+  // CardMedia
 } from '@material-ui/core';
-import { isObject } from 'validate.js';
+// import { isObject } from 'validate.js';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -57,22 +57,25 @@ const order_status = [
   { id: 3, name: 'In Transit' },
   { id: 4, name: 'Delivered' },
   { id: 5, name: 'Closed' },
-  { id: 6, name: 'Cancelled' }
+  { id: 6, name: 'Cancelled' },
+  { id: 7, name: 'Returned' },
+  { id: 8, name: 'Shop Closed' },
+  { id: 9, name: 'On Hold' },
 ];
 const EditManualOrder = props => {
   var [orderData, setorderData] = useState([]);
   const [state, setState] = React.useState([
     { title: 'No.', field: 'number', editable: 'never' },
-    { title: 'Category', field: 'category', editable: 'never' },
-    { title: 'Sub Category', field: 'subCategory', editable: 'never' },
-    { title: 'Brands', field: 'brand', editable: 'never' },
-    { title: 'Product', field: 'product', editable: 'never' },
-    { title: 'Sku name', field: 'skuName', editable: 'never' },
     { title: 'Sku Code', field: 'skuCode', editable: 'never' },
+    { title: 'Sku name', field: 'skuName', editable: 'never' },
     { title: 'Supplier', field: 'supplier', editable: 'never' },
     { title: 'Unit Cost Price', field: 'costPrice', editable: 'never' },
     { title: 'Discount per unit', field: 'discount', editable: 'never' },
-    { title: 'Quantity', field: 'quantity' }
+    { title: 'Quantity', field: 'quantity' },
+    { title: 'Product', field: 'product', editable: 'never' },
+    { title: 'Brand', field: 'brand', editable: 'never' },
+    { title: 'Category', field: 'category', editable: 'never' },
+    { title: 'Subcategory', field: 'subCategory', editable: 'never' },
   ]);
   var [orderId, setOrderId] = useState();
   var [selectedOrderStatus, setSelectedOrderStatus] = useState();
@@ -80,6 +83,7 @@ const EditManualOrder = props => {
     id: '',
     name: '',
     orderDate: '',
+    deliveryDate: '',
     amount: '',
     status: {},
     openSuccess: false,
@@ -87,7 +91,7 @@ const EditManualOrder = props => {
     specialDiscount: ''
   });
 
-  const title = `Order Id : ${props.match.params.id}`;
+  // const title = `Order Id : ${props.match.params.id}`;
   const theme = createMuiTheme({
     typography: {
       fontFamily: 'Nunito Sans, Roboto, sans-serif'
@@ -97,16 +101,27 @@ const EditManualOrder = props => {
     // const id = props.match.params.id;
     // console.log('props id is.....: ', props.match.params);
     // console.log('props', props.location.state);
+    getOrderInfo();
+    return () => {
+      setOrderId(null);
+      setSelectedOrderStatus(null);
+      setParams(null);
+    };
+    // eslint-disable-next-line
+  }, []);
+
+  const getOrderInfo = () => {
     UserModel.getInstance().getOrderDetail(
       props.match.params.id,
       async data => {
-        console.log("ssssssssssstatus", data)
+        // console.log("ssssssssssstatus", data)
         let tempArr = [];
         setParams({
           ...params,
           id: data.id,
           name: data.retailer_name,
           orderDate: new Date(data.created_at).toLocaleDateString(),
+          deliveryDate: new Date(data.delivered_at).toLocaleDateString(),
           amount: data.total,
           status: { id: data.status, name: order_status[data.status].name },
           specialDiscount: data.special_discount
@@ -116,8 +131,8 @@ const EditManualOrder = props => {
           tempArr.push({
             number: index + 1,
             skuId: obj.sku_id,
-            category: obj.categories[0].name,
-            subCategory: obj.sub_categories[0] ? obj.sub_categories[0].name : '',
+            category: (obj.categories && obj.categories[0]) ? obj.categories[0].name : '',
+            subCategory: (obj.sub_categories && obj.sub_categories[0]) ? obj.sub_categories[0].name : '',
             brand: obj.brand ? obj.brand : "",
             product: obj.product_name,
             skuName: obj.sku_name,
@@ -133,17 +148,12 @@ const EditManualOrder = props => {
 
       },
       err => {
-        console.log('detail err', err);
+        // console.log('detail err', err);
       }
     );
-    return () => {
-      setOrderId(null);
-      setSelectedOrderStatus(null);
-      setParams(null);
-    };
-  }, []);
+  }
 
-  let history = useHistory();
+  // let history = useHistory();
 
   const classes = useStyles();
   const { className, ...rest } = props;
@@ -169,19 +179,6 @@ const EditManualOrder = props => {
     });
   };
 
-  const handleAmount = event => {
-    setParams({
-      ...params,
-      [event.target.name]: event.target.value
-    });
-  };
-  const handleDate = event => {
-    setParams({
-      ...params,
-      [event.target.name]: event.target.value
-    });
-  };
-
   const handleSubmit = () => {
     const errors = checkForBlanks();
     // console.log('params', params.status);
@@ -200,13 +197,13 @@ const EditManualOrder = props => {
           // console.log(succ);
           setParams({ ...params, openSuccess: true });
           setTimeout(() => {
-            props.history.push('/orders');
+            props.history.push('/manual-orders');
 
             // console.log('props', props);
           }, 3000);
         },
         err => {
-          console.log(err);
+          // console.log(err);
           setParams({ ...params, openError: true });
         }
       );
@@ -283,6 +280,20 @@ const EditManualOrder = props => {
                 <TextField
                   disabled={true}
                   fullWidth
+                  helperText="Special Discount!"
+                  label="special discount"
+                  margin="dense"
+                  name="specialDiscount"
+                  onChange={handleChange}
+                  required
+                  value={params.specialDiscount}
+                  variant="outlined"
+                />
+              </Grid>
+              <Grid item md={6} xs={12}>
+                <TextField
+                  disabled={true}
+                  fullWidth
                   helperText="Order Date"
                   label="Date"
                   margin="dense"
@@ -297,33 +308,34 @@ const EditManualOrder = props => {
                 <TextField
                   disabled={true}
                   fullWidth
-                  helperText="Special Discount!"
-                  label="special discount"
+                  helperText="Delivery Date"
+                  label="Delivery Date"
                   margin="dense"
-                  name="specialDiscount"
+                  name="deliveryDate"
                   onChange={handleChange}
                   required
-                  value={params.specialDiscount}
+                  value={params.deliveryDate}
                   variant="outlined"
                 />
-                <Grid item md={6} xs={12}>
-                  <Autocomplete
-                    id="Order Status"
-                    options={order_status}
-                    getOptionLabel={option => option.name}
-                    style={{ width: 300 }}
-                    renderInput={params => (
-                      <TextField
-                        {...params}
-                        label="Order Status"
-                        margin="dense"
-                        variant="outlined"
-                      />
-                    )}
-                    onChange={orderStatusChange}
-                    value={params.status}
-                  />
-                </Grid>
+              </Grid>
+
+              <Grid item md={6} xs={12}>
+                <Autocomplete
+                  id="Order Status"
+                  options={order_status}
+                  getOptionLabel={option => option.name}
+                  // style={{ width: 300 }}
+                  renderInput={params => (
+                    <TextField
+                      {...params}
+                      label="Order Status"
+                      margin="dense"
+                      variant="outlined"
+                    />
+                  )}
+                  onChange={orderStatusChange}
+                  value={params.status}
+                />
               </Grid>
 
               <Snackbar
@@ -360,18 +372,9 @@ const EditManualOrder = props => {
             columns={state}
             options={{
               filtering: true,
-              paging: false
+              paging: false,
+              search: false
             }}
-            actions={[
-              {
-                icon: 'add',
-                tooltip: 'Add order Item',
-                isFreeAction: true,
-                onClick: () => {
-                  history.push(`/orders/add-order-detail/${props.match.params.id}`);
-                }
-              },
-            ]}
             data={orderData}
             className={clsx(classes.root, className)}
             editable={{
@@ -391,7 +394,7 @@ const EditManualOrder = props => {
                         window.location.reload();
                       },
                       err => {
-                        console.log(err);
+                        // console.log(err);
                       }
                     );
                   }, 600);
@@ -410,7 +413,7 @@ const EditManualOrder = props => {
 
                   resolve();
                   // console.log('old data', oldData)
-                  console.log('new data', newData)
+                  // console.log('new data', newData)
                   var obj = {
                     order_id: params.id,
                     sku_id: newData.skuId,
@@ -422,11 +425,12 @@ const EditManualOrder = props => {
                   UserModel.getInstance().addOrderDetail(
                     obj,
                     succ => {
-                      console.log('succ', succ)
-                      // window.location.reload();
+                      // console.log('succ', succ)
+                      setParams({ openError: false, openSuccess: true });
+                      window.location.reload();
                     },
                     err => {
-                      console.log('err', err)
+                      // console.log('err', err)
                     }
                   )
                   // }, 1000);

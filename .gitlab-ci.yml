@@ -1,0 +1,63 @@
+stages:
+  - build
+  - deploy
+
+build_react:
+  image: node:8.9.0 
+  stage: build
+
+  script:
+    - echo "====== Install dependencied ======"
+    - npm i
+    - echo "====== Build react APP ======"
+    - CI=false npm run build
+  
+  only:
+  - development
+  - qa
+
+  artifacts:
+    name: panel-build
+    paths:
+      - build
+
+deploy_react_dev:
+  image: alpine
+  stage: deploy
+  script:
+    - echo "====== Deploy to production server ======"
+    - apk update && apk upgrade
+    - apk add openssh bash
+    - echo "====== Add target servers secret key ======"
+    - mkdir -p ~/.ssh
+    - echo -e "$DEV_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa.pem
+    # Sets the permission to 600 to prevent a problem with AWS
+    # that it’s too unprotected.
+    - chmod 600 ~/.ssh/id_rsa.pem
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+    - echo $DEV_SSH_PRIVATE_KEY
+    - scp -r -i ~/.ssh/id_rsa.pem ./build/* ubuntu@${DEV_DEPLOY_SERVER}:~/nginx/sales/
+
+  only:
+  - development
+
+deploy_react_qa:
+  image: alpine
+  stage: deploy
+  script:
+    - echo "====== Deploy to production server ======"
+    - apk update && apk upgrade
+    - apk add openssh bash
+    - echo "====== Add target servers secret key ======"
+    - mkdir -p ~/.ssh
+    - echo -e "$DEV_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa.pem
+    # Sets the permission to 600 to prevent a problem with AWS
+    # that it’s too unprotected.
+    - chmod 600 ~/.ssh/id_rsa.pem
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+    - echo $DEV_SSH_PRIVATE_KEY
+    - scp -r -i ~/.ssh/id_rsa.pem ./build/* ubuntu@${QA_DEPLOY_SERVER}:~/nginx/sales/
+
+  only:
+  - test
+  

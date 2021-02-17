@@ -30,6 +30,21 @@ export default class Api {
   }
 
 
+  getUserProfile(token, params, successCallback, failureCallback) {
+    NetworkManger.getInstance().getNetworkRequest(
+      CONSTANT.baseURL + 'user/profile',
+      token,
+      params,
+      function reqSuccess(data) {
+        successCallback(data);
+      },
+      function reqFailed(error) {
+        failureCallback(error);
+      }
+    );
+  }
+
+
   // Manual Orders
   getUsersListFromMobile(token, params, successCallback, failureCallback) {
     NetworkManger.getInstance().getNetworkRequest(
@@ -102,18 +117,18 @@ export default class Api {
   }
 
   globalSearchOrder(token, params, paramObj, successCallback, failureCallback) {
-    console.log('params', params);
+    // console.log('params', params);
     let searchParamsURL = '';
     params &&
       params.length > 0 &&
       Array.isArray(params) &&
-      params.map((item, index) => {
-        console.log(index, item);
+      params.forEach((item, index) => {
+        // console.log(index, item);
         searchParamsURL +=
           `${item.column_name}=${item.text}` +
           (params.length - 1 == index ? '' : '&');
       });
-    console.log('searchParamURL', searchParamsURL);
+    // console.log('searchParamURL', searchParamsURL);
     NetworkManger.getInstance().getSearchNetworkRequest(
       CONSTANT.baseURL + `order/search?orders.${searchParamsURL}`,
       token,
@@ -293,18 +308,18 @@ export default class Api {
     successCallback,
     failureCallback
   ) {
-    console.log('params', params);
+    // console.log('params', params);
     let searchParamsURL = '';
     params &&
       params.length > 0 &&
       Array.isArray(params) &&
-      params.map((item, index) => {
-        console.log(index, item);
+      params.forEach((item, index) => {
+        // console.log(index, item);
         searchParamsURL +=
           `${item.column_name}=${item.text}` +
           (params.length - 1 == index ? '' : '&');
       });
-    console.log('searchParamURL');
+    // console.log('searchParamURL');
     NetworkManger.getInstance().getSearchNetworkRequest(
       CONSTANT.baseURL + `retailer/search?users.${searchParamsURL}`,
       token,
@@ -425,7 +440,7 @@ export default class Api {
   }
 
   productExist(token, params, successCallback, failureCallback) {
-    console.log('params', params);
+    // console.log('params', params);
     NetworkManger.getInstance().getNetworkRequest(
       CONSTANT.baseURL + `product/check-availability?name=${params}`,
       token,
@@ -445,7 +460,7 @@ export default class Api {
     successCallback,
     failureCallback
   ) {
-    console.log('params', params);
+    // console.log('params', params);
     NetworkManger.getInstance().getSearchNetworkRequest(
       CONSTANT.baseURL +
       `product/search?${params.column_name}.name=` +
@@ -467,18 +482,18 @@ export default class Api {
     successCallback,
     failureCallback
   ) {
-    console.log('params', params);
+    // console.log('params', params);
     let searchParamsURL = '';
     params &&
       params.length > 0 &&
       Array.isArray(params) &&
-      params.map((item, index) => {
-        console.log(index, item);
+      params.forEach((item, index) => {
+        // console.log(index, item);
         searchParamsURL +=
           `${item.column_name}=${item.text}` +
           (params.length - 1 == index ? '' : '&');
       });
-    console.log('searchParamURL');
+    // console.log('searchParamURL');
     NetworkManger.getInstance().getSearchNetworkRequest(
       CONSTANT.baseURL + `product/sku/search?${searchParamsURL}`,
       token,
@@ -752,7 +767,7 @@ export default class Api {
   }
 
   brandExist(token, params, successCallback, failureCallback) {
-    console.log('params', params);
+    // console.log('params', params);
     NetworkManger.getInstance().getNetworkRequest(
       CONSTANT.baseURL + `brand/check-availability?name=${params}`,
       token,
@@ -998,7 +1013,7 @@ export default class Api {
   }
 
   catExist(token, params, successCallback, failureCallback) {
-    console.log('params', params);
+    // console.log('params', params);
     NetworkManger.getInstance().getNetworkRequest(
       CONSTANT.baseURL +
       `category/check-availability?${params.field}=${params.text}`,
@@ -2081,7 +2096,7 @@ export default class Api {
         successCallback(data);
       },
       function reqFailed(error) {
-        console.log(error);
+        // console.log(error);
       }
     );
   }
@@ -4784,18 +4799,18 @@ export default class Api {
     successCallback,
     failureCallback
   ) {
-    console.log('params', params);
+    // console.log('params', params);
     let searchParamsURL = '';
     params &&
       params.length > 0 &&
       Array.isArray(params) &&
-      params.map((item, index) => {
-        console.log(index, item);
+      params.forEach((item, index) => {
+        // console.log(index, item);
         searchParamsURL +=
           `${item.column_name}=${item.text}` +
           (params.length - 1 == index ? '' : '&');
       });
-    console.log('searchParamURL');
+    // console.log('searchParamURL');
     NetworkManger.getInstance().getSearchNetworkRequest(
       CONSTANT.baseURL + `user/search?${searchParamsURL}`,
       token,
@@ -4808,7 +4823,6 @@ export default class Api {
       }
     );
   }
-
 
 
   postCheckPromoExistAndReturnAmount(token, params, successCallback, failureCallback) {
@@ -4825,6 +4839,20 @@ export default class Api {
     );
   }
 
+  
+  getFutureDatesOfDelivery(token, cityid, successCallback, failureCallback) {
+    NetworkManger.getInstance().getNetworkRequest(
+      CONSTANT.baseURL.replace('sales/', '') + 'setting/calendar/' + cityid,
+      token,
+      null,
+      function reqSuccess(data) {
+        successCallback(data);
+      },
+      function reqFailed(error) {
+        failureCallback(error);
+      }
+    );
+  }
 
 
 }

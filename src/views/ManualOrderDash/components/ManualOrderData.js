@@ -1,22 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import clsx from 'clsx';
 import { useHistory } from 'react-router-dom';
-import PropTypes, { func } from 'prop-types';
+import PropTypes
+// , { func } 
+from 'prop-types';
 import { makeStyles } from '@material-ui/styles';
 import {
   MuiThemeProvider,
   createMuiTheme,
   TablePagination,
-  Dialog
+  // Dialog
 } from '@material-ui/core';
 import MaterialTable from 'material-table';
 import UserModel from '../../../models/UserModel';
-import { DateRangePicker } from 'react-date-range';
+// import { DateRangePicker } from 'react-date-range';
 import { addDays } from 'date-fns';
 import 'react-date-range/dist/styles.css'; // main css file
 import 'react-date-range/dist/theme/default.css'; // theme css file
-import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
-import { AsyncParser, parseAsync } from 'json2csv';
+// import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
+import { 
+  // AsyncParser, 
+  parseAsync } from 'json2csv';
 
 const useStyles = makeStyles(theme => ({
   root: {},
@@ -38,21 +42,21 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const statusColors = {
-  delivered: 'success',
-  pending: 'info',
-  refunded: 'danger'
-};
+// const statusColors = {
+//   delivered: 'success',
+//   pending: 'info',
+//   refunded: 'danger'
+// };
 
-const order_status = [
-  'Pending',
-  'In Preparation',
-  'Ready to Ship',
-  'In Transit',
-  'Delivered',
-  'Closed',
-  'Cancelled'
-];
+// const order_status = [
+//   'Pending',
+//   'In Preparation',
+//   'Ready to Ship',
+//   'In Transit',
+//   'Delivered',
+//   'Closed',
+//   'Cancelled'
+// ];
 
 const ManualOrderData = props => {
   var [orderData, setorderData] = useState([]);
@@ -64,6 +68,7 @@ const ManualOrderData = props => {
       editable: 'never',
       filtering: false
     },
+    { title: 'Delivery Date', field: 'delivered_at', editable: 'never', filtering: false },
     {
       title: 'Retailer',
       field: 'retailerName',
@@ -71,9 +76,9 @@ const ManualOrderData = props => {
       filtering: false
     },
     { title: 'Amount', field: 'amount', editable: 'never', filtering: false },
-    { title: 'Promo Discount', field: 'coupon_discount', editable: 'never', filtering: false },
+    // { title: 'Promo Discount', field: 'coupon_discount', editable: 'never', filtering: false },
     { title: 'Special Discount', field: 'special_discount', editable: 'never', filtering: false },
-    { title: 'Wallet Discount', field: 'wallet_discount', editable: 'never', filtering: false },
+    // { title: 'Wallet Discount', field: 'wallet_discount', editable: 'never', filtering: false },
     { title: 'Total Bill', field: 'total_payable', editable: 'never', filtering: false },
     {
       title: 'Status',
@@ -86,18 +91,21 @@ const ManualOrderData = props => {
         3: 'In Transit',
         4: 'Delivered',
         5: 'Closed',
-        6: 'Cancelled'
+        6: 'Cancelled',
+        7: 'Returned',
+        8: 'Shop Closed',
+        9: 'On Hold'
       }
     }
   ]);
   const [params, setParams] = useState({
     page: 1,
     offset: 0,
-    showCalendar: false
+    // showCalendar: false
   });
   const [csvData, setCsvData] = useState([]);
-  const [fromDat, setFromDat] = useState('');
-  const [toDat, setToDat] = useState('');
+  // const [fromDat, setFromDat] = useState('');
+  // const [toDat, setToDat] = useState('');
   const [dateSelRange, setDateSelRange] = useState([
     {
       startDate: new Date(),
@@ -105,7 +113,7 @@ const ManualOrderData = props => {
       key: 'selection'
     }
   ]);
-  var [searchText, setSearchText] = useState('');
+  // var [searchText, setSearchText] = useState('');
 
   useEffect(() => {
     UserModel.getInstance().getOrderLog(
@@ -142,6 +150,7 @@ const ManualOrderData = props => {
             wallet_discount: obj.wallet_discount ? obj.wallet_discount.amount : 0,
             total_payable: bill,
             created_at: new Date(obj.created_at).toLocaleDateString(),
+            delivered_at: new Date(obj.delivered_at).toLocaleDateString(),
             status: obj.status
           });
         });
@@ -149,12 +158,14 @@ const ManualOrderData = props => {
         setorderData(tempArr);
       },
       err => {
-        console.log(err);
+        // console.log(err);
       }
     );
   }, []);
 
-  const { className, ...rest } = props;
+  const { className, 
+    // ...rest
+   } = props;
   let history = useHistory();
 
   const classes = useStyles();
@@ -203,6 +214,7 @@ const ManualOrderData = props => {
               wallet_discount: obj.wallet_discount ? obj.wallet_discount.amount : 0,
               total_payable: bill,
               created_at: new Date(obj.created_at).toLocaleDateString(),
+              delivered_at: new Date(obj.delivered_at).toLocaleDateString(),
               status: obj.status
             });
           });
@@ -210,7 +222,7 @@ const ManualOrderData = props => {
           setParams({ ...params, offset: newOffset, page: newPage });
         },
         err => {
-          console.log(err);
+          // console.log(err);
         }
       );
     }
@@ -254,6 +266,7 @@ const ManualOrderData = props => {
             wallet_discount: obj.wallet_discount ? obj.wallet_discount.amount : 0,
             total_payable: bill,
             created_at: new Date(obj.created_at).toLocaleDateString(),
+            delivered_at: new Date(obj.delivered_at).toLocaleDateString(),
             status: obj.status
           });
         });
@@ -262,46 +275,46 @@ const ManualOrderData = props => {
         setParams({ ...params, offset: newOffset, page: newPage });
       },
       err => {
-        console.log(err);
+        // console.log(err);
       }
     );
   };
 
-  const handleDateChange = async item => {
-    await setDateSelRange([item.selection]);
-    const fromDate =
-      item.selection.startDate.getFullYear() +
-      '-' +
-      (item.selection.startDate.getMonth() + 1) +
-      '-' +
-      item.selection.startDate.getDate();
-    const toDate =
-      item.selection.endDate.getFullYear() +
-      '-' +
-      (item.selection.endDate.getMonth() + 1) +
-      '-' +
-      item.selection.endDate.getDate();
+  // const handleDateChange = async item => {
+  //   await setDateSelRange([item.selection]);
+  //   const fromDate =
+  //     item.selection.startDate.getFullYear() +
+  //     '-' +
+  //     (item.selection.startDate.getMonth() + 1) +
+  //     '-' +
+  //     item.selection.startDate.getDate();
+  //   const toDate =
+  //     item.selection.endDate.getFullYear() +
+  //     '-' +
+  //     (item.selection.endDate.getMonth() + 1) +
+  //     '-' +
+  //     item.selection.endDate.getDate();
 
-    const par = { from: fromDate };
+  //   // const par = { from: fromDate };
 
-    UserModel.getInstance().downloadOrderDetails(
-      { from: fromDate + ' 15:00:00', to: toDate + ' 23:59:59' },
-      succ => {
-        // console.log(succ);
-        setCsvData(succ);
-      },
-      err => {
-        console.log(err);
-      }
-    );
-    setFromDat(fromDate);
-    // console.log('from dat', fromDat);
-    setToDat(toDate);
-    // console.log('from', fromDate + ' 23:59:59');
-    // console.log('to', toDate + ' 15:00:00');
-    // console.log(item.selection.startDate + ' ' + fromDate);
-    // console.log(item.selection.endDate);
-  };
+  //   UserModel.getInstance().downloadOrderDetails(
+  //     { from: fromDate + ' 15:00:00', to: toDate + ' 23:59:59' },
+  //     succ => {
+  //       // console.log(succ);
+  //       setCsvData(succ);
+  //     },
+  //     err => {
+  //       console.log(err);
+  //     }
+  //   );
+  //   // setFromDat(fromDate);
+  //   // console.log('from dat', fromDat);
+  //   // setToDat(toDate);
+  //   // console.log('from', fromDate + ' 23:59:59');
+  //   // console.log('to', toDate + ' 15:00:00');
+  //   // console.log(item.selection.startDate + ' ' + fromDate);
+  //   // console.log(item.selection.endDate);
+  // };
 
   const filterChange = async data => {
     // console.log('data', data);
@@ -314,11 +327,11 @@ const ManualOrderData = props => {
     }
     if (data.length > 0 && data[0].value.length > 0) {
       let searchArray = [];
-      data.map((x, i) => {
+      data.forEach((x, i) => {
         // console.log('map data value', x.value);
         searchArray.push({
           column_name: x.column.field,
-          text: x.column.field == 'status' ? x.value[0] : x.value
+          text: x.column.field === 'status' ? x.value[0] : x.value
         });
       });
       // console.log('search Array', searchArray);
@@ -358,6 +371,7 @@ const ManualOrderData = props => {
               wallet_discount: obj.wallet_discount ? obj.wallet_discount.amount : 0,
               total_payable: bill,
               created_at: new Date(obj.created_at).toLocaleDateString(),
+              delivered_at: new Date(obj.delivered_at).toLocaleDateString(),
               status: obj.status
             });
           });
@@ -366,7 +380,7 @@ const ManualOrderData = props => {
           await setorderData(tempArr);
         },
         err => {
-          console.log('my err', err);
+          // console.log('my err', err);
         }
       );
       // console.log('order data filter', orderData);
@@ -405,6 +419,7 @@ const ManualOrderData = props => {
               wallet_discount: obj.wallet_discount ? obj.wallet_discount.amount : 0,
               total_payable: bill,
               created_at: new Date(obj.created_at).toLocaleDateString(),
+              delivered_at: new Date(obj.delivered_at).toLocaleDateString(),
               status: obj.status
             });
           });
@@ -413,7 +428,7 @@ const ManualOrderData = props => {
           // console.log('222222', tempArr);
         },
         err => {
-          console.log(err);
+          // console.log(err);
         }
       );
     }
@@ -421,7 +436,7 @@ const ManualOrderData = props => {
 
   return (
     <MuiThemeProvider theme={theme}>
-      {params.showCalendar ? (
+      {/* {params.showCalendar ? (
         <Dialog
           open={params.showCalendar}
           onClose={() => {
@@ -438,7 +453,7 @@ const ManualOrderData = props => {
             endDate={dateSelRange.endDate}
           />
         </Dialog>
-      ) : null}
+      ) : null} */}
       <MaterialTable
         title="Orders"
         columns={state}
@@ -469,17 +484,17 @@ const ManualOrderData = props => {
               history.push(`/manual-order/edit-manual-order-detail/${data.orderId}`, (data = data)); // Retailer info fetch info not ready so only passing switch status
             }
           },
-          {
-            icon: CalendarTodayIcon,
-            isFreeAction: true,
-            onClick: (event, data) => {
-              if (params.showCalendar) {
-                setParams({ ...params, showCalendar: false });
-              } else {
-                setParams({ ...params, showCalendar: true });
-              }
-            }
-          },
+          // {
+          //   icon: CalendarTodayIcon,
+          //   isFreeAction: true,
+          //   onClick: (event, data) => {
+          //     if (params.showCalendar) {
+          //       setParams({ ...params, showCalendar: false });
+          //     } else {
+          //       setParams({ ...params, showCalendar: true });
+          //     }
+          //   }
+          // },
           {
             icon: 'add',
             tooltip: 'Add Manual Order',

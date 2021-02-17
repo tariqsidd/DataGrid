@@ -5,36 +5,38 @@ import clsx from 'clsx';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
+import moment from 'moment';
 import {
     Card,
     CardHeader,
     CardContent,
     CardActions,
-    CardActionArea,
-    CardMedia,
+    // CardActionArea,
+    // CardMedia,
     Divider,
     Grid,
     Button,
     TextField,
-    Checkbox,
+    // Checkbox,
     Icon
 } from '@material-ui/core';
 import Hidden from '@material-ui/core/Hidden';
-import Paper from '@material-ui/core/Paper';
-import { withStyles } from '@material-ui/core/styles';
-import { validateNumeric } from 'common/validators';
+// import Paper from '@material-ui/core/Paper';
+// import { withStyles } from '@material-ui/core/styles';
+import { validateNumeric, validateNumericNoDecimal } from 'common/validators';
 import MaterialTable from 'material-table';
+// import style from './style.css';
 // import 'antd/dist/antd.css';
 
-const GreenCheckbox = withStyles({
-    root: {
-        color: 'orange',
-        '&$checked': {
-            color: 'orange',
-        },
-    },
-    checked: {},
-})((props) => <Checkbox color="default" {...props} />);
+// const GreenCheckbox = withStyles({
+//     root: {
+//         color: 'orange',
+//         '&$checked': {
+//             color: 'orange',
+//         },
+//     },
+//     checked: {},
+// })((props) => <Checkbox color="default" {...props} />);
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -73,6 +75,9 @@ const AddManualOrder = props => {
     var [mobileData, setMobileData] = useState([]);
     var [selectedMobileData, setSelectedMobileData] = useState({});
 
+    const [futureDatesOfDelivery, setFutureDatesOfDelivery] = useState([]);
+    const [selectedDeliveryDate, setSelectedDeliveryDate] = useState({});
+
     const [impCondition, setImpCondition] = useState(false)  // Ask before removing
 
     const [skuItems, setSkuItems] = useState([])
@@ -103,9 +108,31 @@ const AddManualOrder = props => {
         { title: 'Total', field: 'cost', editable: 'never' },
     ]);
 
+    // useEffect(() => {
+    //     console.log(orderItemRows[0].quantity, orderItemRows[0].final_price)
+    // })
+
     useEffect(() => {
-        console.log(orderItemRows[0].quantity, orderItemRows[0].final_price)
-    })
+        let userprofile = JSON.parse(localStorage.getItem('sales-profile'))
+        let cityId = userprofile.city_id;
+
+        UserModel.getInstance().getFutureDatesOfDelivery(
+            cityId,
+            data => {
+              console.log('GET future DOD', data)
+              let futureDates = []
+            //   let id = 0;
+              data && data.length > 0 && Array.isArray(data) && data.forEach(date => {
+                futureDates.push({ id: date, name: moment(date).format('dddd - Do MMM YYYY') })
+                // id++;
+              })
+              setFutureDatesOfDelivery(futureDates)
+            },
+            err => {
+              // console.log('err', err)
+            }
+          );
+    }, [])
 
     useEffect(() => {
         let subtotal = 0;
@@ -114,26 +141,30 @@ const AddManualOrder = props => {
                 subtotal += item.cost
             })
         setSubtotal(subtotal)
-        var bill = subtotal;
-        if (specialDiscount) {
-            bill = bill - specialDiscount
-        }
-        // console.log(bill)
 
-        // console.log(specialDiscount, promoCodeDiscount, selectedMobileData.wallet)
-        if (promoCodeDiscount) {
-            // console.log(bill - promoCodeDiscount)
-            bill = bill - promoCodeDiscount
-        }
-        // console.log(bill)
+        var bill = applyPromoReferralGMVDiscounts(subtotal)
 
-        if (selectedMobileData && selectedMobileData.wallet && selectedMobileData.wallet.length > 0 && Array.isArray(selectedMobileData.wallet) && selectedMobileData.wallet[0] && selectedMobileData.wallet[0].amount) {
-            console.log(selectedMobileData.wallet[0].amount, 'here')
-            bill = bill - selectedMobileData.wallet[0].amount
-        }
-        console.log(bill)
+        // var bill = subtotal;
+        // if (specialDiscount) {
+        //     bill = bill - specialDiscount
+        // }
+        // // console.log(bill)
+
+        // // console.log(specialDiscount, promoCodeDiscount, selectedMobileData.wallet)
+        // if (promoCodeDiscount) {
+        //     // console.log(bill - promoCodeDiscount)
+        //     bill = bill - promoCodeDiscount
+        // }
+        // // console.log(bill)
+
+        // if (selectedMobileData && selectedMobileData.wallet && selectedMobileData.wallet.length > 0 && Array.isArray(selectedMobileData.wallet) && selectedMobileData.wallet[0] && selectedMobileData.wallet[0].amount) {
+        //     console.log('wallet')
+        //     bill = bill - selectedMobileData.wallet[0].amount
+        // }
+        // // console.log(bill)
 
         settotalBill(bill)
+        // eslint-disable-next-line
     }, [specialDiscount, orderItemRows, promoCodeDiscount, selectedMobileData])
 
     const mobileHandleChange = async (event, val) => {
@@ -148,6 +179,7 @@ const AddManualOrder = props => {
             });
         }
     };
+
 
     const mobileSearch = async (event, value) => {
         await setParams({ ...params, dataFetchStatus: false });
@@ -164,22 +196,47 @@ const AddManualOrder = props => {
         );
     };
 
-    const handleChange = event => {
-        setParams({
-            ...params,
-            [event.target.name]: event.target.value
-        });
+    const deliveryDateChange = async (event, val) => {
+        // var arr = event.target.getAttribute('data-option-index');
+        // console.log('mobile val', val);
+        if (val) {
+            setSelectedDeliveryDate(val);
+        }
     };
 
+    // const handleChange = event => {
+    //     setParams({
+    //         ...params,
+    //         [event.target.name]: event.target.value
+    //     });
+    // };
+
     const checkErrors = () => {
-        console.log("selectedMobData", selectedMobileData)
-        const err = orderItemRows && orderItemRows.length > 0 && Array.isArray(orderItemRows) && orderItemRows.some(({ name, quantity, pre_slash_price, post_slash_price, min_price, final_price, cost }, index) => {
+        // console.log("selectedMobData", selectedMobileData)
+        var err = false;
+        var warning = false;
+        orderItemRows && orderItemRows.length > 0 && Array.isArray(orderItemRows) && orderItemRows.forEach(({ name, quantity, pre_slash_price, post_slash_price, min_price, final_price, cost }, index) => {
+            // console.log(!name, !quantity, quantity <= 0, !final_price, !cost, !selectedSkuItems[index].id, !selectedSkuItems[index].name)
             if (
-                !name || !quantity || quantity <= 0 || !final_price || final_price > post_slash_price || final_price < min_price || !cost || !selectedSkuItems[index].id || !selectedSkuItems[index].name || !selectedMobileData || !selectedMobileData.id
+                !name || !quantity || quantity <= 0 || !final_price || !cost || !selectedSkuItems[index] || !selectedSkuItems[index].id || !selectedSkuItems[index].name
             ) {
-                // console.log('A')
-                return true;
+                err = true;
             }
+            if (/*final_price > post_slash_price || */ final_price < min_price) {
+                // setOpenData({ openFinalPriceNotWithinRangeWarning: true, openMinOrderValueWarning: false, openSuccess: false, openWarning: false, openError: false, openDiscountWarning: false, openMobileNotSelectedWarning: false, openDeliveryDateWarning: false })
+                warning = true;
+            } 
+        // const err = orderItemRows && orderItemRows.length > 0 && Array.isArray(orderItemRows) && orderItemRows.some(({ name, quantity, pre_slash_price, post_slash_price, min_price, final_price, cost }, index) => {
+        //     if (
+        //         !name || !quantity || quantity <= 0 || !final_price || !cost || !selectedSkuItems[index].id || !selectedSkuItems[index].name
+        //     ) {
+        //         // console.log('A')
+        //         return true;
+        //     }
+        //     if (/*final_price > post_slash_price || */ final_price < min_price) {
+        //         setOpenData({ openFinalPriceNotWithinRangeWarning: true, openMinOrderValueWarning: false, openSuccess: false, openWarning: false, openError: false, openDiscountWarning: false, openMobileNotSelectedWarning: false, openDeliveryDateWarning: false })
+        //         return true;
+        //     } 
             // else {
             //     console.log('B')
             //     // if (min_price > 0) {
@@ -196,24 +253,42 @@ const AddManualOrder = props => {
             //     return true;
             // }
         })
-        return err;
+        // console.log(err, warning)
+        if (err)
+            return 'err';
+        else if (warning)
+            return 'warning';
     };
 
     const handleClose = (event, reason) => {
         if (reason === 'clickaway') {
             return;
         }
-        setOpenData({ openSuccess: false, openWarning: false, openError: false, openDiscountWarning: false, openMinOrderValueWarning: false });
+        setOpenData({ openSuccess: false, openWarning: false, openError: false, openDiscountWarning: false, openMinOrderValueWarning: false, openMobileNotSelectedWarning: false, openFinalPriceNotWithinRangeWarning: false, openDeliveryDateWarning: false });
     };
 
     const handleSubmit = async () => {
-        console.log(params.submitStatus)
+        // console.log(params.submitStatus)
         // if (!params.submitStatus) { //Commented this because it is being handles in render method
-        const errors = await checkErrors() // Hamza you need to redo you error handling. It doesn not work
-        if (errors) {
-            setOpenData({ ...openData, openError: true });
-        } else if (subTotal < 1000) {
-            setOpenData({ ...openData, openMinOrderValueWarning: true })
+        const validationCheck = await checkErrors() // Hamza you need to redo you error handling. It doesn not work
+        if (validationCheck === 'err') {
+            // console.log('A')
+            setOpenData({ openError: true, openSuccess: false, openWarning: false, openDiscountWarning: false, openMinOrderValueWarning: false, openMobileNotSelectedWarning: false, openFinalPriceNotWithinRangeWarning: false, openDeliveryDateWarning: false });
+        } 
+        else if (validationCheck === 'warning') {
+            // console.log('B')
+            setOpenData({ openFinalPriceNotWithinRangeWarning: true, openError: false, openSuccess: false, openWarning: false, openDiscountWarning: false, openMinOrderValueWarning: false, openMobileNotSelectedWarning: false, openDeliveryDateWarning: false });
+        }
+        else if (!selectedMobileData || !selectedMobileData.id) {
+            // console.log('C')
+            setOpenData({ openMobileNotSelectedWarning: true, openSuccess: false, openWarning: false, openError: false, openDiscountWarning: false, openMinOrderValueWarning: false, openFinalPriceNotWithinRangeWarning: false, openDeliveryDateWarning: false })
+        }
+        else if (!selectedDeliveryDate || !selectedDeliveryDate.name) {
+            // console.log('D')
+            setOpenData({ openDeliveryDateWarning: true, openMobileNotSelectedWarning: false, openSuccess: false, openWarning: false, openError: false, openDiscountWarning: false, openMinOrderValueWarning: false, openFinalPriceNotWithinRangeWarning: false })
+        }
+        else if (subTotal < 1000) {
+            setOpenData({ openMinOrderValueWarning: true, openSuccess: false, openWarning: false, openError: false, openDiscountWarning: false, openMobileNotSelectedWarning: false, openFinalPriceNotWithinRangeWarning: false, openDeliveryDateWarning: false })
         }
         else if (
             (specialDiscount > subTotal) ||
@@ -221,21 +296,22 @@ const AddManualOrder = props => {
             (selectedMobileData && selectedMobileData.wallet && selectedMobileData.wallet.length > 0 && Array.isArray(selectedMobileData.wallet) &&
                 (specialDiscount + promoCodeDiscount + selectedMobileData.wallet[0].amount > subTotal))
         ) {
-            setOpenData({ ...openData, openDiscountWarning: true })
+            setOpenData({ openDiscountWarning: true, openSuccess: false, openWarning: false, openError: false, openMinOrderValueWarning: false, openMobileNotSelectedWarning: false, openFinalPriceNotWithinRangeWarning: false, openDeliveryDateWarning: false })
         }
         else if (totalBill && Number(totalBill) && totalBill > 0) {
             setParams({ ...params, submitStatus: true });
-            let par = new FormData();
+            // let par = new FormData();
             let orderList = orderItemRows && orderItemRows.filter(x => x.quantity > 0).map((item, index) => ({
                 sku_id: selectedSkuItems[index].id,
                 price: item.final_price,
                 qty: +item.quantity
             }))
             if (orderList.length > 0 && selectedMobileData && selectedMobileData.id) {
-                console.log("MAKING")
+                // console.log("MAKING")
                 var obj = {
                     user_id: selectedMobileData.id, // retailer ID
                     items: orderList,
+                    delivered_at: selectedDeliveryDate.id
                 };
                 if (specialDiscount) {
                     obj = {
@@ -259,20 +335,20 @@ const AddManualOrder = props => {
                 UserModel.getInstance().postManualOrder(
                     obj,
                     succ => {
-                        setOpenData({ ...openData, openSuccess: true });
+                        setOpenData({ openSuccess: true, openWarning: false, openError: false, openDiscountWarning: false, openMinOrderValueWarning: false, openMobileNotSelectedWarning: false, openFinalPriceNotWithinRangeWarning: false, openDeliveryDateWarning: false });
                         setTimeout(() => {
                             props.history.push('/manual-orders');
                         }, 1000);
                     },
                     err => {
                         setParams({ ...params, submitStatus: false });
-                        console.log(err);
+                        // console.log(err);
                     }
                 );
             }
             else {
                 setParams({ ...params, submitStatus: false });
-                setOpenData({ ...openData, openWarning: true });
+                setOpenData({ openWarning: true, openSuccess: false, openError: false, openDiscountWarning: false, openMinOrderValueWarning: false, openMobileNotSelectedWarning: false, openFinalPriceNotWithinRangeWarning: false, openDeliveryDateWarning: false });
             }
             // }
         }
@@ -282,10 +358,11 @@ const AddManualOrder = props => {
     }
 
 
-    const skuSearch = async (event, value) => {
-        // console.log('skusearch', { event, value })
+    const skuSearch = async (event, value, index) => {
+        console.log('skusearch', { event, value })
         // console.log({ event, value })
         if (value) {
+            console.log('YES')
             await setParams({ ...params, dataFetchStatus: false });
             await UserModel.getInstance().getSkuByName(
                 { 'q': value },
@@ -294,9 +371,9 @@ const AddManualOrder = props => {
                     let itemsInStockArr = [];
                     data && data.length > 0 && Array.isArray(data) && data.forEach((item) => {
                         // console.log(item.is_stock, item.name)
-                        if (!item.is_stock) {
+                        if (!item.is_stock && item.latest_balance && item.latest_balance.rate && item.latest_balance.rate > 0) {
                             if (item.is_deal) {
-                                console.log({ item })
+                                // console.log({ item })
                                 var tempItem = { ...item, name: item.name + " - DEAL" }
                                 itemsInStockArr.push(tempItem)
                             } else {
@@ -304,61 +381,68 @@ const AddManualOrder = props => {
                             }
                         }
                     })
-                    setSkuItems([...itemsInStockArr]);
+                    // console.log(itemsInStockArr)
+                    // console.log(selectedSkuItems)
+                    var newItemsOnly = [];
+                    // checked len > than 1, so that there is atleast some item to check (if it already exist) otherwise gives error of cannot access property of undefined.
+                    // cuz 1st index is already empty line genrated by default, acc to logic.
+                    if (selectedSkuItems && selectedSkuItems.length > 0 && Array.isArray(selectedSkuItems)) { 
+                        newItemsOnly = itemsInStockArr.filter(item => selectedSkuItems.every(selectedskus => selectedskus.id != item.id))
+                    }
+                    // console.log(newItemsOnly)
+                    setSkuItems([...newItemsOnly]);
                     setParams({ ...params, dataFetchStatus: true });
                 },
                 err => {
-                    console.log(err);
+                    // console.log(err);
                 }
             );
+        } else {
+            console.log('NO')
+            let selectedSkus = selectedSkuItems
+            selectedSkus[index] = {id: '', name: ''}
+            setSelectedSkuItems([...selectedSkus])
         }
     };
+
+    const handlePlusMinusFinalPrice = (e, index, sign) => {
+        var myevent = e;
+        const copyOrderItems = orderItemRows;
+        var thisItem = copyOrderItems[index];
+        if (sign === 'minus') {
+            myevent.target.value = +thisItem.final_price - 1;
+        } else if (sign === 'plus') {
+            myevent.target.value = +thisItem.final_price + 1;
+        }
+        
+        handleOrderItemDetailsChange(myevent, index)
+    }
 
     const handleOrderItemDetailsChange = (e, index) => {
         // console.log('eeeeeeeee handleOrderItemChange', e.target.name)
         // console.clear()
         // console.log('handleOrderItemChange')
         // console.log(e.target.name, e.target.value, { index })
-        console.log(e.target.name, e.target.value)
+        // console.log(e.target.name, e.target.value)
         const orderItemsDetailArr = orderItemRows;
         var orderitem = orderItemsDetailArr[index];
+        var valuue = e.target.value;
         if ((e.target.name === 'quantity' || e.target.name === 'final_price')) {
-            if (validateNumeric(parseInt(e.target.value)) || e.target.value === '') {
-                console.log('vladatenumeric')
-                console.log('vladatenumeric', e.target.value)
-                orderitem[e.target.name] = e.target.value;
+            // if (validateNumeric(parseInt(valuue)) || valuue === '') {
+            if (valuue === '' || (validateNumeric(+valuue) && validateNumericNoDecimal(+valuue) && !valuue.includes('.'))) {
+                // console.log('vladatenumeric')
+                // console.log('vladatenumeric', valuue)
+                orderitem[e.target.name] = valuue;
             }
         }
 
-        var disc_Threshold_Found = false;
-        if (orderitem && orderitem.qty_discount && orderitem.qty_discount.length > 0 && Array.isArray(orderitem.qty_discount)) {
-            orderitem.qty_discount.forEach((dis_Obj, idx) => {
-                // console.log('disObj',idx)
-                console.log('each iter')
-                if (idx == orderitem.qty_discount.length - 1 && orderitem.quantity >= dis_Obj.lower) {
-                    // console.log('A')
-                    orderitem.final_price = (orderitem.post_slash_price - dis_Obj.value);
-                    disc_Threshold_Found = true;
-                    return;
-                }
-                if (orderitem.quantity >= dis_Obj.lower && orderitem.quantity <= dis_Obj.upper) {
-                    // console.log('B')
-                    // console.log('order post slash', orderitem.post_slash_price, dis_Obj.value)
-                    orderitem.final_price = (orderitem.post_slash_price - dis_Obj.value);
-                    disc_Threshold_Found = true;
-                    return;
-                }
-            })
-
-            if (!disc_Threshold_Found) {
-                orderitem.final_price = orderitem.post_slash_price;
-            }
-        }
+        orderitem = applyBulkDiscounts(orderitem)
 
         // console.log(orderitem)
-
         if (e.target.name === 'quantity' || e.target.name === 'final_price') {
-            orderitem.cost = orderitem.quantity * orderitem.final_price;
+            if (valuue === '' || (validateNumeric(+valuue) && validateNumericNoDecimal(+valuue) && !valuue.includes('.'))) {
+                orderitem.cost = orderitem.quantity * orderitem.final_price;
+            }
         }
         orderItemsDetailArr[index] = orderitem;
         // console.log(orderItemsDetailArr)
@@ -369,27 +453,57 @@ const AddManualOrder = props => {
         })
         setSubtotal(subtotal)
 
-        var bill = subtotal;
-        if (specialDiscount) {
-            bill = bill - specialDiscount
-        }
-        // console.log(bill)
+        var bill = applyPromoReferralGMVDiscounts(subtotal)
 
-        console.log(specialDiscount, promoCodeDiscount, selectedMobileData.wallet)
-        if (promoCodeDiscount) {
-            console.log(bill - promoCodeDiscount)
-            bill = bill - promoCodeDiscount
-        }
-        // console.log(bill)
+        // var bill = subtotal;
+        // if (specialDiscount) {
+        //     bill = bill - specialDiscount
+        // }
+        // // console.log(bill)
 
-        if (selectedMobileData && selectedMobileData.wallet && selectedMobileData.wallet.length > 0 && Array.isArray(selectedMobileData.wallet) && selectedMobileData.wallet[0] && selectedMobileData.wallet[0].amount) {
-            console.log('wallet')
-            bill = bill - selectedMobileData.wallet[0].amount
-        }
-        // console.log(bill)
+        // // console.log(specialDiscount, promoCodeDiscount, selectedMobileData.wallet)
+        // if (promoCodeDiscount) {
+        //     // console.log(bill - promoCodeDiscount)
+        //     bill = bill - promoCodeDiscount
+        // }
+        // // console.log(bill)
+
+        // if (selectedMobileData && selectedMobileData.wallet && selectedMobileData.wallet.length > 0 && Array.isArray(selectedMobileData.wallet) && selectedMobileData.wallet[0] && selectedMobileData.wallet[0].amount) {
+        //     console.log('wallet')
+        //     bill = bill - selectedMobileData.wallet[0].amount
+        // }
+        // // console.log(bill)
 
         settotalBill(bill)
         setImpCondition(!impCondition)  // ask before removing
+    }
+
+    const applyBulkDiscounts = (order_ITEM) => {
+        var disc_Threshold_Found = false;
+        if (order_ITEM && order_ITEM.qty_discount && order_ITEM.qty_discount.length > 0 && Array.isArray(order_ITEM.qty_discount)) {
+            order_ITEM.qty_discount.forEach((dis_Obj, idx) => {
+                // console.log('disObj',idx)
+                // console.log('each iter')
+                if (idx == order_ITEM.qty_discount.length - 1 && order_ITEM.quantity >= dis_Obj.lower) {
+                    // console.log('A')
+                    order_ITEM.final_price = (order_ITEM.post_slash_price - dis_Obj.value);
+                    disc_Threshold_Found = true;
+                    return;
+                }
+                if (order_ITEM.quantity >= dis_Obj.lower && order_ITEM.quantity <= dis_Obj.upper) {
+                    // console.log('B')
+                    // console.log('order post slash', order_ITEM.post_slash_price, dis_Obj.value)
+                    order_ITEM.final_price = (order_ITEM.post_slash_price - dis_Obj.value);
+                    disc_Threshold_Found = true;
+                    return;
+                }
+            })
+
+            if (!disc_Threshold_Found) {
+                order_ITEM.final_price = order_ITEM.post_slash_price;
+            }
+        }
+        return order_ITEM;
     }
 
     const orderItemHandleChange = async (event, val, index) => {
@@ -404,45 +518,25 @@ const AddManualOrder = props => {
 
             const orderItemsDetailArr = orderItemRows;
             var orderitem = orderItemsDetailArr[index];
-            var disc_Threshold_Found = false;
-            if (orderitem && orderitem.qty_discount && orderitem.qty_discount.length > 0 && Array.isArray(orderitem.qty_discount)) {
-                orderitem.qty_discount.forEach((dis_Obj, idx) => {
-                    // console.log('disObj',idx)
-                    // console.log('each iter')
-                    if (idx == orderitem.qty_discount.length - 1 && orderitem.quantity >= dis_Obj.lower) {
-                        // console.log('A')
-                        orderitem.final_price = (orderitem.post_slash_price - dis_Obj.value);
-                        disc_Threshold_Found = true;
-                        return;
-                    }
-                    if (orderitem.quantity >= dis_Obj.lower && orderitem.quantity <= dis_Obj.upper) {
-                        // console.log('B')
-                        // console.log('order post slash', orderitem.post_slash_price, dis_Obj.value)
-                        orderitem.final_price = (orderitem.post_slash_price - dis_Obj.value);
-                        disc_Threshold_Found = true;
-                        return;
-                    }
-                })
 
-                if (!disc_Threshold_Found) {
-                    orderitem.final_price = orderitem.post_slash_price;
-                }
-            }
             // console.log(val.latest_balance ? val.latest_balance.rate : val.post_slash_price)
             // if (val.latest_balance)
             //     console.log('balrate', val.latest_balance.rate)
             // else console.log('postslash', val.post_slash_price)
 
-            orderItemsDetailArr[index].name = val.name;
-            // orderItemsDetailArr[index].quantity = val.quantity;
-            // orderItemsDetailArr[index].price = val.price;
-            orderItemsDetailArr[index].pre_slash_price = val.price;
-            orderItemsDetailArr[index].post_slash_price = val.price - val.discount;
+            orderitem.name = val.name;
+            // orderitem.quantity = val.quantity;
+            // orderitem.price = val.price;
+            orderitem.pre_slash_price = val.price + val.discount;
+            orderitem.post_slash_price = val.price;
             // console.log(val.latest_balance);
-            orderItemsDetailArr[index].min_price = val.latest_balance ? val.latest_balance.rate : (val.price - val.discount); // if VIC calculated rate is not available, display post slash as min value (maximum possible discounted value).
-            orderItemsDetailArr[index].final_price = val.price - val.discount;
-            // orderItemsDetailArr[index].qty_discount = val.qty_discount; // Bulk Discount to be enabled later
-            orderItemsDetailArr[index].cost = orderItemsDetailArr[index].quantity > 1 ? (orderItemsDetailArr[index].quantity * val.price) : (orderItemsDetailArr[index].quantity === 0 ? 0 : '')
+            orderitem.min_price = val.latest_balance ? val.latest_balance.rate : (val.price); // if VIC calculated rate is not available, display post slash as min value (maximum possible discounted value).
+            orderitem.final_price = val.price;
+            // orderitem.qty_discount = val.qty_discount; // Bulk Discount to be enabled later
+            orderitem.cost = orderitem.quantity > 1 ? (orderitem.quantity * val.price) : (orderitem.quantity === 0 ? 0 : '')
+
+            orderitem = applyBulkDiscounts(orderitem)
+            orderItemsDetailArr[index] = orderitem;
             setOrderItemRows(orderItemsDetailArr)
 
             let subtotal = 0;
@@ -450,43 +544,49 @@ const AddManualOrder = props => {
                 subtotal += item.cost
             })
             setSubtotal(subtotal)
-            var bill = subtotal;
-            if (specialDiscount) {
-                bill = bill - specialDiscount
-            }
-            console.log(bill)
 
-            console.log(specialDiscount, promoCodeDiscount, selectedMobileData.wallet)
-            if (promoCodeDiscount) {
-                console.log(bill - promoCodeDiscount)
-                bill = bill - promoCodeDiscount
-            }
-            console.log(bill)
+            var bill = applyPromoReferralGMVDiscounts(subtotal)
 
-            if (selectedMobileData && selectedMobileData.wallet && selectedMobileData.wallet.length > 0 && Array.isArray(selectedMobileData.wallet) && selectedMobileData.wallet[0] && selectedMobileData.wallet[0].amount) {
-                console.log('wallet')
-                bill = bill - selectedMobileData.wallet[0].amount
-            }
-            console.log(bill)
+            // var bill = subtotal;
+            // if (specialDiscount) {
+            //     bill = bill - specialDiscount
+            // }
+            // // console.log(bill)
+
+            // console.log(specialDiscount, promoCodeDiscount, selectedMobileData.wallet)
+            // if (promoCodeDiscount) {
+            //     // console.log(bill - promoCodeDiscount)
+            //     bill = bill - promoCodeDiscount
+            // }
+            // // console.log(bill)
+
+            // if (selectedMobileData && selectedMobileData.wallet && selectedMobileData.wallet.length > 0 && Array.isArray(selectedMobileData.wallet) && selectedMobileData.wallet[0] && selectedMobileData.wallet[0].amount) {
+            //     console.log('wallet')
+            //     bill = bill - selectedMobileData.wallet[0].amount
+            // }
+            // console.log(bill)
 
             settotalBill(bill)
             setImpCondition(!impCondition)  // ask before removing
         } else {
             const skuItemsDetailArr = selectedSkuItems;
             delete skuItemsDetailArr[index]
-            console.log(skuItemsDetailArr)
+            // console.log(skuItemsDetailArr)
             setSelectedSkuItems(skuItemsDetailArr);
 
             const orderItemsDetailArr = orderItemRows;
-            orderItemsDetailArr[index].name = '';
-            orderItemsDetailArr[index].quantity = '';
-            // orderItemsDetailArr[index].price = '';
-            orderItemsDetailArr[index].pre_slash_price = '';
-            orderItemsDetailArr[index].post_slash_price = '';
-            orderItemsDetailArr[index].min_price = '';
-            orderItemsDetailArr[index].final_price = '';
-            orderItemsDetailArr[index].qty_discount = '';
-            orderItemsDetailArr[index].cost = '';
+            var orderitem = orderItemsDetailArr[index];
+
+            orderitem.name = '';
+            orderitem.quantity = '';
+            // orderitem.price = '';
+            orderitem.pre_slash_price = '';
+            orderitem.post_slash_price = '';
+            orderitem.min_price = '';
+            orderitem.final_price = '';
+            orderitem.qty_discount = '';
+            orderitem.cost = '';
+
             setOrderItemRows(orderItemsDetailArr)
 
             let subtotal = 0;
@@ -494,44 +594,84 @@ const AddManualOrder = props => {
                 subtotal += item.cost
             })
             setSubtotal(subtotal)
-            var bill = subtotal;
-            if (specialDiscount) {
-                bill = bill - specialDiscount
-            }
-            console.log(bill)
 
-            console.log(specialDiscount, promoCodeDiscount, selectedMobileData.wallet)
-            if (promoCodeDiscount) {
-                console.log(bill - promoCodeDiscount)
-                bill = bill - promoCodeDiscount
-            }
-            console.log(bill)
+            var bill = applyPromoReferralGMVDiscounts(subtotal)
+            // var bill = subtotal;
+            // if (specialDiscount) {
+            //     bill = bill - specialDiscount
+            // }
+            // // console.log(bill)
 
-            if (selectedMobileData && selectedMobileData.wallet && selectedMobileData.wallet.length > 0 && Array.isArray(selectedMobileData.wallet) && selectedMobileData.wallet[0] && selectedMobileData.wallet[0].amount) {
-                console.log('wallet')
-                bill = bill - selectedMobileData.wallet[0].amount
-            }
-            console.log(bill)
+            // // console.log(specialDiscount, promoCodeDiscount, selectedMobileData.wallet)
+            // if (promoCodeDiscount) {
+            //     // console.log(bill - promoCodeDiscount)
+            //     bill = bill - promoCodeDiscount
+            // }
+            // // console.log(bill)
+
+            // if (selectedMobileData && selectedMobileData.wallet && selectedMobileData.wallet.length > 0 && Array.isArray(selectedMobileData.wallet) && selectedMobileData.wallet[0] && selectedMobileData.wallet[0].amount) {
+            //     console.log('wallet')
+            //     bill = bill - selectedMobileData.wallet[0].amount
+            // }
+            // // console.log(bill)
 
             settotalBill(bill)
             setImpCondition(!impCondition)  // ask before removing
         }
+        setSkuItems([]) // important to empty it, so that list doesnot repeat the already added sku.
     };
 
-    const addNewOrderItemRow = () => {
+    const applyPromoReferralGMVDiscounts = (subtotal) => {
+        var bill = subtotal;
+        if (specialDiscount) {
+            bill = bill - specialDiscount
+        }
+        // console.log(bill)
+
+        // console.log(specialDiscount, promoCodeDiscount, selectedMobileData.wallet)
+        if (promoCodeDiscount) {
+            // console.log(bill - promoCodeDiscount)
+            bill = bill - promoCodeDiscount
+        }
+        // console.log(bill)
+
+        if (selectedMobileData && selectedMobileData.wallet && selectedMobileData.wallet.length > 0 && Array.isArray(selectedMobileData.wallet) && selectedMobileData.wallet[0] && selectedMobileData.wallet[0].amount) {
+            // console.log('wallet')
+            bill = bill - selectedMobileData.wallet[0].amount
+        }
+        // console.log(bill)
+        return bill;
+    }
+
+    const addNewOrderItemRow = async () => {
         // console.log('add new order row')
         // let rowFilled = false;
-        const err = orderItemRows && orderItemRows.length > 0 && Array.isArray(orderItemRows) && orderItemRows.some(({ name, quantity, pre_slash_price, post_slash_price, min_price, final_price, cost }, index) => {
-            // console.log(val)
-            console.log(
-                !name, !quantity, quantity <= 0, !final_price, final_price > post_slash_price, final_price >= min_price, !cost, !selectedSkuItems[index].id, !selectedSkuItems[index].name
-            )
+        const validationCheck = await checkErrors() // Hamza you need to redo you error handling. It doesn not work
+        if (validationCheck === 'err') {
+            setOpenData({ openError: true, openSuccess: false, openWarning: false, openDiscountWarning: false, openMinOrderValueWarning: false, openMobileNotSelectedWarning: false, openFinalPriceNotWithinRangeWarning: false, openDeliveryDateWarning: false });
+        } 
+        else if (validationCheck === 'warning') {
+            setOpenData({ openFinalPriceNotWithinRangeWarning: true, openError: false, openSuccess: false, openWarning: false, openDiscountWarning: false, openMinOrderValueWarning: false, openMobileNotSelectedWarning: false, openDeliveryDateWarning: false });
+        }
+        else if (!selectedMobileData || !selectedMobileData.id) {
+            setOpenData({ openMobileNotSelectedWarning: true, openSuccess: false, openWarning: false, openError: false, openDiscountWarning: false, openMinOrderValueWarning: false, openFinalPriceNotWithinRangeWarning: false, openDeliveryDateWarning: false })
+        }
+        // const err = orderItemRows && orderItemRows.length > 0 && Array.isArray(orderItemRows) && orderItemRows.some(({ name, quantity, pre_slash_price, post_slash_price, min_price, final_price, cost }, index) => {
+        //     // console.log(val)
+        //     console.log(
+        //         !name, !quantity, quantity <= 0, !final_price, final_price > post_slash_price, final_price >= min_price, !cost, !selectedSkuItems[index].id, !selectedSkuItems[index].name
+        //     )
 
-            if (
-                !name || !quantity || quantity <= 0 || !final_price || final_price > post_slash_price || final_price < min_price || !cost || !selectedSkuItems[index].id || !selectedSkuItems[index].name
-            ) {
-                return true;
-            }
+        //     if (
+        //         !name || !quantity || quantity <= 0 || !final_price || !cost || !selectedSkuItems[index].id || !selectedSkuItems[index].name
+        //     ) {
+        //         return true;
+        //     } 
+        //     else if (final_price > post_slash_price || final_price < min_price) {
+        //         setOpenData({ openFinalPriceNotWithinRangeWarning: true, openWarning: false, openSuccess: false, openError: false, openDiscountWarning: false, openMinOrderValueWarning: false, openMobileNotSelectedWarning: false, openDeliveryDateWarning: false });
+        //         warning = true;
+        //     }
+
             // else {
             //     // if (min_price > 0) {
             //     if (final_price >= min_price) {
@@ -562,23 +702,26 @@ const AddManualOrder = props => {
             //     rowFilled = false
             //     return;
             // }
-        })
-        const newOrderItem = {
-            name: '',
-            quantity: '',
-            pre_slash_price: '',
-            post_slash_price: '',
-            min_price: '',
-            final_price: '',
-            cost: ''
-        }
-        const newSku = {
-            id: null,
-            name: '',
-        }
-        if (err) {
-            setOpenData({ openSuccess: false, openWarning: true, openError: false, openDiscountWarning: false, openMinOrderValueWarning: false });
-        } else {
+
+
+        // })
+
+        // console.log(validationCheck)
+
+        else {
+            const newOrderItem = {
+                name: '',
+                quantity: '',
+                pre_slash_price: '',
+                post_slash_price: '',
+                min_price: '',
+                final_price: '',
+                cost: ''
+            }
+            const newSku = {
+                id: null,
+                name: '',
+            }
             setOrderItemRows([...orderItemRows, newOrderItem])
             setSelectedSkuItems([...selectedSkuItems, newSku])
         }
@@ -588,10 +731,12 @@ const AddManualOrder = props => {
     const removeOrderItem = (index) => {
         if (orderItemRows.length > 1) {
             let orderItemsDetailArr = [...orderItemRows];
+            // console.log(orderItemRows)
             orderItemsDetailArr.splice(index, 1)
             // console.log(orderItemsDetailArr)
             setOrderItemRows([...orderItemsDetailArr])
             let skuSelectedDetailsArr = [...selectedSkuItems];
+            // console.log(selectedSkuItems)
             skuSelectedDetailsArr.splice(index, 1)
             // console.log(skuSelectedDetailsArr)
             setSelectedSkuItems([...skuSelectedDetailsArr])
@@ -601,14 +746,28 @@ const AddManualOrder = props => {
 
     const handleSpecialDiscountChange = event => {
         var spDiscount = event.target.value;
-        console.log(spDiscount)
+        // console.log(typeof(spDiscount))
+        // console.log(spDiscount)
         // console.log(validateNumeric(spDiscount))
         // console.log(validateNumeric('8+4_23%#^&^'))
-        if (validateNumeric(spDiscount) && spDiscount !== 0 && spDiscount !== '0' && spDiscount !== '' && !spDiscount.includes('+') && !spDiscount.includes('-')) {
-            console.log(spDiscount)
+        // // console.log(validateNumeric(spDiscount), spDiscount !== 0, spDiscount !== '0', !spDiscount.includes('+'), !spDiscount.includes('-'))
+        // // console.log(spDiscount == '', validateNumeric(spDiscount))
+        // console.log(spDiscount == '', validateNumeric(spDiscount), spDiscount !== 0, spDiscount !== '0', !spDiscount.includes('+'), !spDiscount.includes('-'))
+        // if (spDiscount == '' || (validateNumeric(spDiscount) && spDiscount !== 0 && spDiscount !== '0' && !spDiscount.includes('+') && !spDiscount.includes('-'))) {
+        //     console.log(spDiscount)
+        //     setspecialDiscount(spDiscount);
+        // } 
+        // else {
+        //     // alert('helo')
+        //     setspecialDiscount(specialDiscount);
+        // }
+
+        // console.log(validateNumeric(spDiscount))
+        // console.log(validateInteger(+spDiscount))
+        // console.log(validateNumericNoDecimal(+spDiscount))
+        if (spDiscount === '' || (validateNumeric(+spDiscount) && validateNumericNoDecimal(+spDiscount) && !spDiscount.includes('.'))) {
+            // console.log(spDiscount, +spDiscount)
             setspecialDiscount(spDiscount);
-        } else {
-            setspecialDiscount('');
         }
     };
 
@@ -643,24 +802,24 @@ const AddManualOrder = props => {
     const generateOrderItemsRows = (values, index) => {
         // console.log({ orderItemRows, selectedSkuItems })
         // console.log({ values })
+        // console.log('dropdown SKU item', index, selectedSkuItems[index])
+        let thisSku = selectedSkuItems[index]  // {id: 1, name: 'Prince biscuit'} new sahi
         return (
             <>
                 <Grid container spacing={1} style={{ marginTop: 20 }}>
 
                     <Grid item md={4} xs={12}>
                         <Autocomplete
-                            id="sku"
-                            // name='Sku_name'
                             options={skuItems}
                             getOptionLabel={option => option.name}
                             renderInput={params => (
-                                <TextField {...params} label="SKU" variant="outlined"
+                                <TextField {...params} label="SKU" variant="outlined" 
                                     // margin="dense" 
                                     placeholder='Search SKU' />
                             )}
-                            value={selectedSkuItems[index]}
+                            value={selectedSkuItems[index] ? selectedSkuItems[index] : {id: null, name: ''}}
                             onChange={(e, val) => orderItemHandleChange(e, val, index)}
-                            onInputChange={skuSearch}
+                            onInputChange={(e, val) => skuSearch(e, val, index)}
                             loading
                             loadingText={
                                 params.dataFetchStatus ? 'Loading' : 'No Matches'
@@ -673,7 +832,7 @@ const AddManualOrder = props => {
                             fullWidth
                             label="Qty"
                             name="quantity"
-                            type='number'
+                            type='text'
                             inputProps={{ min: 1 }}
                             min={1}
                             onChange={(e) => handleOrderItemDetailsChange(e, index)}
@@ -755,12 +914,21 @@ const AddManualOrder = props => {
                             disabled
                         />
 
+                        <button 
+                            type="button" 
+                            name='final_price' 
+                            onClick={(e) => handlePlusMinusFinalPrice(e, index, 'minus')} 
+                            // value="-" 
+                            disabled={!values.final_price || values.final_price <= values.min_price} 
+                            data-field="final_price" 
+                            style={{backgroundColor: '#DCDCDC', borderRadius: 3, padding: 6}}
+                        >-</button>
                         <TextField
                             style={{ marginLeft: 5, marginRight: 5 }}
                             fullWidth
                             label="Final Price"
                             name="final_price"
-                            type='number'
+                            type='text'
                             inputProps={{ min: values.min_price, max: values.pre_slash_price }}
                             min={values.min_price}
                             max={values.post_slash_price}
@@ -771,6 +939,15 @@ const AddManualOrder = props => {
                             variant="outlined"
                         // placeholder="Final Price"
                         />
+                        <button 
+                            type="button" 
+                            name='final_price' 
+                            onClick={(e) => handlePlusMinusFinalPrice(e, index, 'plus')} 
+                            // value="+" 
+                            disabled={!values.final_price /* || values.final_price >= values.post_slash_price */} 
+                            data-field="final_price" 
+                            style={{backgroundColor: '#DCDCDC', borderRadius: 3, padding: 5}}
+                        >+</button>
 
                         <TextField
                             style={{ marginLeft: 5, marginRight: 5 }}
@@ -789,7 +966,13 @@ const AddManualOrder = props => {
                             disabled
                         />
 
-                        <Icon color="primary" style={{ fontSize: 40, marginLeft: 5, marginRight: 5 }} onClick={() => removeOrderItem(index)}>cancel</Icon>
+                        {/* These consitions were a backup plan if autocomplete didnt work, then tried to show remove button only on last index */}
+                        {/* {selectedSkuItems && selectedSkuItems.length > 0 && Array.isArray(selectedSkuItems) && index+1 == selectedSkuItems.length 
+                        ? */}
+                            <Icon color="primary" style={{ fontSize: 40, marginLeft: 5, marginRight: 5 }} onClick={() => removeOrderItem(index)}>cancel</Icon>
+                        {/* :
+                            <span style={{margin: 23}}></span>
+                        } */}
                     </Grid>
 
                 </Grid>
@@ -856,6 +1039,24 @@ const AddManualOrder = props => {
                                     value={selectedMobileData.name}
                                     variant="outlined"
                                     disabled
+                                />
+                            </Grid>
+
+                            <Grid item md={6} xs={12}>
+                                <Autocomplete
+                                    id="future_DoD"
+                                    options={futureDatesOfDelivery}
+                                    getOptionLabel={option => option.name}
+                                    renderInput={params => (
+                                        <TextField {...params} label="Delivery Date" variant="outlined" required margin="dense" placeholder='Select delivery date' />
+                                    )}
+                                    value={selectedDeliveryDate}
+                                    onChange={deliveryDateChange}
+                                    // onInputChange={mobileSearch}
+                                    loading
+                                    loadingText={
+                                        params.dataFetchStatus ? 'Loading' : 'No Matches'
+                                    }
                                 />
                             </Grid>
                         </Grid>
@@ -992,7 +1193,7 @@ const AddManualOrder = props => {
                             <Grid item md={7} xs={12}>
                                 <Hidden>{() => { return null }}</Hidden>
                             </Grid>
-                            <Grid item md={2} xs={12} style={{ position: 'relative' }}>
+                            <Grid item md={2} xs={12} style={{ position: 'relative', paddingTop: 18 }}>
                                 <div>Special Discount :</div>
                             </Grid>
 
@@ -1002,7 +1203,7 @@ const AddManualOrder = props => {
                                     fullWidth
                                     onChange={handleSpecialDiscountChange}
                                     required
-                                    type="numeric"
+                                    type="text"
                                     value={specialDiscount}
                                     variant="standard"
                                 />
@@ -1045,6 +1246,30 @@ const AddManualOrder = props => {
                             </Alert>
                         </Snackbar>
                         <Snackbar
+                            open={openData.openDeliveryDateWarning}
+                            autoHideDuration={6000}
+                            onClose={handleClose}>
+                            <Alert onClose={handleClose} severity="warning">
+                                Please select a delivery date for this order!
+                            </Alert>
+                        </Snackbar>
+                        <Snackbar
+                            open={openData.openMobileNotSelectedWarning}
+                            autoHideDuration={6000}
+                            onClose={handleClose}>
+                            <Alert onClose={handleClose} severity="warning">
+                                Please select retailer's mobile number!
+                            </Alert>
+                        </Snackbar>
+                        <Snackbar
+                            open={openData.openFinalPriceNotWithinRangeWarning}
+                            autoHideDuration={6000}
+                            onClose={handleClose}>
+                            <Alert onClose={handleClose} severity="warning">
+                                Final price should be within Min. price and Post-slash price range!
+                            </Alert>
+                        </Snackbar>
+                        <Snackbar
                             open={openData.openMinOrderValueWarning}
                             autoHideDuration={6000}
                             onClose={handleClose}>
@@ -1073,7 +1298,7 @@ const AddManualOrder = props => {
                             autoHideDuration={6000}
                             onClose={handleClose}>
                             <Alert onClose={handleClose} severity="error">
-                                Error when making changes. Ensure all fields are filled
+                                Error when making changes. Ensure all order item fields are filled.
                             </Alert>
                         </Snackbar>
                     </CardContent>
