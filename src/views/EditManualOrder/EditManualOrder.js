@@ -57,7 +57,10 @@ const order_status = [
   { id: 3, name: 'In Transit' },
   { id: 4, name: 'Delivered' },
   { id: 5, name: 'Closed' },
-  { id: 6, name: 'Cancelled' }
+  { id: 6, name: 'Cancelled' },
+  { id: 7, name: 'Returned' },
+  { id: 8, name: 'Shop Closed' },
+  { id: 9, name: 'On Hold' },
 ];
 const EditManualOrder = props => {
   var [orderData, setorderData] = useState([]);
@@ -80,6 +83,7 @@ const EditManualOrder = props => {
     id: '',
     name: '',
     orderDate: '',
+    deliveryDate: '',
     amount: '',
     status: {},
     openSuccess: false,
@@ -117,6 +121,7 @@ const EditManualOrder = props => {
           id: data.id,
           name: data.retailer_name,
           orderDate: new Date(data.created_at).toLocaleDateString(),
+          deliveryDate: new Date(data.delivered_at).toLocaleDateString(),
           amount: data.total,
           status: { id: data.status, name: order_status[data.status].name },
           specialDiscount: data.special_discount
@@ -275,6 +280,20 @@ const EditManualOrder = props => {
                 <TextField
                   disabled={true}
                   fullWidth
+                  helperText="Special Discount!"
+                  label="special discount"
+                  margin="dense"
+                  name="specialDiscount"
+                  onChange={handleChange}
+                  required
+                  value={params.specialDiscount}
+                  variant="outlined"
+                />
+              </Grid>
+              <Grid item md={6} xs={12}>
+                <TextField
+                  disabled={true}
+                  fullWidth
                   helperText="Order Date"
                   label="Date"
                   margin="dense"
@@ -289,13 +308,13 @@ const EditManualOrder = props => {
                 <TextField
                   disabled={true}
                   fullWidth
-                  helperText="Special Discount!"
-                  label="special discount"
+                  helperText="Delivery Date"
+                  label="Delivery Date"
                   margin="dense"
-                  name="specialDiscount"
+                  name="deliveryDate"
                   onChange={handleChange}
                   required
-                  value={params.specialDiscount}
+                  value={params.deliveryDate}
                   variant="outlined"
                 />
               </Grid>

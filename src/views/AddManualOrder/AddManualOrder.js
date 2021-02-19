@@ -5,6 +5,7 @@ import clsx from 'clsx';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
+import moment from 'moment';
 import {
     Card,
     CardHeader,
@@ -74,6 +75,9 @@ const AddManualOrder = props => {
     var [mobileData, setMobileData] = useState([]);
     var [selectedMobileData, setSelectedMobileData] = useState({});
 
+    const [futureDatesOfDelivery, setFutureDatesOfDelivery] = useState([]);
+    const [selectedDeliveryDate, setSelectedDeliveryDate] = useState({});
+
     const [impCondition, setImpCondition] = useState(false)  // Ask before removing
 
     const [skuItems, setSkuItems] = useState([])
@@ -107,6 +111,28 @@ const AddManualOrder = props => {
     // useEffect(() => {
     //     console.log(orderItemRows[0].quantity, orderItemRows[0].final_price)
     // })
+
+    useEffect(() => {
+        let userprofile = JSON.parse(localStorage.getItem('sales-profile'))
+        let cityId = userprofile.city_id;
+
+        UserModel.getInstance().getFutureDatesOfDelivery(
+            cityId,
+            data => {
+              console.log('GET future DOD', data)
+              let futureDates = []
+            //   let id = 0;
+              data && data.length > 0 && Array.isArray(data) && data.forEach(date => {
+                futureDates.push({ id: date, name: moment(date).format('dddd - Do MMM YYYY') })
+                // id++;
+              })
+              setFutureDatesOfDelivery(futureDates)
+            },
+            err => {
+              // console.log('err', err)
+            }
+          );
+    }, [])
 
     useEffect(() => {
         let subtotal = 0;
@@ -170,6 +196,14 @@ const AddManualOrder = props => {
         );
     };
 
+    const deliveryDateChange = async (event, val) => {
+        // var arr = event.target.getAttribute('data-option-index');
+        // console.log('mobile val', val);
+        if (val) {
+            setSelectedDeliveryDate(val);
+        }
+    };
+
     // const handleChange = event => {
     //     setParams({
     //         ...params,
@@ -188,8 +222,8 @@ const AddManualOrder = props => {
             ) {
                 err = true;
             }
-            if (final_price > post_slash_price || final_price < min_price) {
-                // setOpenData({ openFinalPriceNotWithinRangeWarning: true, openMinOrderValueWarning: false, openSuccess: false, openWarning: false, openError: false, openDiscountWarning: false, openMobileNotSelectedWarning: false })
+            if (/*final_price > post_slash_price || */ final_price < min_price) {
+                // setOpenData({ openFinalPriceNotWithinRangeWarning: true, openMinOrderValueWarning: false, openSuccess: false, openWarning: false, openError: false, openDiscountWarning: false, openMobileNotSelectedWarning: false, openDeliveryDateWarning: false })
                 warning = true;
             } 
         // const err = orderItemRows && orderItemRows.length > 0 && Array.isArray(orderItemRows) && orderItemRows.some(({ name, quantity, pre_slash_price, post_slash_price, min_price, final_price, cost }, index) => {
@@ -199,8 +233,8 @@ const AddManualOrder = props => {
         //         // console.log('A')
         //         return true;
         //     }
-        //     if (final_price > post_slash_price || final_price < min_price) {
-        //         setOpenData({ openFinalPriceNotWithinRangeWarning: true, openMinOrderValueWarning: false, openSuccess: false, openWarning: false, openError: false, openDiscountWarning: false, openMobileNotSelectedWarning: false })
+        //     if (/*final_price > post_slash_price || */ final_price < min_price) {
+        //         setOpenData({ openFinalPriceNotWithinRangeWarning: true, openMinOrderValueWarning: false, openSuccess: false, openWarning: false, openError: false, openDiscountWarning: false, openMobileNotSelectedWarning: false, openDeliveryDateWarning: false })
         //         return true;
         //     } 
             // else {
@@ -230,7 +264,7 @@ const AddManualOrder = props => {
         if (reason === 'clickaway') {
             return;
         }
-        setOpenData({ openSuccess: false, openWarning: false, openError: false, openDiscountWarning: false, openMinOrderValueWarning: false, openMobileNotSelectedWarning: false, openFinalPriceNotWithinRangeWarning: false });
+        setOpenData({ openSuccess: false, openWarning: false, openError: false, openDiscountWarning: false, openMinOrderValueWarning: false, openMobileNotSelectedWarning: false, openFinalPriceNotWithinRangeWarning: false, openDeliveryDateWarning: false });
     };
 
     const handleSubmit = async () => {
@@ -239,18 +273,22 @@ const AddManualOrder = props => {
         const validationCheck = await checkErrors() // Hamza you need to redo you error handling. It doesn not work
         if (validationCheck === 'err') {
             // console.log('A')
-            setOpenData({ openError: true, openSuccess: false, openWarning: false, openDiscountWarning: false, openMinOrderValueWarning: false, openMobileNotSelectedWarning: false, openFinalPriceNotWithinRangeWarning: false });
+            setOpenData({ openError: true, openSuccess: false, openWarning: false, openDiscountWarning: false, openMinOrderValueWarning: false, openMobileNotSelectedWarning: false, openFinalPriceNotWithinRangeWarning: false, openDeliveryDateWarning: false });
         } 
         else if (validationCheck === 'warning') {
             // console.log('B')
-            setOpenData({ openFinalPriceNotWithinRangeWarning: true, openError: false, openSuccess: false, openWarning: false, openDiscountWarning: false, openMinOrderValueWarning: false, openMobileNotSelectedWarning: false });
+            setOpenData({ openFinalPriceNotWithinRangeWarning: true, openError: false, openSuccess: false, openWarning: false, openDiscountWarning: false, openMinOrderValueWarning: false, openMobileNotSelectedWarning: false, openDeliveryDateWarning: false });
         }
         else if (!selectedMobileData || !selectedMobileData.id) {
             // console.log('C')
-            setOpenData({ openMobileNotSelectedWarning: true, openSuccess: false, openWarning: false, openError: false, openDiscountWarning: false, openMinOrderValueWarning: false, openFinalPriceNotWithinRangeWarning: false })
+            setOpenData({ openMobileNotSelectedWarning: true, openSuccess: false, openWarning: false, openError: false, openDiscountWarning: false, openMinOrderValueWarning: false, openFinalPriceNotWithinRangeWarning: false, openDeliveryDateWarning: false })
+        }
+        else if (!selectedDeliveryDate || !selectedDeliveryDate.name) {
+            // console.log('D')
+            setOpenData({ openDeliveryDateWarning: true, openMobileNotSelectedWarning: false, openSuccess: false, openWarning: false, openError: false, openDiscountWarning: false, openMinOrderValueWarning: false, openFinalPriceNotWithinRangeWarning: false })
         }
         else if (subTotal < 1000) {
-            setOpenData({ openMinOrderValueWarning: true, openSuccess: false, openWarning: false, openError: false, openDiscountWarning: false, openMobileNotSelectedWarning: false, openFinalPriceNotWithinRangeWarning: false })
+            setOpenData({ openMinOrderValueWarning: true, openSuccess: false, openWarning: false, openError: false, openDiscountWarning: false, openMobileNotSelectedWarning: false, openFinalPriceNotWithinRangeWarning: false, openDeliveryDateWarning: false })
         }
         else if (
             (specialDiscount > subTotal) ||
@@ -258,7 +296,7 @@ const AddManualOrder = props => {
             (selectedMobileData && selectedMobileData.wallet && selectedMobileData.wallet.length > 0 && Array.isArray(selectedMobileData.wallet) &&
                 (specialDiscount + promoCodeDiscount + selectedMobileData.wallet[0].amount > subTotal))
         ) {
-            setOpenData({ openDiscountWarning: true, openSuccess: false, openWarning: false, openError: false, openMinOrderValueWarning: false, openMobileNotSelectedWarning: false, openFinalPriceNotWithinRangeWarning: false })
+            setOpenData({ openDiscountWarning: true, openSuccess: false, openWarning: false, openError: false, openMinOrderValueWarning: false, openMobileNotSelectedWarning: false, openFinalPriceNotWithinRangeWarning: false, openDeliveryDateWarning: false })
         }
         else if (totalBill && Number(totalBill) && totalBill > 0) {
             setParams({ ...params, submitStatus: true });
@@ -273,6 +311,7 @@ const AddManualOrder = props => {
                 var obj = {
                     user_id: selectedMobileData.id, // retailer ID
                     items: orderList,
+                    delivered_at: selectedDeliveryDate.id
                 };
                 if (specialDiscount) {
                     obj = {
@@ -296,7 +335,7 @@ const AddManualOrder = props => {
                 UserModel.getInstance().postManualOrder(
                     obj,
                     succ => {
-                        setOpenData({ openSuccess: true, openWarning: false, openError: false, openDiscountWarning: false, openMinOrderValueWarning: false, openMobileNotSelectedWarning: false, openFinalPriceNotWithinRangeWarning: false });
+                        setOpenData({ openSuccess: true, openWarning: false, openError: false, openDiscountWarning: false, openMinOrderValueWarning: false, openMobileNotSelectedWarning: false, openFinalPriceNotWithinRangeWarning: false, openDeliveryDateWarning: false });
                         setTimeout(() => {
                             props.history.push('/manual-orders');
                         }, 1000);
@@ -309,7 +348,7 @@ const AddManualOrder = props => {
             }
             else {
                 setParams({ ...params, submitStatus: false });
-                setOpenData({ openWarning: true, openSuccess: false, openError: false, openDiscountWarning: false, openMinOrderValueWarning: false, openMobileNotSelectedWarning: false, openFinalPriceNotWithinRangeWarning: false });
+                setOpenData({ openWarning: true, openSuccess: false, openError: false, openDiscountWarning: false, openMinOrderValueWarning: false, openMobileNotSelectedWarning: false, openFinalPriceNotWithinRangeWarning: false, openDeliveryDateWarning: false });
             }
             // }
         }
@@ -609,13 +648,13 @@ const AddManualOrder = props => {
         // let rowFilled = false;
         const validationCheck = await checkErrors() // Hamza you need to redo you error handling. It doesn not work
         if (validationCheck === 'err') {
-            setOpenData({ openError: true, openSuccess: false, openWarning: false, openDiscountWarning: false, openMinOrderValueWarning: false, openMobileNotSelectedWarning: false, openFinalPriceNotWithinRangeWarning: false });
+            setOpenData({ openError: true, openSuccess: false, openWarning: false, openDiscountWarning: false, openMinOrderValueWarning: false, openMobileNotSelectedWarning: false, openFinalPriceNotWithinRangeWarning: false, openDeliveryDateWarning: false });
         } 
         else if (validationCheck === 'warning') {
-            setOpenData({ openFinalPriceNotWithinRangeWarning: true, openError: false, openSuccess: false, openWarning: false, openDiscountWarning: false, openMinOrderValueWarning: false, openMobileNotSelectedWarning: false });
+            setOpenData({ openFinalPriceNotWithinRangeWarning: true, openError: false, openSuccess: false, openWarning: false, openDiscountWarning: false, openMinOrderValueWarning: false, openMobileNotSelectedWarning: false, openDeliveryDateWarning: false });
         }
         else if (!selectedMobileData || !selectedMobileData.id) {
-            setOpenData({ openMobileNotSelectedWarning: true, openSuccess: false, openWarning: false, openError: false, openDiscountWarning: false, openMinOrderValueWarning: false, openFinalPriceNotWithinRangeWarning: false })
+            setOpenData({ openMobileNotSelectedWarning: true, openSuccess: false, openWarning: false, openError: false, openDiscountWarning: false, openMinOrderValueWarning: false, openFinalPriceNotWithinRangeWarning: false, openDeliveryDateWarning: false })
         }
         // const err = orderItemRows && orderItemRows.length > 0 && Array.isArray(orderItemRows) && orderItemRows.some(({ name, quantity, pre_slash_price, post_slash_price, min_price, final_price, cost }, index) => {
         //     // console.log(val)
@@ -629,7 +668,7 @@ const AddManualOrder = props => {
         //         return true;
         //     } 
         //     else if (final_price > post_slash_price || final_price < min_price) {
-        //         setOpenData({ openFinalPriceNotWithinRangeWarning: true, openWarning: false, openSuccess: false, openError: false, openDiscountWarning: false, openMinOrderValueWarning: false, openMobileNotSelectedWarning: false });
+        //         setOpenData({ openFinalPriceNotWithinRangeWarning: true, openWarning: false, openSuccess: false, openError: false, openDiscountWarning: false, openMinOrderValueWarning: false, openMobileNotSelectedWarning: false, openDeliveryDateWarning: false });
         //         warning = true;
         //     }
 
@@ -905,7 +944,7 @@ const AddManualOrder = props => {
                             name='final_price' 
                             onClick={(e) => handlePlusMinusFinalPrice(e, index, 'plus')} 
                             // value="+" 
-                            disabled={!values.final_price || values.final_price >= values.post_slash_price} 
+                            disabled={!values.final_price /* || values.final_price >= values.post_slash_price */} 
                             data-field="final_price" 
                             style={{backgroundColor: '#DCDCDC', borderRadius: 3, padding: 5}}
                         >+</button>
@@ -1000,6 +1039,24 @@ const AddManualOrder = props => {
                                     value={selectedMobileData.name}
                                     variant="outlined"
                                     disabled
+                                />
+                            </Grid>
+
+                            <Grid item md={6} xs={12}>
+                                <Autocomplete
+                                    id="future_DoD"
+                                    options={futureDatesOfDelivery}
+                                    getOptionLabel={option => option.name}
+                                    renderInput={params => (
+                                        <TextField {...params} label="Delivery Date" variant="outlined" required margin="dense" placeholder='Select delivery date' />
+                                    )}
+                                    value={selectedDeliveryDate}
+                                    onChange={deliveryDateChange}
+                                    // onInputChange={mobileSearch}
+                                    loading
+                                    loadingText={
+                                        params.dataFetchStatus ? 'Loading' : 'No Matches'
+                                    }
                                 />
                             </Grid>
                         </Grid>
@@ -1186,6 +1243,14 @@ const AddManualOrder = props => {
                             onClose={handleClose}>
                             <Alert onClose={handleClose} severity="warning">
                                 Please complete above row(s) by selecting SKU(s), desired quantity and mobile!
+                            </Alert>
+                        </Snackbar>
+                        <Snackbar
+                            open={openData.openDeliveryDateWarning}
+                            autoHideDuration={6000}
+                            onClose={handleClose}>
+                            <Alert onClose={handleClose} severity="warning">
+                                Please select a delivery date for this order!
                             </Alert>
                         </Snackbar>
                         <Snackbar
