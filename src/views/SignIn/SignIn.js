@@ -266,7 +266,7 @@ const SignIn = props => {
               Sign in using Google Account
             </Button>
             {/* : */}
-            <div className={classes.contentBody}>
+            {/* <div className={classes.contentBody}>
               <form className={classes.form} onSubmit={handleSignIn}>
                 <Typography className={classes.title} variant="h2">
                   Sign in
@@ -313,7 +313,7 @@ const SignIn = props => {
                   Sign in
                     </Button>
               </form>
-            </div>
+            </div> */}
             {/* } */}
 
 

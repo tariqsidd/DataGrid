@@ -57,7 +57,10 @@ const order_status = [
   { id: 3, name: 'In Transit' },
   { id: 4, name: 'Delivered' },
   { id: 5, name: 'Closed' },
-  { id: 6, name: 'Cancelled' }
+  { id: 6, name: 'Cancelled' },
+  { id: 7, name: 'Returned' },
+  { id: 8, name: 'Shop Closed' },
+  { id: 9, name: 'On Hold' },
 ];
 const EditManualOrder = props => {
   var [orderData, setorderData] = useState([]);
