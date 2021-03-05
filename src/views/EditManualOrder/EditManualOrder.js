@@ -325,6 +325,7 @@ const EditManualOrder = props => {
                   options={order_status}
                   getOptionLabel={option => option.name}
                   // style={{ width: 300 }}
+                  disabled
                   renderInput={params => (
                     <TextField
                       {...params}
@@ -358,7 +359,7 @@ const EditManualOrder = props => {
             <br />
           </CardContent>
           <CardActions>
-            <Button color="primary" variant="contained" onClick={handleSubmit}>
+            <Button color="primary" variant="contained" disabled onClick={handleSubmit}>
               Make changes
             </Button>
           </CardActions>
@@ -377,68 +378,68 @@ const EditManualOrder = props => {
             }}
             data={orderData}
             className={clsx(classes.root, className)}
-            editable={{
-              onRowDelete: oldData =>
-                new Promise(resolve => {
-                  setTimeout(async () => {
-                    resolve();
-                    // console.log('skuId', oldData.skuId);
-                    await UserModel.getInstance().removeOrderDetail(
-                      {
-                        order_id: params.id,
-                        sku_id: oldData.skuId,
-                        type: 'delete',
-                      },
-                      succ => {
-                        // console.log(succ);
-                        window.location.reload();
-                      },
-                      err => {
-                        // console.log(err);
-                      }
-                    );
-                  }, 600);
-                })
-                  .then(() =>
-                    window.location.reload()
-                  ),
+            // editable={{
+            //   onRowDelete: oldData =>
+            //     new Promise(resolve => {
+            //       setTimeout(async () => {
+            //         resolve();
+            //         // console.log('skuId', oldData.skuId);
+            //         await UserModel.getInstance().removeOrderDetail(
+            //           {
+            //             order_id: params.id,
+            //             sku_id: oldData.skuId,
+            //             type: 'delete',
+            //           },
+            //           succ => {
+            //             // console.log(succ);
+            //             window.location.reload();
+            //           },
+            //           err => {
+            //             // console.log(err);
+            //           }
+            //         );
+            //       }, 600);
+            //     })
+            //       .then(() =>
+            //         window.location.reload()
+            //       ),
 
-              onRowUpdate: (newData, oldData) =>
-                new Promise((resolve, reject) => {
-                  // setTimeout(() => {
-                  //     const dataUpdate = [...data];
-                  //     const index = oldData.tableData.id;
-                  //     dataUpdate[index] = newData;
-                  //     setData([...dataUpdate]);
+            //   onRowUpdate: (newData, oldData) =>
+            //     new Promise((resolve, reject) => {
+            //       // setTimeout(() => {
+            //       //     const dataUpdate = [...data];
+            //       //     const index = oldData.tableData.id;
+            //       //     dataUpdate[index] = newData;
+            //       //     setData([...dataUpdate]);
 
-                  resolve();
-                  // console.log('old data', oldData)
-                  // console.log('new data', newData)
-                  var obj = {
-                    order_id: params.id,
-                    sku_id: newData.skuId,
-                    qty: +newData.quantity,
-                    price: newData.price,
-                    discount: newData.discount,
-                    type: "update",
-                  };
-                  UserModel.getInstance().addOrderDetail(
-                    obj,
-                    succ => {
-                      // console.log('succ', succ)
-                      setParams({ openError: false, openSuccess: true });
-                      window.location.reload();
-                    },
-                    err => {
-                      // console.log('err', err)
-                    }
-                  )
-                  // }, 1000);
-                })
-              // .then(() =>
-              //   window.location.reload()
-              // ),
-            }}
+            //       resolve();
+            //       // console.log('old data', oldData)
+            //       // console.log('new data', newData)
+            //       var obj = {
+            //         order_id: params.id,
+            //         sku_id: newData.skuId,
+            //         qty: +newData.quantity,
+            //         price: newData.price,
+            //         discount: newData.discount,
+            //         type: "update",
+            //       };
+            //       UserModel.getInstance().addOrderDetail(
+            //         obj,
+            //         succ => {
+            //           // console.log('succ', succ)
+            //           setParams({ openError: false, openSuccess: true });
+            //           window.location.reload();
+            //         },
+            //         err => {
+            //           // console.log('err', err)
+            //         }
+            //       )
+            //       // }, 1000);
+            //     })
+            //   // .then(() =>
+            //   //   window.location.reload()
+            //   // ),
+            // }}
 
           >
           </MaterialTable>
