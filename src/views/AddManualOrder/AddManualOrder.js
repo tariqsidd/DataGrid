@@ -222,10 +222,10 @@ const AddManualOrder = props => {
             ) {
                 err = true;
             }
-            if (/*final_price > post_slash_price || */ final_price < min_price) {
-                // setOpenData({ openFinalPriceNotWithinRangeWarning: true, openMinOrderValueWarning: false, openSuccess: false, openWarning: false, openError: false, openDiscountWarning: false, openMobileNotSelectedWarning: false, openDeliveryDateWarning: false })
-                warning = true;
-            } 
+            // if (/*final_price > post_slash_price || */ final_price < min_price) {
+            //     // setOpenData({ openFinalPriceNotWithinRangeWarning: true, openMinOrderValueWarning: false, openSuccess: false, openWarning: false, openError: false, openDiscountWarning: false, openMobileNotSelectedWarning: false, openDeliveryDateWarning: false })
+            //     warning = true;
+            // } 
         // const err = orderItemRows && orderItemRows.length > 0 && Array.isArray(orderItemRows) && orderItemRows.some(({ name, quantity, pre_slash_price, post_slash_price, min_price, final_price, cost }, index) => {
         //     if (
         //         !name || !quantity || quantity <= 0 || !final_price || !cost || !selectedSkuItems[index].id || !selectedSkuItems[index].name
