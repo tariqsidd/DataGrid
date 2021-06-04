@@ -371,7 +371,7 @@ const AddManualOrder = props => {
                     let itemsInStockArr = [];
                     data && data.length > 0 && Array.isArray(data) && data.forEach((item) => {
                         // console.log(item.is_stock, item.name)
-                        if (!item.is_stock && item.latest_balance && item.latest_balance.rate && item.latest_balance.rate > 0) {
+                        if (!item.is_stock /*&& item.latest_balance && item.latest_balance.rate && item.latest_balance.rate > 0*/) {
                             if (item.is_deal) {
                                 // console.log({ item })
                                 var tempItem = { ...item, name: item.name + " - DEAL" }
