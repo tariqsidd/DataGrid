@@ -15,7 +15,7 @@ const staging = {
 };
 
 const prod = {
-  baseURL     :'http://api.dastgyr.com/sales/'
+  baseURL     :'https://api.dastgyr.com/sales/'
 };
 
 var config = local;
