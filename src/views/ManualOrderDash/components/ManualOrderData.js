@@ -125,21 +125,21 @@ const ManualOrderData = props => {
 
         data.forEach(obj => {
           var bill = obj.total;
-          console.log(bill)
+          // console.log(bill)
           if (obj.special_discount) {
             bill = bill - obj.special_discount
           }
-          console.log(bill)
+          // console.log(bill)
 
           if (obj.coupon_discount) {
             bill = bill - obj.coupon_discount
           }
-          console.log(bill)
+          // console.log(bill)
 
           if (obj.wallet_discount && obj.wallet_discount.amount) {
             bill = bill - obj.wallet_discount.amount
           }
-          console.log(bill)
+          // console.log(bill)
           tempArr.push({
             orderId: obj.id,
             order_number: obj.order_number,
