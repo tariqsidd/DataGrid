@@ -25,6 +25,7 @@ import Hidden from '@material-ui/core/Hidden';
 // import { withStyles } from '@material-ui/core/styles';
 import { validateNumeric, validateNumericNoDecimal } from 'common/validators';
 import MaterialTable from 'material-table';
+import AlertModal from '../../components/Modal';
 // import style from './style.css';
 // import 'antd/dist/antd.css';
 
@@ -91,6 +92,9 @@ const AddManualOrder = props => {
     var [specialDiscount, setspecialDiscount] = useState('');
     var [totalBill, settotalBill] = useState('');
 
+    const [alertDialogOpen, setAlertDialogOpen] = useState(false);
+    var [alertData, setAlertData] = useState({});
+
     const [openData, setOpenData] = useState({
         openSuccess: false,
         openError: false
@@ -119,7 +123,7 @@ const AddManualOrder = props => {
         UserModel.getInstance().getFutureDatesOfDelivery(
             cityId,
             data => {
-              console.log('GET future DOD', data)
+            //   console.log('GET future DOD', data)
               let futureDates = []
             //   let id = 0;
               data && data.length > 0 && Array.isArray(data) && data.forEach(date => {
@@ -342,7 +346,19 @@ const AddManualOrder = props => {
                     },
                     err => {
                         setParams({ ...params, submitStatus: false });
-                        // console.log(err);
+                        console.log(err);
+                        const all_conflicting_skus = err;
+                        const oos_skus = all_conflicting_skus.filter(sku => !!sku.is_stock == true)
+                        const limited_skus = all_conflicting_skus.filter(sku => sku.aoos_limit - sku.current_aoos_inv)
+
+                        const skus = {
+                            oos_skus,
+                            limited_skus
+                        }
+                        if (skus && (skus.oos_skus || skus.limited_skus)) {
+                            setAlertDialogOpen(true);
+                            setAlertData(skus)
+                        }
                     }
                 );
             }
@@ -359,10 +375,10 @@ const AddManualOrder = props => {
 
 
     const skuSearch = async (event, value, index) => {
-        console.log('skusearch', { event, value })
+        // console.log('skusearch', { event, value })
         // console.log({ event, value })
         if (value) {
-            console.log('YES')
+            // console.log('YES')
             await setParams({ ...params, dataFetchStatus: false });
             await UserModel.getInstance().getSkuByName(
                 { 'q': value },
@@ -398,7 +414,7 @@ const AddManualOrder = props => {
                 }
             );
         } else {
-            console.log('NO')
+            // console.log('NO')
             let selectedSkus = selectedSkuItems
             selectedSkus[index] = {id: '', name: ''}
             setSelectedSkuItems([...selectedSkus])
@@ -425,25 +441,33 @@ const AddManualOrder = props => {
         // console.log(e.target.name, e.target.value, { index })
         // console.log(e.target.name, e.target.value)
         const orderItemsDetailArr = orderItemRows;
+        // console.log(orderItemsDetailArr)
         var orderitem = orderItemsDetailArr[index];
+        // console.log(orderitem)
         var valuue = e.target.value;
-        if ((e.target.name === 'quantity' || e.target.name === 'final_price')) {
+        if (e.target.name === 'quantity' && orderitem.available_qty && valuue > orderitem.available_qty) {
+            alert(`Max available qty. for ${selectedSkuItems[index]?.name} is ${orderitem.available_qty}`);
+            return;
+        }
+        
+        if (e.target.name === 'quantity' || e.target.name === 'final_price') {
             // if (validateNumeric(parseInt(valuue)) || valuue === '') {
-            if (valuue === '' || (validateNumeric(+valuue) && validateNumericNoDecimal(+valuue) && !valuue.includes('.'))) {
+            if (valuue === '' || (validateNumeric(+valuue) && validateNumericNoDecimal(+valuue) && !valuue.includes('.') && ((e.target.name === 'quantity' && orderitem.available_qty && valuue <= orderitem.available_qty) || e.target.name === 'final_price'))) {
                 // console.log('vladatenumeric')
                 // console.log('vladatenumeric', valuue)
                 orderitem[e.target.name] = valuue;
+                orderitem.cost = orderitem.quantity * orderitem.final_price;
             }
         }
 
         orderitem = applyBulkDiscounts(orderitem)
 
         // console.log(orderitem)
-        if (e.target.name === 'quantity' || e.target.name === 'final_price') {
-            if (valuue === '' || (validateNumeric(+valuue) && validateNumericNoDecimal(+valuue) && !valuue.includes('.'))) {
-                orderitem.cost = orderitem.quantity * orderitem.final_price;
-            }
-        }
+        // if (e.target.name === 'quantity' || e.target.name === 'final_price') {
+        //     if (valuue === '' || (validateNumeric(+valuue) && validateNumericNoDecimal(+valuue) && !valuue.includes('.'))) {
+        //         orderitem.cost = orderitem.quantity * orderitem.final_price;
+        //     }
+        // }
         orderItemsDetailArr[index] = orderitem;
         // console.log(orderItemsDetailArr)
         setOrderItemRows(orderItemsDetailArr)
@@ -525,6 +549,7 @@ const AddManualOrder = props => {
             // else console.log('postslash', val.post_slash_price)
 
             orderitem.name = val.name;
+            orderitem.available_qty = (typeof(val.available_qty) == 'null' || typeof(val.available_qty) == 'undefined') ? 99999999 : val.available_qty;
             // orderitem.quantity = val.quantity;
             // orderitem.price = val.price;
             orderitem.pre_slash_price = val.price + val.discount;
@@ -798,6 +823,60 @@ const AddManualOrder = props => {
         );
     };
 
+    const removeOOSitems = async oos_items => {
+        // console.log(orderItemRows)
+        // console.log(selectedSkuItems)
+        let orderItemsDetailArr = [...orderItemRows];
+        let skuSelectedDetailsArr = [...selectedSkuItems];
+        // console.log(orderItemsDetailArr)
+        // console.log(skuSelectedDetailsArr)
+        oos_items.forEach(sku => {
+            const index = skuSelectedDetailsArr.findIndex(item => item.id === sku.id)
+            // console.log(index)
+            if (index >= 0) {
+                orderItemsDetailArr.splice(index, 1)
+                skuSelectedDetailsArr.splice(index, 1)
+            }
+        })
+        if (orderItemsDetailArr.length == 0 || skuSelectedDetailsArr.length == 0) {
+            skuSelectedDetailsArr = [{ id: null, name: '' }]
+            orderItemsDetailArr = [{ name: '', quantity: '', pre_slash_price: '', post_slash_price: '', min_price: '', final_price: '', cost: '', qty_discount: [] }]
+        }
+
+        setOrderItemRows([...orderItemsDetailArr])
+        setSelectedSkuItems([...skuSelectedDetailsArr])
+        setImpCondition(!impCondition)  // ask before removing
+    }
+
+    const reduceQtyOfLimiteditems = async limited_items => {
+        // console.log(orderItemRows)
+        let skuSelectedDetailsArr = [...selectedSkuItems];
+        // let orderItemsDetailArr = [...orderItemRows];
+        // console.log(orderItemsDetailArr)
+        limited_items.forEach(sku => {
+            const index = skuSelectedDetailsArr.findIndex(item => item.id === sku.id) // checking from sku state and not items array cuz sku id is stored only in order details state array.. took 3 hrs to debug the issue
+            // console.log(index)
+            if (index >= 0) {
+                var e = {
+                    target: {
+                        name: 'quantity',
+                        value: (sku.aoos_limit - sku.current_aoos_inv).toString()
+                    }
+                }
+                // console.log(e)
+                handleOrderItemDetailsChange(e, index)
+            }
+        })
+    }
+
+    const handleOrderChangeForOOSOrReducedQty = async (oos_items, limited_items) => {
+        limited_items && limited_items && limited_items && await reduceQtyOfLimiteditems(limited_items);
+        oos_items && oos_items && oos_items && await removeOOSitems(oos_items);
+        setTimeout(() => {
+            setAlertDialogOpen(false);
+        }, 500)
+    }
+
 
     const generateOrderItemsRows = (values, index) => {
         // console.log({ orderItemRows, selectedSkuItems })
@@ -832,9 +911,10 @@ const AddManualOrder = props => {
                             fullWidth
                             label="Qty"
                             name="quantity"
-                            type='text'
-                            inputProps={{ min: 1 }}
+                            type='number'
+                            inputProps={{ min: 1, max: values.available_qty }}
                             min={1}
+                            max={values.available_qty}
                             onChange={(e) => handleOrderItemDetailsChange(e, index)}
                             required
                             // margin='dense'
@@ -1003,6 +1083,16 @@ const AddManualOrder = props => {
 
     return (
         <div className={classes.root}>
+
+            <AlertModal
+                open={alertDialogOpen}
+                close={() => setAlertDialogOpen(false)}
+                data={alertData}
+                // removeOOSitems={removeOOSitems}
+                // reduceQtyOfLimiteditems={reduceQtyOfLimiteditems}
+                handleOrderChangeForOOSOrReducedQty={(oos_skus, limited_skus) => handleOrderChangeForOOSOrReducedQty(oos_skus, limited_skus)}
+            />
+
             <Card {...rest} className={clsx(classes.root, className)}>
                 <form autoComplete="off" noValidate>
                     <CardHeader title="Add Manual Order" />
