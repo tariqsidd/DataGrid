@@ -348,16 +348,18 @@ const AddManualOrder = props => {
                         setParams({ ...params, submitStatus: false });
                         console.log(err);
                         const all_conflicting_skus = err;
-                        const oos_skus = all_conflicting_skus.filter(sku => !!sku.is_stock == true)
-                        const limited_skus = all_conflicting_skus.filter(sku => sku.aoos_limit - sku.current_aoos_inv)
+                        if (all_conflicting_skus && all_conflicting_skus.length > 0 && Array.isArray(all_conflicting_skus)) {
+                            const oos_skus = all_conflicting_skus.filter(sku => !!sku.is_stock == true)
+                            const limited_skus = all_conflicting_skus.filter(sku => sku.aoos_limit - sku.current_aoos_inv)
 
-                        const skus = {
-                            oos_skus,
-                            limited_skus
-                        }
-                        if (skus && (skus.oos_skus || skus.limited_skus)) {
-                            setAlertDialogOpen(true);
-                            setAlertData(skus)
+                            const skus = {
+                                oos_skus,
+                                limited_skus
+                            }
+                            if (skus && (skus.oos_skus || skus.limited_skus)) {
+                                setAlertDialogOpen(true);
+                                setAlertData(skus)
+                            }
                         }
                     }
                 );
@@ -434,7 +436,7 @@ const AddManualOrder = props => {
         handleOrderItemDetailsChange(myevent, index)
     }
 
-    const handleOrderItemDetailsChange = (e, index) => {
+    const handleOrderItemDetailsChange = (e, index, type) => {
         // console.log('eeeeeeeee handleOrderItemChange', e.target.name)
         // console.clear()
         // console.log('handleOrderItemChange')
@@ -449,7 +451,9 @@ const AddManualOrder = props => {
             alert(`Max available qty. for ${selectedSkuItems[index]?.name} is ${orderitem.available_qty}`);
             return;
         }
-        
+        if (type == "autoReduceQty") {
+            orderitem["available_qty"] = valuue;
+        }
         if (e.target.name === 'quantity' || e.target.name === 'final_price') {
             // if (validateNumeric(parseInt(valuue)) || valuue === '') {
             if (valuue === '' || (validateNumeric(+valuue) && validateNumericNoDecimal(+valuue) && !valuue.includes('.') && ((e.target.name === 'quantity' && orderitem.available_qty && valuue <= orderitem.available_qty) || e.target.name === 'final_price'))) {
@@ -864,7 +868,7 @@ const AddManualOrder = props => {
                     }
                 }
                 // console.log(e)
-                handleOrderItemDetailsChange(e, index)
+                handleOrderItemDetailsChange(e, index, 'autoReduceQty')
             }
         })
     }
