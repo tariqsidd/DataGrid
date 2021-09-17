@@ -315,7 +315,8 @@ const AddManualOrder = props => {
                 var obj = {
                     user_id: selectedMobileData.id, // retailer ID
                     items: orderList,
-                    delivered_at: selectedDeliveryDate.id
+                    delivered_at: selectedDeliveryDate.id,
+                    total_amount: totalBill
                 };
                 if (specialDiscount) {
                     obj = {
@@ -335,7 +336,6 @@ const AddManualOrder = props => {
                         wallet_id: (selectedMobileData && selectedMobileData.wallet && selectedMobileData.wallet[0]) ? selectedMobileData.wallet[0].id : null
                     }
                 }
-
                 UserModel.getInstance().postManualOrder(
                     obj,
                     succ => {
