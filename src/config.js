@@ -10,6 +10,11 @@ const qa = {
   baseURL     :'https://api-qa.dastgyr.com/sales/'
 };
 
+const qa2 = {
+  baseURL     :'https://api-qa2.dastgyr.com/sales/'
+};
+
+
 const staging = {
   baseURL     :'https://api-staging.dastgyr.com/sales/'
 };
@@ -29,6 +34,9 @@ switch (process.env.REACT_APP_STAGE) {
       break;
   case 'qa':
       config = qa
+      break;
+  case 'qa2':
+      config = qa2
       break;
   case 'staging':
       config = staging
