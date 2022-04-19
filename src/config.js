@@ -11,7 +11,8 @@ const qa = {
 };
 
 const qa2 = {
-  baseURL     :'https://api-qa2.dastgyr.com/sales/'
+  baseURL     :'https://api-qa2.dastgyr.com/sales/',
+  aclBaseUrl: 'https://qa2-acl.dastgyr.com/sales'
 };
 
 
@@ -23,7 +24,7 @@ const prod = {
   baseURL     :'https://api.dastgyr.com/sales/'
 };
 
-var config = local;
+var config = qa2;
 
 switch (process.env.REACT_APP_STAGE) {
   case 'local':

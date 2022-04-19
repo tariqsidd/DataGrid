@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  // Link as RouterLink, 
+import {
+  // Link as RouterLink,
   withRouter } from 'react-router-dom';
 // import Card from '@material-ui/core/Card';
 import PropTypes from 'prop-types';
@@ -255,12 +255,14 @@ const SignIn = props => {
               onClick={() => {
                 const myURL = window.location.href;
                 // console.log({ myURL })
-                var baseurl = CONSTANT.baseURL;
-                baseurl = baseurl.slice(0, baseurl.lastIndexOf('/'))
+                var baseurl = CONSTANT.aclBaseUrl;
+                console.log('XXXXXXXXXXXXXXXXXXXXX',baseurl)
+                // baseurl = baseurl.slice(0, baseurl.lastIndexOf('/'))
                 // console.log(baseurl)
-                baseurl = baseurl.slice(0, baseurl.lastIndexOf('/'))
-                // console.log(baseurl)
-                window.location.replace(`${baseurl}/auth/login?role_id=${5}&next=${myURL}`)
+                // baseurl = baseurl.slice(0, baseurl.lastIndexOf('/'))
+                console.log('baseurl===========>',`${baseurl}login?next=${myURL}`)
+
+                window.location.replace(`${baseurl}/login?next=${myURL}`)
               }}
               variant="contained">
               Sign in using Google Account
