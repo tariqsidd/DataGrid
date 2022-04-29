@@ -7,7 +7,7 @@ const dev = {
 };
 
 const qa = {
-  baseURL     :'https://api-qa.dastgyr.com/sales/'
+  baseURL     :'https://api-qa4.dastgyr.com/sales/'
 };
 
 const staging = {
