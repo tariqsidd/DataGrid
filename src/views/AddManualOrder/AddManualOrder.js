@@ -118,9 +118,9 @@ const AddManualOrder = props => {
 
     useEffect(() => {
         let userprofile = JSON.parse(localStorage.getItem('sales-profile'))
-        let cityId = userprofile.city_id;
+        let cityId = userprofile?.city_id;
 
-        UserModel.getInstance().getFutureDatesOfDelivery(
+      cityId && UserModel.getInstance().getFutureDatesOfDelivery(
             cityId,
             data => {
             //   console.log('GET future DOD', data)
@@ -229,7 +229,7 @@ const AddManualOrder = props => {
             // if (/*final_price > post_slash_price || */ final_price < min_price) {
             //     // setOpenData({ openFinalPriceNotWithinRangeWarning: true, openMinOrderValueWarning: false, openSuccess: false, openWarning: false, openError: false, openDiscountWarning: false, openMobileNotSelectedWarning: false, openDeliveryDateWarning: false })
             //     warning = true;
-            // } 
+            // }
         // const err = orderItemRows && orderItemRows.length > 0 && Array.isArray(orderItemRows) && orderItemRows.some(({ name, quantity, pre_slash_price, post_slash_price, min_price, final_price, cost }, index) => {
         //     if (
         //         !name || !quantity || quantity <= 0 || !final_price || !cost || !selectedSkuItems[index].id || !selectedSkuItems[index].name
@@ -240,7 +240,7 @@ const AddManualOrder = props => {
         //     if (/*final_price > post_slash_price || */ final_price < min_price) {
         //         setOpenData({ openFinalPriceNotWithinRangeWarning: true, openMinOrderValueWarning: false, openSuccess: false, openWarning: false, openError: false, openDiscountWarning: false, openMobileNotSelectedWarning: false, openDeliveryDateWarning: false })
         //         return true;
-        //     } 
+        //     }
             // else {
             //     console.log('B')
             //     // if (min_price > 0) {
@@ -249,7 +249,7 @@ const AddManualOrder = props => {
             //         return false;
             //     }
             //     //     return true;
-            //     // } 
+            //     // }
             //     // else if (final_price >= post_slash_price) {
             //     //     return false;
             //     // }
@@ -278,7 +278,7 @@ const AddManualOrder = props => {
         if (validationCheck === 'err') {
             // console.log('A')
             setOpenData({ openError: true, openSuccess: false, openWarning: false, openDiscountWarning: false, openMinOrderValueWarning: false, openMobileNotSelectedWarning: false, openFinalPriceNotWithinRangeWarning: false, openDeliveryDateWarning: false });
-        } 
+        }
         else if (validationCheck === 'warning') {
             // console.log('B')
             setOpenData({ openFinalPriceNotWithinRangeWarning: true, openError: false, openSuccess: false, openWarning: false, openDiscountWarning: false, openMinOrderValueWarning: false, openMobileNotSelectedWarning: false, openDeliveryDateWarning: false });
@@ -404,7 +404,7 @@ const AddManualOrder = props => {
                     var newItemsOnly = [];
                     // checked len > than 1, so that there is atleast some item to check (if it already exist) otherwise gives error of cannot access property of undefined.
                     // cuz 1st index is already empty line genrated by default, acc to logic.
-                    if (selectedSkuItems && selectedSkuItems.length > 0 && Array.isArray(selectedSkuItems)) { 
+                    if (selectedSkuItems && selectedSkuItems.length > 0 && Array.isArray(selectedSkuItems)) {
                         newItemsOnly = itemsInStockArr.filter(item => selectedSkuItems.every(selectedskus => selectedskus.id != item.id))
                     }
                     // console.log(newItemsOnly)
@@ -432,7 +432,7 @@ const AddManualOrder = props => {
         } else if (sign === 'plus') {
             myevent.target.value = +thisItem.final_price + 1;
         }
-        
+
         handleOrderItemDetailsChange(myevent, index)
     }
 
@@ -678,7 +678,7 @@ const AddManualOrder = props => {
         const validationCheck = await checkErrors() // Hamza you need to redo you error handling. It doesn not work
         if (validationCheck === 'err') {
             setOpenData({ openError: true, openSuccess: false, openWarning: false, openDiscountWarning: false, openMinOrderValueWarning: false, openMobileNotSelectedWarning: false, openFinalPriceNotWithinRangeWarning: false, openDeliveryDateWarning: false });
-        } 
+        }
         else if (validationCheck === 'warning') {
             setOpenData({ openFinalPriceNotWithinRangeWarning: true, openError: false, openSuccess: false, openWarning: false, openDiscountWarning: false, openMinOrderValueWarning: false, openMobileNotSelectedWarning: false, openDeliveryDateWarning: false });
         }
@@ -695,7 +695,7 @@ const AddManualOrder = props => {
         //         !name || !quantity || quantity <= 0 || !final_price || !cost || !selectedSkuItems[index].id || !selectedSkuItems[index].name
         //     ) {
         //         return true;
-        //     } 
+        //     }
         //     else if (final_price > post_slash_price || final_price < min_price) {
         //         setOpenData({ openFinalPriceNotWithinRangeWarning: true, openWarning: false, openSuccess: false, openError: false, openDiscountWarning: false, openMinOrderValueWarning: false, openMobileNotSelectedWarning: false, openDeliveryDateWarning: false });
         //         warning = true;
@@ -707,14 +707,14 @@ const AddManualOrder = props => {
             //         return false;
             //     }
             //     //     return true;
-            //     // } 
+            //     // }
             //     // else if (final_price >= post_slash_price) {
             //     //     return false;
             //     // }
             //     return true;
             // }
 
-            // final_price >= min_price && final_price <= post_slash_price 
+            // final_price >= min_price && final_price <= post_slash_price
 
             // if (name && quantity && quantity > 0 && final_price && cost) {
             //     if (min_price > 0) {
@@ -785,7 +785,7 @@ const AddManualOrder = props => {
         // if (spDiscount == '' || (validateNumeric(spDiscount) && spDiscount !== 0 && spDiscount !== '0' && !spDiscount.includes('+') && !spDiscount.includes('-'))) {
         //     console.log(spDiscount)
         //     setspecialDiscount(spDiscount);
-        // } 
+        // }
         // else {
         //     // alert('helo')
         //     setspecialDiscount(specialDiscount);
@@ -896,8 +896,8 @@ const AddManualOrder = props => {
                             options={skuItems}
                             getOptionLabel={option => option.name}
                             renderInput={params => (
-                                <TextField {...params} label="SKU" variant="outlined" 
-                                    // margin="dense" 
+                                <TextField {...params} label="SKU" variant="outlined"
+                                    // margin="dense"
                                     placeholder='Search SKU' />
                             )}
                             value={selectedSkuItems[index] ? selectedSkuItems[index] : {id: null, name: ''}}
@@ -998,13 +998,13 @@ const AddManualOrder = props => {
                             disabled
                         />
 
-                        <button 
-                            type="button" 
-                            name='final_price' 
-                            onClick={(e) => handlePlusMinusFinalPrice(e, index, 'minus')} 
-                            // value="-" 
-                            disabled={!values.final_price || values.final_price <= values.min_price} 
-                            data-field="final_price" 
+                        <button
+                            type="button"
+                            name='final_price'
+                            onClick={(e) => handlePlusMinusFinalPrice(e, index, 'minus')}
+                            // value="-"
+                            disabled={!values.final_price || values.final_price <= values.min_price}
+                            data-field="final_price"
                             style={{backgroundColor: '#DCDCDC', borderRadius: 3, padding: 6}}
                         >-</button>
                         <TextField
@@ -1023,13 +1023,13 @@ const AddManualOrder = props => {
                             variant="outlined"
                         // placeholder="Final Price"
                         />
-                        <button 
-                            type="button" 
-                            name='final_price' 
-                            onClick={(e) => handlePlusMinusFinalPrice(e, index, 'plus')} 
-                            // value="+" 
-                            disabled={!values.final_price /* || values.final_price >= values.post_slash_price */} 
-                            data-field="final_price" 
+                        <button
+                            type="button"
+                            name='final_price'
+                            onClick={(e) => handlePlusMinusFinalPrice(e, index, 'plus')}
+                            // value="+"
+                            disabled={!values.final_price /* || values.final_price >= values.post_slash_price */}
+                            data-field="final_price"
                             style={{backgroundColor: '#DCDCDC', borderRadius: 3, padding: 5}}
                         >+</button>
 
@@ -1051,7 +1051,7 @@ const AddManualOrder = props => {
                         />
 
                         {/* These consitions were a backup plan if autocomplete didnt work, then tried to show remove button only on last index */}
-                        {/* {selectedSkuItems && selectedSkuItems.length > 0 && Array.isArray(selectedSkuItems) && index+1 == selectedSkuItems.length 
+                        {/* {selectedSkuItems && selectedSkuItems.length > 0 && Array.isArray(selectedSkuItems) && index+1 == selectedSkuItems.length
                         ? */}
                             <Icon color="primary" style={{ fontSize: 40, marginLeft: 5, marginRight: 5 }} onClick={() => removeOrderItem(index)}>cancel</Icon>
                         {/* :
