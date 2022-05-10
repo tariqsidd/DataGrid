@@ -2,11 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/styles';
 import UserModel from 'models/UserModel';
 import clsx from 'clsx';
-// import { useHistory } from 'react-router-dom';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
-// import Switch from '@material-ui/core/Switch';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core';
 import MaterialTable from 'material-table';
 
@@ -19,10 +17,7 @@ import {
   Grid,
   Button,
   TextField,
-  // CardActionArea,
-  // CardMedia
 } from '@material-ui/core';
-// import { isObject } from 'validate.js';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -65,17 +60,15 @@ const order_status = [
 const EditManualOrder = props => {
   var [orderData, setorderData] = useState([]);
   const [state, setState] = React.useState([
-    { title: 'No.', field: 'number', editable: 'never' },
-    { title: 'Sku Code', field: 'skuCode', editable: 'never' },
-    { title: 'Sku name', field: 'skuName', editable: 'never' },
-    { title: 'Supplier', field: 'supplier', editable: 'never' },
-    { title: 'Unit Cost Price', field: 'costPrice', editable: 'never' },
-    { title: 'Discount per unit', field: 'discount', editable: 'never' },
-    { title: 'Quantity', field: 'quantity' },
-    { title: 'Product', field: 'product', editable: 'never' },
-    { title: 'Brand', field: 'brand', editable: 'never' },
-    { title: 'Category', field: 'category', editable: 'never' },
-    { title: 'Subcategory', field: 'subCategory', editable: 'never' },
+    { title: 'No.', field: 'number', filtering: false, width: '5%'  },
+    { title: 'Sku Code', field: 'skuCode', filtering: false },
+    { title: 'Sku Name', field: 'skuName',  },
+    { title: 'Supplier', field: 'supplier',  },
+    { title: 'Unit Cost Price', field: 'costPrice', filtering: false, width: '5%'  },
+    { title: 'Discount per unit', field: 'discount',  filtering: false, width: '5%'},
+    { title: 'Quantity', field: 'quantity', filtering: false, width: '5%'},
+    { title: 'Brand', field: 'brand',  },
+    { title: 'Category', field: 'category',  },
   ]);
   var [orderId, setOrderId] = useState();
   var [selectedOrderStatus, setSelectedOrderStatus] = useState();
@@ -91,16 +84,12 @@ const EditManualOrder = props => {
     specialDiscount: ''
   });
 
-  // const title = `Order Id : ${props.match.params.id}`;
   const theme = createMuiTheme({
     typography: {
       fontFamily: 'Nunito Sans, Roboto, sans-serif'
     }
   });
   useEffect(() => {
-    // const id = props.match.params.id;
-    // console.log('props id is.....: ', props.match.params);
-    // console.log('props', props.location.state);
     getOrderInfo();
     return () => {
       setOrderId(null);
@@ -114,7 +103,6 @@ const EditManualOrder = props => {
     UserModel.getInstance().getOrderDetail(
       props.match.params.id,
       async data => {
-        // console.log("ssssssssssstatus", data)
         let tempArr = [];
         setParams({
           ...params,
@@ -131,11 +119,9 @@ const EditManualOrder = props => {
           tempArr.push({
             number: index + 1,
             skuId: obj.sku_id,
-            category: (obj.categories && obj.categories[0]) ? obj.categories[0].name : '',
-            subCategory: (obj.sub_categories && obj.sub_categories[0]) ? obj.sub_categories[0].name : '',
-            brand: obj.brand ? obj.brand : "",
-            product: obj.product_name,
-            skuName: obj.sku_name,
+            category: (obj.categories && obj.categories[0]) ? obj.categories[0].categories_name : '',
+            brand: obj.brand_name ? obj.brand_name : "",
+            skuName: obj.name,
             skuCode: obj.sku_code,
             supplier: obj.supplier ? obj.supplier : '',
             discount: obj.discount,
@@ -143,26 +129,20 @@ const EditManualOrder = props => {
             quantity: obj.qty
           });
         });
-        //       // console.log(retailerData)
         setorderData(tempArr);
 
       },
       err => {
-        // console.log('detail err', err);
       }
     );
   }
 
-  // let history = useHistory();
 
   const classes = useStyles();
   const { className, ...rest } = props;
 
   const orderStatusChange = async (event, val) => {
-    // console.log('value', val);
-    // console.log(event.target.dataset.optionIndex, order_status[event.target.dataset.optionIndex])
-    // await setParams({...params, status: order_status[event.target.dataset.optionIndex]})
-    await setParams({ ...params, status: { id: val.id, name: val.name } });
+    setParams({ ...params, status: { id: val.id, name: val.name } });
   };
 
   const handleClose = (event, reason) => {
@@ -378,69 +358,6 @@ const EditManualOrder = props => {
             }}
             data={orderData}
             className={clsx(classes.root, className)}
-            // editable={{
-            //   onRowDelete: oldData =>
-            //     new Promise(resolve => {
-            //       setTimeout(async () => {
-            //         resolve();
-            //         // console.log('skuId', oldData.skuId);
-            //         await UserModel.getInstance().removeOrderDetail(
-            //           {
-            //             order_id: params.id,
-            //             sku_id: oldData.skuId,
-            //             type: 'delete',
-            //           },
-            //           succ => {
-            //             // console.log(succ);
-            //             window.location.reload();
-            //           },
-            //           err => {
-            //             // console.log(err);
-            //           }
-            //         );
-            //       }, 600);
-            //     })
-            //       .then(() =>
-            //         window.location.reload()
-            //       ),
-
-            //   onRowUpdate: (newData, oldData) =>
-            //     new Promise((resolve, reject) => {
-            //       // setTimeout(() => {
-            //       //     const dataUpdate = [...data];
-            //       //     const index = oldData.tableData.id;
-            //       //     dataUpdate[index] = newData;
-            //       //     setData([...dataUpdate]);
-
-            //       resolve();
-            //       // console.log('old data', oldData)
-            //       // console.log('new data', newData)
-            //       var obj = {
-            //         order_id: params.id,
-            //         sku_id: newData.skuId,
-            //         qty: +newData.quantity,
-            //         price: newData.price,
-            //         discount: newData.discount,
-            //         type: "update",
-            //       };
-            //       UserModel.getInstance().addOrderDetail(
-            //         obj,
-            //         succ => {
-            //           // console.log('succ', succ)
-            //           setParams({ openError: false, openSuccess: true });
-            //           window.location.reload();
-            //         },
-            //         err => {
-            //           // console.log('err', err)
-            //         }
-            //       )
-            //       // }, 1000);
-            //     })
-            //   // .then(() =>
-            //   //   window.location.reload()
-            //   // ),
-            // }}
-
           >
           </MaterialTable>
         </MuiThemeProvider>
