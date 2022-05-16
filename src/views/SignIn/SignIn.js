@@ -146,7 +146,7 @@ const SignIn = props => {
     // eslint-disable-next-line
   }, [])
 
-  const afterSignInWithGoogle = async () => {
+  const afterSignInWithGoogle =  () => {
     // console.log(props.history.location)
     var paramsString = props.history.location.search;
     var searchParams = new URLSearchParams(paramsString);
@@ -154,16 +154,18 @@ const SignIn = props => {
     var refreshToken = searchParams.get("refresh");
     var error = searchParams.get("error_message");
     // console.log({ authToken, refreshToken, error })
-    if (!authToken || authToken !== 'null')
-      await localStorage.setItem('sales-auth-token', authToken)
+    if(authToken !== null && authToken.length){
+      console.log('TOKEN RESET',authToken !== 'null' || authToken !== null)
+      localStorage.setItem('sales-auth-token', authToken)
+    }
     if (!refreshToken || refreshToken !== 'null')
-      await localStorage.setItem('sales-refresh-token', refreshToken)
+         localStorage.setItem('sales-refresh-token', refreshToken)
 
-    const auth = await localStorage.getItem('sales-auth-token')
-    const refresh = await localStorage.getItem('sales-refresh-token')
+    const auth = localStorage.getItem('sales-auth-token')
+    const refresh =  localStorage.getItem('sales-refresh-token')
 
     // console.log({ auth, refresh })
-    if (auth && refresh && auth !== 'null' && refresh !== 'null') {
+    if (auth && auth !== 'null') {
       // console.log('auth and refresh token exists')
       // console.log(props.history.push)
       // console.log(props)
