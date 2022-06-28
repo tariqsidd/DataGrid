@@ -17,14 +17,15 @@ const qa2 = {
 
 
 const staging = {
-  baseURL     :'https://api-staging.dastgyr.com/sales/'
+  baseURL     :'https://api-staging.dastgyr.com/sales/',
+  aclBaseUrl: 'https://api-staging-acl.dastgyr.com/sales'
 };
 
 const prod = {
   baseURL     :'https://api.dastgyr.com/sales/'
 };
 
-var config = qa2;
+var config = staging;
 
 switch (process.env.REACT_APP_STAGE) {
   case 'local':
