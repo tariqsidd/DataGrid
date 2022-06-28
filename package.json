@@ -19,6 +19,7 @@
     "build:local"    :  "REACT_APP_STAGE=local npm run build",
     "build:dev"      :  "REACT_APP_STAGE=dev npm run build",
     "build:qa"       :  "REACT_APP_STAGE=qa npm run build",
+    "build:qa2"       :  "REACT_APP_STAGE=qa2 npm run build",
     "build:prod"     :  "REACT_APP_STAGE=prod npm run build",
     "build:staging"  :  "REACT_APP_STAGE=staging npm run build"
   },

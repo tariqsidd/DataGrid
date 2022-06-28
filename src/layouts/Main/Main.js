@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import { makeStyles, useTheme } from '@material-ui/styles';
@@ -32,6 +32,14 @@ const Main = props => {
   });
 
   const [openSidebar, setOpenSidebar] = useState(false);
+
+  useEffect(()=>{
+    let {push} = children.props.history;
+    let token = localStorage.getItem('sales-auth-token');
+    token === 'null' && push('/sign-in')
+    console.log('props===>',props)
+    console.log('token===>',token)
+  },[]);
 
   const handleSidebarOpen = () => {
     setOpenSidebar(true);

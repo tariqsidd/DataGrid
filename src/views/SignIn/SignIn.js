@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  // Link as RouterLink, 
+import {
+  // Link as RouterLink,
   withRouter } from 'react-router-dom';
 // import Card from '@material-ui/core/Card';
 import PropTypes from 'prop-types';
@@ -146,7 +146,7 @@ const SignIn = props => {
     // eslint-disable-next-line
   }, [])
 
-  const afterSignInWithGoogle = async () => {
+  const afterSignInWithGoogle =  () => {
     // console.log(props.history.location)
     var paramsString = props.history.location.search;
     var searchParams = new URLSearchParams(paramsString);
@@ -154,16 +154,18 @@ const SignIn = props => {
     var refreshToken = searchParams.get("refresh");
     var error = searchParams.get("error_message");
     // console.log({ authToken, refreshToken, error })
-    if (!authToken || authToken !== 'null')
-      await localStorage.setItem('sales-auth-token', authToken)
+    if(authToken !== null && authToken.length){
+      console.log('TOKEN RESET',authToken !== 'null' || authToken !== null)
+      localStorage.setItem('sales-auth-token', authToken)
+    }
     if (!refreshToken || refreshToken !== 'null')
-      await localStorage.setItem('sales-refresh-token', refreshToken)
+         localStorage.setItem('sales-refresh-token', refreshToken)
 
-    const auth = await localStorage.getItem('sales-auth-token')
-    const refresh = await localStorage.getItem('sales-refresh-token')
+    const auth = localStorage.getItem('sales-auth-token')
+    const refresh =  localStorage.getItem('sales-refresh-token')
 
     // console.log({ auth, refresh })
-    if (auth && refresh && auth !== 'null' && refresh !== 'null') {
+    if (auth && auth !== 'null') {
       // console.log('auth and refresh token exists')
       // console.log(props.history.push)
       // console.log(props)
@@ -255,12 +257,14 @@ const SignIn = props => {
               onClick={() => {
                 const myURL = window.location.href;
                 // console.log({ myURL })
-                var baseurl = CONSTANT.baseURL;
-                baseurl = baseurl.slice(0, baseurl.lastIndexOf('/'))
+                var baseurl = CONSTANT.aclBaseUrl;
+                console.log('XXXXXXXXXXXXXXXXXXXXX',baseurl)
+                // baseurl = baseurl.slice(0, baseurl.lastIndexOf('/'))
                 // console.log(baseurl)
-                baseurl = baseurl.slice(0, baseurl.lastIndexOf('/'))
-                // console.log(baseurl)
-                window.location.replace(`${baseurl}/auth/login?role_id=${5}&next=${myURL}`)
+                // baseurl = baseurl.slice(0, baseurl.lastIndexOf('/'))
+                console.log('baseurl===========>',`${baseurl}login?next=${myURL}`)
+
+                window.location.replace(`${baseurl}/login?next=${myURL}`)
               }}
               variant="contained">
               Sign in using Google Account
