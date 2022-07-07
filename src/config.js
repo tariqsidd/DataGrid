@@ -22,8 +22,8 @@ const staging = {
 };
 
 const prod = {
-  baseURL     :'https://api.dastgyr.com/sales/',
-  aclBaseUrl: 'https://acl.dastgyr.com/sales'
+  baseURL:     'https://api.dastgyr.com/sales/',
+  aclBaseUrl:  'https://api-acl.dastgyr.com/sales'
 };
 
 var config = staging;
