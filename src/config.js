@@ -3,11 +3,13 @@ const local  = {
 }
 
 const dev = {
-  baseURL     :'https://api-dev.dastgyr.com/sales/'
+  baseURL     :'https://api-dev.dastgyr.com/sales/',
+  aclBaseUrl: 'https://dev-acl.dastgyr.com/sales'
 };
 
 const qa = {
-  baseURL     :'https://api-qa4.dastgyr.com/sales/'
+  baseURL     :'https://api-qa4.dastgyr.com/sales/',
+  aclBaseUrl: 'https://qa-acl.dastgyr.com/sales'
 };
 
 const qa2 = {
