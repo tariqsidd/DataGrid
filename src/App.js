@@ -1,39 +1,26 @@
-import React, { Component } from 'react';
-import { Router } from 'react-router-dom';
-import { createBrowserHistory } from 'history';
-import { Chart } from 'react-chartjs-2';
-import { ThemeProvider } from '@material-ui/styles';
-import validate from 'validate.js';
+import React from 'react';
+import TableComponent from "./DataGrid";
+import {_tableHeader} from "./Data";
 
-import { chartjs } from './helpers';
-import theme from './theme';
-// import PerfectScrollbar from 'react-perfect-scrollbar';
-import 'react-perfect-scrollbar/dist/css/styles.css';
-import './assets/scss/index.scss';
-import validators from './common/validators';
-import Routes from './Routes';
+const Data = [
+  { name: 'Jamil', surname: 'Smith', city: 'Los Karachi', phoneNo: 2313453453, country: 'PK', errors:[{cellName: 'city', errorMsg:'city not allowed'}] },
+  { name: 'John', surname: 'Doe', city: 'New York', phoneNo: 1234567890, country: 'USA', errors:[{cellName: 'phoneNo', errorMsg:'wrong country code'}] },
+  { name: 'Jane', surname: '', city: 'Los Angeles', phoneNo: 9876543210, country: 'USA', errors:[{cellName: 'surname', errorMsg:'surname required'}] },
+];
 
-const browserHistory = createBrowserHistory();
-
-Chart.helpers.extend(Chart.elements.Rectangle.prototype, {
-  draw: chartjs.draw
-});
-
-validate.validators = {
-  ...validate.validators,
-  ...validators
+const App = ()=>{
+  return(
+    <div>
+      <TableComponent
+        data={Data}
+        tableHeaders={_tableHeader}
+        onRowChange={(data, i)=>{
+          console.log('data', data)
+          console.log('index',i)
+        }}/>
+    </div>
+  )
 };
 
-export default class App extends Component {
-  render() {
-    return (
-      <ThemeProvider theme={theme}>
-        <Router history={browserHistory}>
-          {/* <PerfectScrollbar> */}
-            <Routes />
-          {/* </PerfectScrollbar> */}
-        </Router>
-      </ThemeProvider>
-    );
-  }
-}
+
+export default App;

@@ -7,21 +7,9 @@
   "private": false,
   "scripts": {
     "start": "react-scripts start",
-    "build": "GENERATE_SOURCEMAP=false react-scripts build",
-    "winBuild": "set \"GENERATE_SOURCEMAP=false\" && react-scripts build",
+    "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "start:local"    :  "REACT_APP_STAGE=local npm start",
-    "start:dev"      :  "REACT_APP_STAGE=dev npm start",
-    "start:qa"       :  "REACT_APP_STAGE=qa npm start",
-    "start:prod"     :  "REACT_APP_STAGE=prod npm start",
-    "start:staging"  :  "REACT_APP_STAGE=staging npm start",
-    "build:local"    :  "REACT_APP_STAGE=local npm run build",
-    "build:dev"      :  "REACT_APP_STAGE=dev npm run build",
-    "build:qa"       :  "REACT_APP_STAGE=qa npm run build",
-    "build:qa2"       :  "REACT_APP_STAGE=qa2 npm run build",
-    "build:prod"     :  "REACT_APP_STAGE=prod npm run build",
-    "build:staging"  :  "REACT_APP_STAGE=staging npm run build"
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -43,38 +31,16 @@
     "@material-ui/icons": "^4.9.1",
     "@material-ui/lab": "^4.0.0-alpha.56",
     "@material-ui/styles": "^4.2.1",
-    "antd": "^4.5.3",
-    "antd-img-crop": "^3.9.0",
-    "chart.js": "^2.8.0",
-    "clsx": "^1.0.4",
-    "csvtojson": "^2.0.10",
-    "fontsource-roboto": "^2.1.4",
-    "history": "^4.9.0",
-    "json2csv": "^5.0.1",
-    "material-table": "^1.68.0",
-    "moment": "^2.29.0",
-    "node-sass": "^4.12.0",
-    "prop-types": "^15.7.2",
-    "react": "^16.8.6",
-    "react-chartjs-2": "^2.7.6",
-    "react-date-range": "^1.0.3",
-    "react-dom": "^16.8.6",
-    "react-perfect-scrollbar": "^1.5.3",
     "react-router-dom": "^5.0.1",
-    "react-scripts": "^3.0.1",
-    "recompose": "^0.30.0",
-    "underscore": "^1.9.1",
-    "uuid": "^3.3.2",
-    "validate.js": "^0.13.1",
-    "yarn": "^1.22.4"
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1",
+    "web-vitals": "^2.1.4"
   },
   "devDependencies": {
-    "eslint": "^6.6.0",
-    "eslint-plugin-prettier": "^3.0.1",
-    "eslint-plugin-react": "^7.12.4",
-    "prettier": "^1.17.1",
-    "prettier-eslint": "^8.8.2",
-    "prettier-eslint-cli": "^4.7.1",
-    "typescript": "^3.5.1"
+    "jest": "^28.1.3"
   }
 }
