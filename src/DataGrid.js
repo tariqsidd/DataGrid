@@ -8,18 +8,25 @@ import {
   TextField,
   Paper,
 } from "@material-ui/core";
+import Autocomplete from "@material-ui/lab/Autocomplete";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
 import IconButton from "@material-ui/core/IconButton";
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
+import { CustomTextField } from "CustomCells/TextField";
+
+let Ajv = require("ajv");
+let ajv = new Ajv({ allErrors: true });
 
 const TableComponent = ({ data, tableHeaders, onRowChange }) => {
+  const [error, setError] = useState(Math.random());
   const [editingCell, setEditingCell] = useState(null);
   const [editingValue, setEditingValue] = useState("");
   const [highlightedCell, setHighlightedCell] = useState(null); // { rowIndex, fieldName }
   const [draggingCell, setDraggingCell] = useState(null);
   const [currentErrorIndex, setCurrentErrorIndex] = useState(0);
   const [errorFocusCell, setErrorFocusCell] = useState(null);
+  const columnOrder = tableHeaders.map((item) => item.headerFieldName);
 
   const handleHighlight = (rowIndex, header) => {
     setHighlightedCell({ rowIndex, fieldName: header.headerFieldName });
@@ -55,6 +62,8 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
       setDraggingCell(null);
       setHighlightedCell(null);
       onRowChange(newData);
+      setError(Math.random());
+      // setData(newData);
     }
   };
 
@@ -69,6 +78,8 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
       newData[editingCell.rowIndex][editingCell.fieldName] = editingValue;
 
       onRowChange(newData[editingCell.rowIndex], editingCell.rowIndex);
+      setError(Math.random());
+      // setData(newData);
 
       setEditingCell(null);
       setEditingValue("");
@@ -76,18 +87,32 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
   };
 
   const getCellError = (rowIndex, fieldName) => {
-    const rowErrors = data[rowIndex].errors;
-    if (rowErrors && rowErrors.length) {
-      const errorObj = rowErrors.find((e) => e.cellName === fieldName);
-      if (errorObj) return errorObj.errorMsg;
+    const rowErrorsObj = data[rowIndex].errorObj;
+    if (rowErrorsObj && rowErrorsObj[fieldName]) {
+      return rowErrorsObj[fieldName];
     }
+
+    // Earlier Working
+    // const rowErrors = data[rowIndex].errors;
+    // if (rowErrors && rowErrors.length) {
+    //   const errorObj = rowErrors.find((e) => e.cellName === fieldName);
+    //   if (errorObj) return errorObj.errorMsg;
+    // }
     return null;
   };
 
+  //Previous Work
+  // const errorCells = data.flatMap((row, rowIndex) =>
+  //   row.errors
+  //     ? row.errors.map((error) => ({ rowIndex, cellName: error.cellName }))
+  //     : []
+  // );
+
   const errorCells = data.flatMap((row, rowIndex) =>
-    row.errors
-      ? row.errors.map((error) => ({ rowIndex, cellName: error.cellName }))
-      : []
+    Object.keys(row.errorObj).map((cellName) => ({
+      rowIndex,
+      cellName,
+    }))
   );
 
   const focusOnErrorCell = (index) => {
@@ -107,7 +132,7 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
     if (errorCells.length > 0) {
       focusOnErrorCell(0);
     }
-  }, [data]);
+  }, [error]);
 
   const handleNextError = (event) => {
     event.stopPropagation(); // Stop event propagation
@@ -144,21 +169,13 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
 
   const renderErrorCell = (row, header, hasError, rowIndex, isErrorFocused) => {
     return (
-      <Paper
-        elevation={4}
+      <div
         style={{
-          padding: "2px", // Reduced padding
           backgroundColor: "#ffe6e6",
           display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          border: "2px solid red",
+          flexDirection: "row",
         }}
       >
-        {/* <span style={{ marginBottom: '2px' }}>
-          {cellContent(row, header, hasError, rowIndex)}
-      </span> */}
-
         <div
           style={{
             display: "flex",
@@ -191,7 +208,7 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
             </IconButton>
           )}
         </div>
-      </Paper>
+      </div>
     );
   };
 
@@ -259,18 +276,116 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
     );
   };
 
+  const validate = (header, rowIndex) => {
+    let object = {};
+    if (editingValue.length > 0) {
+      object = { [header.headerFieldName]: editingValue };
+    }
+    let validate = ajv.compile(header.headerSchema);
+    let valid = validate(object);
+    if (!valid) {
+      const error = ajv.errorsText(validate.errors);
+      const newData = [...data];
+
+      newData[rowIndex]["errorObj"][header.headerFieldName] = error;
+      const obj = newData[rowIndex]["errorObj"];
+
+      const sortedErrorObj = Object.fromEntries(
+        columnOrder
+          .filter((key) => obj.hasOwnProperty(key)) // Filter out keys not in the object
+          .map((key) => [key, obj[key]])
+      );
+      newData[rowIndex]["errorObj"] = sortedErrorObj;
+    }
+  };
+
+  const customTextField = (header, rowIndex) => {
+    validate(header, rowIndex);
+    return (
+      <TextField
+        style={{
+          padding: "0px",
+        }}
+        type={header.headerCellType === "number" ? "number" : "text"}
+        // variant="outlined"
+        value={editingValue}
+        onBlur={handleBlur}
+        onChange={(e) => setEditingValue(e.target.value)}
+        autoFocus
+      />
+    );
+  };
+
+  const customSelectField = (header, rowIndex) => {
+    validate(header, rowIndex);
+    return (
+      <>
+        {/* <TextField
+          style={{
+            padding: "0px",
+          }}
+          type={header.headerCellType === "number" ? "number" : "text"}
+          variant="outlined"
+          value={editingValue}
+          onBlur={handleBlur}
+          onChange={(e) => setEditingValue(e.target.value)}
+          autoFocus
+        /> */}
+        <Autocomplete
+          style={{
+            padding: "0px",
+          }}
+          id="city"
+          options={header.headerOptions}
+          getOptionLabel={(option) => option.label || ""}
+          value={editingValue}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              margin="dense"
+              // label="City"
+              variant="outlined"
+              placeholder="All"
+            />
+          )}
+          onChange={(e) => {
+            console.log("E", e);
+            console.log(e.target.textContent);
+            setEditingValue(e.target.textContent);
+          }}
+        />
+      </>
+    );
+  };
+
+  const getCellType = (header, rowIndex) => {
+    switch (header.headerCellType) {
+      case "textField":
+        return customTextField(header, rowIndex);
+      // case "date":
+      //   return customDateField;
+      // case "select":
+      //   return customSelectField(header, rowIndex);
+      default:
+        return "";
+    }
+  };
+
   return (
     <div>
       <Table stickyHeader>
-        {header()}
+        {/* {header()} */}
         <TableBody>
           {data.map((row, rowIndex) => (
             <TableRow key={rowIndex} style={{ height: "60px" }}>
               <TableCell
                 style={{
-                  padding: "8px", // Reduced padding
-                  fontSize: "0.75em", // Reduced font size if needed
                   border: "1px solid #8080801a",
+                  width: "100px",
+                  height: "50px",
+                  overflow: "hidden",
+                  padding: "0px",
+                  fontSize: "0.75em",
                 }}
                 align="center"
               >
@@ -305,7 +420,24 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
                     onDragEnter={() => handleDragEnter(rowIndex, header)}
                     onDragEnd={handleDragEnd}
                     onDrop={() => handleDrop(rowIndex, header)}
+                    // style={{
+                    //   ...(isHighlighted
+                    //     ? {
+                    //         border: isEditing ? "" : "2px dotted black",
+                    //         position: "relative",
+                    //       }
+                    //     : {
+                    //         border: "1px solid #8080801a",
+                    //       }),
+                    //   padding: "0px", // Reduced padding
+                    //   fontSize: "0.75em", // Reduced font size if needed
+                    //   // border: "1px solid #8080801a",
+                    // }}
                     style={{
+                      width: "100px",
+                      maxWidth: "100px",
+                      height: "50px",
+                      overflow: "hidden",
                       ...(isHighlighted
                         ? {
                             border: isEditing ? "" : "2px dotted black",
@@ -314,26 +446,29 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
                         : {
                             border: "1px solid #8080801a",
                           }),
-                      padding: "0px", // Reduced padding
-                      fontSize: "0.75em", // Reduced font size if needed
-                      // border: "1px solid #8080801a",
+                      padding: "0px",
+                      fontSize: "0.75em",
+                      backgroundColor:
+                        hasError || isErrorFocused ? "#ffe6e6" : "#fff",
                     }}
                   >
                     {isEditing ? (
-                      <TextField
-                        style={{
-                          padding: "0px",
-                        }}
-                        type={
-                          header.headerCellType === "number" ? "number" : "text"
-                        }
-                        variant="outlined"
-                        value={editingValue}
-                        onBlur={handleBlur}
-                        onChange={(e) => setEditingValue(e.target.value)}
-                        // autoFocus
-                      />
+                      // <TextField
+                      //   style={{
+                      //     padding: "0px",
+                      //   }}
+                      //   type={
+                      //     header.headerCellType === "number" ? "number" : "text"
+                      //   }
+                      //   variant="outlined"
+                      //   value={editingValue}
+                      //   onBlur={handleBlur}
+                      //   onChange={(e) => setEditingValue(e.target.value)}
+                      //   autoFocus
+                      // />
+                      getCellType(header, rowIndex)
                     ) : (
+                      // customTextField(header, rowIndex)
                       <>
                         {hasError || isErrorFocused
                           ? renderErrorCell(
@@ -351,7 +486,7 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
               })}
             </TableRow>
           ))}
-          {footer()}
+          {/* {footer()} */}
         </TableBody>
       </Table>
     </div>
