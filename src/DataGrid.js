@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect} from "react";
 import {
   Table,
   TableBody,
@@ -7,13 +7,14 @@ import {
   TableRow,
   TextField,
   Paper,
+  Box
 } from "@material-ui/core";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
 import IconButton from "@material-ui/core/IconButton";
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
 
-const TableComponent = ({ data, tableHeaders, onRowChange }) => {
+const TableComponent = ({data, tableHeaders, onRowChange}) => {
   const [editingCell, setEditingCell] = useState(null);
   const [editingValue, setEditingValue] = useState("");
   const [highlightedCell, setHighlightedCell] = useState(null); // { rowIndex, fieldName }
@@ -22,11 +23,11 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
   const [errorFocusCell, setErrorFocusCell] = useState(null);
 
   const handleHighlight = (rowIndex, header) => {
-    setHighlightedCell({ rowIndex, fieldName: header.headerFieldName });
+    setHighlightedCell({rowIndex, fieldName: header.headerFieldName});
   };
 
   const handleDragStart = (rowIndex, header) => {
-    setDraggingCell({ rowIndex, fieldName: header.headerFieldName });
+    setDraggingCell({rowIndex, fieldName: header.headerFieldName});
   };
 
   const handleDragOver = (e) => {
@@ -59,7 +60,7 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
   };
 
   const handleDoubleClick = (rowIndex, header) => {
-    setEditingCell({ rowIndex, fieldName: header.headerFieldName });
+    setEditingCell({rowIndex, fieldName: header.headerFieldName});
     setEditingValue(data[rowIndex][header.headerFieldName]);
   };
 
@@ -86,7 +87,7 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
 
   const errorCells = data.flatMap((row, rowIndex) =>
     row.errors
-      ? row.errors.map((error) => ({ rowIndex, cellName: error.cellName }))
+      ? row.errors.map((error) => ({rowIndex, cellName: error.cellName}))
       : []
   );
 
@@ -135,7 +136,7 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
     <>
       {row[header.headerFieldName]}
       {hasError && (
-        <div style={{ color: "red", fontSize: "0.75em" }}>
+        <div style={{color: "red", fontSize: "0.75em"}}>
           {getCellError(rowIndex, header.headerFieldName)}
         </div>
       )}
@@ -144,54 +145,39 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
 
   const renderErrorCell = (row, header, hasError, rowIndex, isErrorFocused) => {
     return (
-      <Paper
-        elevation={4}
+      <div
         style={{
-          padding: "2px", // Reduced padding
           backgroundColor: "#ffe6e6",
           display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          border: "2px solid red",
-        }}
-      >
-        {/* <span style={{ marginBottom: '2px' }}>
-          {cellContent(row, header, hasError, rowIndex)}
-      </span> */}
+          flexDirection: "row",
+        }}>
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            width: "100%",
-          }}
-        >
-          {isErrorFocused && (
-            <IconButton
-              onClick={(e) => handlePrevError(e)}
-              disabled={currentErrorIndex === 0}
-              aria-label="previous error"
-              style={{ padding: "2px" }}
-            >
-              <ArrowBackIosIcon />
-            </IconButton>
-          )}
 
-          <span style={{ marginBottom: "2px" }}>
+        {isErrorFocused && (
+          <IconButton
+            onClick={(e) => handlePrevError(e)}
+            disabled={currentErrorIndex === 0}
+            aria-label="previous error"
+            style={{padding: "2px"}}
+          >
+            <ArrowBackIosIcon/>
+          </IconButton>
+        )}
+
+        <span style={{marginBottom: "2px"}}>
             {cellContent(row, header, hasError, rowIndex)}
           </span>
-          {isErrorFocused && (
-            <IconButton
-              onClick={(e) => handleNextError(e)}
-              disabled={currentErrorIndex === errorCells.length - 1}
-              aria-label="next error"
-              style={{ padding: "2px" }}
-            >
-              <ArrowForwardIosIcon />
-            </IconButton>
-          )}
-        </div>
-      </Paper>
+        {isErrorFocused && (
+          <IconButton
+            onClick={(e) => handleNextError(e)}
+            disabled={currentErrorIndex === errorCells.length - 1}
+            aria-label="next error"
+            style={{padding: "2px"}}
+          >
+            <ArrowForwardIosIcon/>
+          </IconButton>
+        )}
+      </div>
     );
   };
 
@@ -207,7 +193,7 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
               backgroundColor: "#8080801a",
             }}
             align="center"
-          ></TableCell>
+          />
           {tableHeaders.map((header) => (
             <TableCell
               style={{
@@ -238,11 +224,12 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
           }}
           align="center"
         >
-          <IconButton onClick={() => {}} size="large">
-            <AddCircleOutlineIcon style={{ color: "#000000de" }} />
+          <IconButton onClick={() => {
+          }} size="large">
+            <AddCircleOutlineIcon style={{color: "#000000de"}}/>
           </IconButton>
         </TableCell>
-        {Array.from({ length: tableHeaders.length }, (_, index) => (
+        {Array.from({length: tableHeaders.length}, (_, index) => (
           <TableCell
             key={index} // Provide a unique key for each cell
             style={{
@@ -250,10 +237,9 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
               fontSize: "0.75em",
               border: "1px solid #8080801a",
               backgroundColor: "#8080801a",
-              // width: "100%",
             }}
             align="center"
-          ></TableCell>
+          />
         ))}
       </TableRow>
     );
@@ -265,18 +251,21 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
         {header()}
         <TableBody>
           {data.map((row, rowIndex) => (
-            <TableRow key={rowIndex} style={{ height: "60px" }}>
+            <TableRow key={rowIndex} style={{height: "60px"}}>
               <TableCell
                 style={{
-                  padding: "8px", // Reduced padding
-                  fontSize: "0.75em", // Reduced font size if needed
                   border: "1px solid #8080801a",
+                  width: '100px',
+                  height: '50px',
+                  overflow: 'hidden',
+                  padding: "0px",
+                  fontSize: "0.75em",
                 }}
-                align="center"
-              >
+                align="center">
                 {rowIndex}
               </TableCell>
               {tableHeaders.map((header) => {
+
                 const hasError = cellHasError(rowIndex, header.headerFieldName);
                 const isHighlighted =
                   highlightedCell &&
@@ -290,7 +279,6 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
                   editingCell &&
                   editingCell.rowIndex === rowIndex &&
                   editingCell.fieldName === header.headerFieldName;
-
                 return (
                   <TableCell
                     key={header.headerName}
@@ -306,43 +294,47 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
                     onDragEnd={handleDragEnd}
                     onDrop={() => handleDrop(rowIndex, header)}
                     style={{
+                      width: '100px',
+                      maxWidth: '100px',
+                      height: '50px',
+                      overflow: 'hidden',
                       ...(isHighlighted
                         ? {
-                            border: isEditing ? "" : "2px dotted black",
-                            position: "relative",
-                          }
+                          border: isEditing ? "" : "2px dotted black",
+                          position: "relative",
+                        }
                         : {
-                            border: "1px solid #8080801a",
-                          }),
-                      padding: "0px", // Reduced padding
-                      fontSize: "0.75em", // Reduced font size if needed
-                      // border: "1px solid #8080801a",
+                          border: "1px solid #8080801a",
+                        }),
+                      padding: "0px",
+                      fontSize: "0.75em",
+                      backgroundColor: hasError || isErrorFocused ? "#ffe6e6" : '#fff',
                     }}
                   >
                     {isEditing ? (
                       <TextField
-                        style={{
-                          padding: "0px",
-                        }}
+                        fullWidth={false}
+                        size="small"
+                        style={{maxHeight: '20px', padding: '0px'}}
                         type={
                           header.headerCellType === "number" ? "number" : "text"
                         }
-                        variant="outlined"
+                        // variant="outlined"
                         value={editingValue}
                         onBlur={handleBlur}
                         onChange={(e) => setEditingValue(e.target.value)}
-                        // autoFocus
+                        autoFocus
                       />
                     ) : (
                       <>
                         {hasError || isErrorFocused
                           ? renderErrorCell(
-                              row,
-                              header,
-                              hasError,
-                              rowIndex,
-                              isErrorFocused
-                            )
+                            row,
+                            header,
+                            hasError,
+                            rowIndex,
+                            isErrorFocused
+                          )
                           : cellContent(row, header, hasError, rowIndex)}
                       </>
                     )}
