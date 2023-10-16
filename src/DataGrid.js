@@ -308,10 +308,7 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
                     style={{
                       ...(isHighlighted
                         ? {
-                            border:
-                              // isEditing
-                              //   ? "2px solid blue"
-                              "2px dotted blue",
+                            border: isEditing ? "" : "2px dotted black",
                             position: "relative",
                           }
                         : {
@@ -330,7 +327,7 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
                         type={
                           header.headerCellType === "number" ? "number" : "text"
                         }
-                        // variant="outlined"
+                        variant="outlined"
                         value={editingValue}
                         onBlur={handleBlur}
                         onChange={(e) => setEditingValue(e.target.value)}
