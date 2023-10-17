@@ -6,6 +6,8 @@ const Data = [
   {
     name: "Jamil",
     surname: "Smith",
+    // date: "2023-10-17T11:38:36Z",
+    date: "17/10/2012",
     city: "Los Karachi",
     phoneNo: 2313453453,
     country: "PK",
@@ -15,6 +17,8 @@ const Data = [
   {
     name: "John",
     surname: "Doe",
+    // date: "2023-10-17T11:38:36Z",
+    date: "18/10/2013",
     city: "New York",
     phoneNo: 1234567890,
     country: "USA",
@@ -24,6 +28,8 @@ const Data = [
   {
     name: "Jane",
     surname: "",
+    // date: "2023-10-17T11:38:36Z",
+    date: "19/10/2014",
     city: "Los Angeles",
     phoneNo: 9876543210,
     country: "USA",

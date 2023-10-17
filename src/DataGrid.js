@@ -8,19 +8,26 @@ import {
   TextField,
   MenuItem,
 } from "@material-ui/core";
-import Autocomplete from "@material-ui/lab/Autocomplete";
+import {
+  KeyboardDatePicker,
+  MuiPickersUtilsProvider,
+} from "@material-ui/pickers";
+import DateFnsUtils from "@date-io/date-fns";
+import "date-fns";
+// import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
 import IconButton from "@material-ui/core/IconButton";
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
-import { CustomTextField } from "CustomCells/TextField";
 
 let Ajv = require("ajv");
 let ajv = new Ajv({ allErrors: true });
+const dateFns = require("date-fns");
 
 const TableComponent = ({ data, tableHeaders, onRowChange }) => {
   const [error, setError] = useState(Math.random());
   const [editingCell, setEditingCell] = useState(null);
+  const [editingCellHeader, setEditingCellHeader] = useState(null);
   const [editingValue, setEditingValue] = useState("");
   const [highlightedCell, setHighlightedCell] = useState(null); // { rowIndex, fieldName }
   const [draggingCell, setDraggingCell] = useState(null);
@@ -57,6 +64,12 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
       for (let i = draggingCell.rowIndex; i <= targetRowIndex; i++) {
         newData[i][header.headerFieldName] =
           data[draggingCell.rowIndex][header.headerFieldName];
+        // Validate the edited row data cell
+        newData[i].errorObj = validateRowData(
+          draggingCell.fieldName,
+          newData[i],
+          header
+        );
       }
 
       setDraggingCell(null);
@@ -69,18 +82,64 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
 
   const handleDoubleClick = (rowIndex, header) => {
     setEditingCell({ rowIndex, fieldName: header.headerFieldName });
+    setEditingCellHeader(header);
     setEditingValue(data[rowIndex][header.headerFieldName]);
   };
 
+  const validateRowData = (fieldName, rowData, headers) => {
+    // console.log("Row Data", rowData);
+    // console.log("Field Name", fieldName);
+    // console.log("Header", headers);
+
+    const errors = JSON.parse(JSON.stringify(rowData.errorObj));
+    // console.log("Errors Initially", errors);
+    // console.log(errors.hasOwnProperty(fieldName));
+    if (errors.hasOwnProperty(fieldName)) {
+      delete errors[fieldName];
+    }
+    // console.log(" Errors After Removing Existing Error", errors);
+    const schema = headers.headerSchema;
+    const fieldKey = headers.headerFieldName;
+    let valueToValidate = {};
+    let value = rowData[fieldKey];
+    // console.log("Value length check", value.length > 0);
+    // console.log("Value undefined", value != undefined);
+    if (headers.headerCellType === "number") {
+      if (value != undefined) {
+        valueToValidate = { [fieldKey]: value };
+      }
+    } else if (value.length > 0) {
+      valueToValidate = { [fieldKey]: value };
+    }
+    // console.log("Value to Validate", valueToValidate);
+    if (schema) {
+      const validate = ajv.compile(schema);
+      if (!validate(valueToValidate)) {
+        errors[fieldKey] = validate.errors[0].message;
+      }
+    }
+    // console.log(" Errors After Validation", errors);
+    return errors;
+  };
+
   const handleBlur = () => {
-    if (editingCell) {
+    console.log("On blur called");
+    if (editingCell && editingCellHeader) {
       const newData = [...data];
       newData[editingCell.rowIndex][editingCell.fieldName] = editingValue;
+
+      // Validate the edited row data cell
+      newData[editingCell.rowIndex].errorObj = validateRowData(
+        editingCell.fieldName,
+        newData[editingCell.rowIndex],
+        editingCellHeader
+      );
 
       onRowChange(newData[editingCell.rowIndex], editingCell.rowIndex);
       setError(Math.random());
 
       setEditingCell(null);
+      setEditingCellHeader(null);
       setEditingValue("");
     }
   };
@@ -90,22 +149,8 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
     if (rowErrorsObj && rowErrorsObj[fieldName]) {
       return rowErrorsObj[fieldName];
     }
-
-    // Earlier Working
-    // const rowErrors = data[rowIndex].errors;
-    // if (rowErrors && rowErrors.length) {
-    //   const errorObj = rowErrors.find((e) => e.cellName === fieldName);
-    //   if (errorObj) return errorObj.errorMsg;
-    // }
     return null;
   };
-
-  //Previous Work
-  // const errorCells = data.flatMap((row, rowIndex) =>
-  //   row.errors
-  //     ? row.errors.map((error) => ({ rowIndex, cellName: error.cellName }))
-  //     : []
-  // );
 
   const errorCells = data.flatMap((row, rowIndex) =>
     Object.keys(row.errorObj).map((cellName) => ({
@@ -130,6 +175,9 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
   useEffect(() => {
     if (errorCells.length > 0) {
       focusOnErrorCell(0);
+    } else {
+      setErrorFocusCell(null);
+      setHighlightedCell(null);
     }
   }, [error]);
 
@@ -157,6 +205,12 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
 
   const cellContent = (row, header, hasError, rowIndex) => (
     <>
+      {/* {header.headerCellType === "date"
+        ? // new Date(row[header.headerFieldName]).toLocaleDateString()
+          dateFns.format(new Date(row[header.headerFieldName]), "dd/MM/yyyy", {
+            locale: dateFns.enGB,
+          })
+        : row[header.headerFieldName]} */}
       {row[header.headerFieldName]}
       {hasError && (
         <div style={{ color: "red", fontSize: "0.75em" }}>
@@ -275,77 +329,7 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
     );
   };
 
-  const validate = (header, rowIndex, value) => {
-    const newData = [...data];
-    console.log("Initial", newData);
-    //Error Obj Handling
-    // if (
-    //   newData[rowIndex]["errorObj"] &&
-    //   newData[rowIndex]["errorObj"].hasOwnProperty(header.headerFieldName)
-    // ) {
-    //   let error = JSON.parse(JSON.stringify(newData[rowIndex]["errorObj"]));
-    //   delete error[header.headerFieldName];
-    //   let obj = { ...newData[rowIndex], errorObj: error };
-    //   newData[rowIndex] = obj;
-    // }
-
-    console.log("Existing Removal", newData);
-    let object = {};
-    if (value?.length > 0 || value != undefined) {
-      let editingValue = value;
-      if (header.headerCellType === "number") {
-        editingValue = parseInt(editingValue, 10);
-      }
-      object = { [header.headerFieldName]: editingValue };
-    }
-    let validate = ajv.compile(header.headerSchema);
-    let valid = validate(object);
-    if (!valid) {
-      const error = ajv.errorsText(validate.errors);
-      // const newData = [...data];
-
-      if (
-        newData[rowIndex]["errorObj"] &&
-        newData[rowIndex]["errorObj"].hasOwnProperty(header.headerFieldName)
-      ) {
-        let error = JSON.parse(JSON.stringify(newData[rowIndex]["errorObj"]));
-        delete error[header.headerFieldName];
-        let obj = { ...newData[rowIndex], errorObj: error };
-        newData[rowIndex] = obj;
-      }
-
-      newData[rowIndex]["errorObj"][header.headerFieldName] = error;
-      const obj = newData[rowIndex]["errorObj"];
-
-      const sortedErrorObj = Object.fromEntries(
-        columnOrder
-          .filter((key) => obj.hasOwnProperty(key)) // Filter out keys not in the object
-          .map((key) => [key, obj[key]])
-      );
-      newData[rowIndex]["errorObj"] = sortedErrorObj;
-    }
-
-    console.log("Post Validation", newData);
-  };
-
-  const removeExistingError = (header, rowIndex) => {
-    const newData = [...data];
-
-    //Error Obj Handling
-    if (
-      newData[rowIndex]["errorObj"] &&
-      newData[rowIndex]["errorObj"].hasOwnProperty(header.headerFieldName)
-    ) {
-      let error = JSON.parse(JSON.stringify(newData[rowIndex]["errorObj"]));
-      delete error[header.headerFieldName];
-      let obj = { ...newData[rowIndex], errorObj: error };
-      newData[rowIndex] = obj;
-    }
-  };
-
-  const customTextField = (header, rowIndex) => {
-    // removeExistingError(header, rowIndex);
-    // validate(header, rowIndex);
+  const customTextField = (header) => {
     return (
       <TextField
         margin="dense"
@@ -358,32 +342,24 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
         value={editingValue}
         onBlur={handleBlur}
         onChange={(e) => {
-          setEditingValue(e.target.value.toString());
-          // removeExistingError(header, rowIndex);
-          validate(header, rowIndex, e.target.value.toString());
-          // const newData = [...data];
-          // console.log("Before", newData);
-          // newData[rowIndex][header.headerFieldName] = e.target.value;
-          // if (
-          //   newData[rowIndex]["errorObj"] &&
-          //   newData[rowIndex]["errorObj"].hasOwnProperty(header.headerFieldName)
-          // ) {
-          //   let error = JSON.parse(
-          //     JSON.stringify(newData[rowIndex]["errorObj"])
-          //   );
-          //   delete error[header.headerFieldName];
-          //   let obj = { ...newData[rowIndex], errorObj: error };
-          //   newData[rowIndex] = obj;
-          //   console.log("After", newData);
-          // }
+          // e.target.value.length < 0
+          //   ? setEditingValue(e.target.value.toString())
+          //   : header.headerCellType === "number"
+          //   ? setEditingValue(parseInt(e.target.value, 10))
+          //   : setEditingValue(e.target.value.toString());
+
+          header.headerCellType === "number"
+            ? e.target.value.length > 0
+              ? setEditingValue(parseInt(e.target.value, 10))
+              : setEditingValue(null)
+            : setEditingValue(e.target.value.toString());
         }}
-        // autoFocus
+        autoFocus
       />
     );
   };
 
-  const customSelectField = (header, rowIndex) => {
-    // validate(header, rowIndex);
+  const customSelectField = (header) => {
     return (
       <TextField
         select
@@ -394,23 +370,9 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
           width: "180px",
         }}
         value={editingValue}
+        onBlur={handleBlur}
         onChange={(e) => {
           setEditingValue(e.target.value);
-          const newData = [...data];
-          console.log("Before", newData);
-          newData[rowIndex][header.headerFieldName] = e.target.value;
-          if (
-            newData[rowIndex]["errorObj"] &&
-            newData[rowIndex]["errorObj"].hasOwnProperty(header.headerFieldName)
-          ) {
-            let error = JSON.parse(
-              JSON.stringify(newData[rowIndex]["errorObj"])
-            );
-            delete error[header.headerFieldName];
-            let obj = { ...newData[rowIndex], errorObj: error };
-            newData[rowIndex] = obj;
-            console.log("After", newData);
-          }
         }}
         variant="outlined"
       >
@@ -423,16 +385,60 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
     );
   };
 
-  const getCellType = (header, rowIndex) => {
+  const customDateField = (header) => {
+    return (
+      // <MuiPickersUtilsProvider utils={DateFnsUtils}>
+      //   <KeyboardDatePicker
+      //     disableToolbar
+      //     variant="inline"
+      //     format="dd/MM/yyyy"
+      //     inputVariant="outlined"
+      //     // value={new Date(editingValue)}
+      //     value={dateFns.parse(editingValue, "dd/MM/yyyy", new Date())}
+      //     onChange={(date) => {
+      //       // console.log(date);
+      //       // console.log(typeof date);
+      //       // console.log(new Date(new Date(date)).toISOString());
+      //       const utcDate = new Date(new Date(date)).toISOString();
+      //       setEditingValue(utcDate);
+      //     }}
+      //     autoFocus
+      //     // onBlur={handleBlur}
+      //   />
+      // </MuiPickersUtilsProvider>
+      <TextField
+        type="date"
+        // value="2017-05-24"
+        value="24/05/2018"
+        format="dd/mm/yyyy"
+        // value={dateFns.parse(editingValue, "dd-MM-yyyy", new Date())}
+        InputLabelProps={{
+          shrink: true,
+        }}
+        onChange={(event, date) => {
+          console.log(event);
+          console.log(event.target.value);
+          // console.log(typeof date);
+          // console.log(new Date(new Date(date)).toISOString());
+          // const utcDate = new Date(new Date(date)).toISOString();
+          setEditingValue(event.target.value);
+        }}
+        variant="outlined"
+        onBlur={handleBlur}
+      />
+    );
+  };
+
+  const getCellType = (header) => {
     switch (header.headerCellType) {
       case "textField":
-        return customTextField(header, rowIndex);
+        return customTextField(header);
       case "number":
-        return customTextField(header, rowIndex);
-      // case "date":
-      //   return customDateField;
+        return customTextField(header);
+      case "date":
+        return customDateField(header);
       case "select":
-        return customSelectField(header, rowIndex);
+        return customSelectField(header);
       default:
         return "";
     }
@@ -487,19 +493,6 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
                     onDragEnter={() => handleDragEnter(rowIndex, header)}
                     onDragEnd={handleDragEnd}
                     onDrop={() => handleDrop(rowIndex, header)}
-                    // style={{
-                    //   ...(isHighlighted
-                    //     ? {
-                    //         border: isEditing ? "" : "2px dotted black",
-                    //         position: "relative",
-                    //       }
-                    //     : {
-                    //         border: "1px solid #8080801a",
-                    //       }),
-                    //   padding: "0px", // Reduced padding
-                    //   fontSize: "0.75em", // Reduced font size if needed
-                    //   // border: "1px solid #8080801a",
-                    // }}
                     style={{
                       width: "100px",
                       maxWidth: "100px",
@@ -520,20 +513,7 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
                     }}
                   >
                     {isEditing ? (
-                      // <TextField
-                      //   style={{
-                      //     padding: "0px",
-                      //   }}
-                      //   type={
-                      //     header.headerCellType === "number" ? "number" : "text"
-                      //   }
-                      //   variant="outlined"
-                      //   value={editingValue}
-                      //   onBlur={handleBlur}
-                      //   onChange={(e) => setEditingValue(e.target.value)}
-                      //   autoFocus
-                      // />
-                      getCellType(header, rowIndex)
+                      getCellType(header)
                     ) : (
                       // customTextField(header, rowIndex)
                       <>

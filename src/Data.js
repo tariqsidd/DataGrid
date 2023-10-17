@@ -36,21 +36,21 @@ export const tableHeader = [
       additionalProperties: false,
     },
   },
-  // {
-  //   headerName: "Date",
-  //   headerFieldName: "date",
-  //   headerFieldType: "Date",
-  //   headerCellType: "date",
-  //   headerOptions: null,
-  //   headerSchema: {
-  //     type: "object",
-  //     properties: {
-  //       date: { type: "string" },
-  //     },
-  //     required: ["date"],
-  //     additionalProperties: false,
-  //   },
-  // },
+  {
+    headerName: "Date",
+    headerFieldName: "date",
+    headerFieldType: "Date",
+    headerCellType: "date",
+    headerOptions: null,
+    headerSchema: {
+      type: "object",
+      properties: {
+        date: { type: "string" },
+      },
+      required: ["date"],
+      additionalProperties: false,
+    },
+  },
   // {
   //   headerName: "Present",
   //   headerFieldName: "present",
