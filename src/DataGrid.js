@@ -205,12 +205,6 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
 
   const cellContent = (row, header, hasError, rowIndex) => (
     <>
-      {/* {header.headerCellType === "date"
-        ? // new Date(row[header.headerFieldName]).toLocaleDateString()
-          dateFns.format(new Date(row[header.headerFieldName]), "dd/MM/yyyy", {
-            locale: dateFns.enGB,
-          })
-        : row[header.headerFieldName]} */}
       {row[header.headerFieldName]}
       {hasError && (
         <div style={{ color: "red", fontSize: "0.75em" }}>
@@ -307,8 +301,16 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
             backgroundColor: "#8080801a",
           }}
           align="center"
+          onClick={() => {
+            addRow();
+          }}
         >
-          <IconButton onClick={() => {}} size="large">
+          <IconButton
+            onClick={() => {
+              // addRow();
+            }}
+            size="large"
+          >
             <AddCircleOutlineIcon style={{ color: "#000000de" }} />
           </IconButton>
         </TableCell>
@@ -328,6 +330,35 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
       </TableRow>
     );
   };
+
+  function getDefaultForType(type) {
+    switch (type) {
+      case "string":
+        return "";
+      case "Date":
+        return "";
+      case "number":
+        return null;
+      default:
+        return "";
+    }
+  }
+
+  const addRow = () => {
+    const newRow = {};
+    tableHeaders.forEach((header) => {
+      newRow[header.headerFieldName] = getDefaultForType(
+        header.headerFieldType
+      );
+    });
+    newRow["errorObj"] = {};
+    const newData = [...data];
+    newData.push(newRow);
+    console.log(newData);
+    onRowChange(newData);
+  };
+
+  console.log("Outside", data);
 
   const customTextField = (header) => {
     return (
