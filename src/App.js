@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import TableComponent from "./DataGrid";
-import { _tableHeader, tableHeader } from "./Data";
+import {_headers, _tableHeader, tableHeader} from "./Data";
 
 const Data = [
   {
@@ -9,8 +9,7 @@ const Data = [
     city: "Los Karachi",
     phoneNo: 2313453453,
     country: "PK",
-    errors: [{ cellName: "city", errorMsg: "city not allowed" }],
-    errorObj: { city: "city not allowed" },
+    errorObj: { },
   },
   {
     name: "John",
@@ -18,8 +17,7 @@ const Data = [
     city: "New York",
     phoneNo: 1234567890,
     country: "USA",
-    errors: [{ cellName: "phoneNo", errorMsg: "wrong country code" }],
-    errorObj: { phoneNo: "wrong country code" },
+    errorObj: { },
   },
   {
     name: "Jane",
@@ -27,8 +25,7 @@ const Data = [
     city: "Los Angeles",
     phoneNo: 9876543210,
     country: "USA",
-    errors: [{ cellName: "surname", errorMsg: "surname required" }],
-    errorObj: { surname: "surname required" },
+    errorObj: { },
   },
 ];
 
@@ -38,7 +35,7 @@ const App = () => {
     <div>
       <TableComponent
         data={Data}
-        tableHeaders={tableHeader}
+        tableHeaders={_headers}
         onRowChange={(data, i) => {
           console.log("data", data);
           console.log("index", i);

@@ -112,6 +112,39 @@ export const _tableHeader = [
     headerFieldType: "string",
     headerCellType: "textField",
     headerSchema: {
+      type: "string",
+      properties: {
+        name: { type: "string", minLength: 2, maxLength: 8 },
+      },
+      required: ["name"],
+      additionalProperties: false,
+    },
+  },
+  {
+    headerName: "Surname",
+    headerFieldName: "surname",
+    headerFieldType: "string",
+    headerCellType: "textField",
+    headerSchema: {
+      type: "string",
+      properties: {
+        name: { type: "string", minLength: 2, maxLength: 8 },
+      },
+      required: ["name"],
+      additionalProperties: false,
+    },
+  },
+];
+
+export const columnOrder = tableHeader.map((item) => item.headerFieldName);
+
+export const _headers = [
+  {
+    headerName: "Name",
+    headerFieldName: "name",
+    headerFieldType: "string",
+    headerCellType: "textField",
+    headerSchema: {
       type: "object",
       properties: {
         name: { type: "string", minLength: 2, maxLength: 8 },
@@ -128,54 +161,10 @@ export const _tableHeader = [
     headerSchema: {
       type: "object",
       properties: {
-        name: { type: "string", minLength: 2, maxLength: 8 },
+        surname: { type: "string", minLength: 2, maxLength: 8 },
       },
-      required: ["name"],
-      additionalProperties: false,
-    },
-  },
-  {
-    headerName: "City",
-    headerFieldName: "city",
-    headerFieldType: "string",
-    headerCellType: "textField",
-    headerSchema: {
-      type: "object",
-      properties: {
-        name: { type: "string", minLength: 2, maxLength: 8 },
-      },
-      required: ["name"],
-      additionalProperties: false,
-    },
-  },
-  {
-    headerName: "Phone Number",
-    headerFieldName: "phoneNo",
-    headerFieldType: "number",
-    headerCellType: "number",
-    headerSchema: {
-      type: "object",
-      properties: {
-        name: { type: "string", minLength: 2, maxLength: 8 },
-      },
-      required: ["name"],
-      additionalProperties: false,
-    },
-  },
-  {
-    headerName: "Country",
-    headerFieldName: "country",
-    headerFieldType: "string",
-    headerCellType: "textField",
-    headerSchema: {
-      type: "object",
-      properties: {
-        name: { type: "string", minLength: 2, maxLength: 8 },
-      },
-      required: ["name"],
+      required: ["surname"],
       additionalProperties: false,
     },
   },
 ];
-
-export const columnOrder = tableHeader.map((item) => item.headerFieldName);

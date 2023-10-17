@@ -1,25 +1,14 @@
-import React, { useState, useEffect } from "react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  TextField,
-  Paper,
-} from "@material-ui/core";
-import Autocomplete from "@material-ui/lab/Autocomplete";
+import React, {useEffect, useState} from "react";
+import {Table, TableBody, TableCell, TableHead, TableRow, TextField,} from "@material-ui/core";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
 import IconButton from "@material-ui/core/IconButton";
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
-import { CustomTextField } from "CustomCells/TextField";
 
 let Ajv = require("ajv");
 let ajv = new Ajv({ allErrors: true });
 
 const TableComponent = ({ data, tableHeaders, onRowChange }) => {
-  const [error, setError] = useState(Math.random());
   const [editingCell, setEditingCell] = useState(null);
   const [editingValue, setEditingValue] = useState("");
   const [highlightedCell, setHighlightedCell] = useState(null); // { rowIndex, fieldName }
@@ -62,7 +51,6 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
       setDraggingCell(null);
       setHighlightedCell(null);
       onRowChange(newData);
-      setError(Math.random());
       // setData(newData);
     }
   };
@@ -77,14 +65,16 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
       const newData = [...data];
       newData[editingCell.rowIndex][editingCell.fieldName] = editingValue;
 
+      // Validate the edited row data
+      newData[editingCell.rowIndex].errorObj = validateRowData(newData[editingCell.rowIndex], tableHeaders);
+
       onRowChange(newData[editingCell.rowIndex], editingCell.rowIndex);
-      setError(Math.random());
-      // setData(newData);
 
       setEditingCell(null);
       setEditingValue("");
     }
   };
+
 
   const getCellError = (rowIndex, fieldName) => {
     const rowErrorsObj = data[rowIndex].errorObj;
@@ -92,21 +82,8 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
       return rowErrorsObj[fieldName];
     }
 
-    // Earlier Working
-    // const rowErrors = data[rowIndex].errors;
-    // if (rowErrors && rowErrors.length) {
-    //   const errorObj = rowErrors.find((e) => e.cellName === fieldName);
-    //   if (errorObj) return errorObj.errorMsg;
-    // }
     return null;
   };
-
-  //Previous Work
-  // const errorCells = data.flatMap((row, rowIndex) =>
-  //   row.errors
-  //     ? row.errors.map((error) => ({ rowIndex, cellName: error.cellName }))
-  //     : []
-  // );
 
   const errorCells = data.flatMap((row, rowIndex) =>
     Object.keys(row.errorObj).map((cellName) => ({
@@ -129,10 +106,19 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
   };
 
   useEffect(() => {
+    // Validate each row of data when the component mounts
+    const newData = [...data];
+    newData.forEach((row, index) => {
+      row.errorObj = validateRowData(row, tableHeaders);
+    });
+
+    onRowChange(newData);
+
+    // If there are errors, focus on the first one
     if (errorCells.length > 0) {
       focusOnErrorCell(0);
     }
-  }, [error]);
+  }, [editingCell]);
 
   const handleNextError = (event) => {
     event.stopPropagation(); // Stop event propagation
@@ -169,17 +155,10 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
 
   const renderErrorCell = (row, header, hasError, rowIndex, isErrorFocused) => {
     return (
-      <div
-        style={{
-          backgroundColor: "#ffe6e6",
-          display: "flex",
-          flexDirection: "row",
-        }}
-      >
         <div
           style={{
             display: "flex",
-            justifyContent: "space-between",
+            justifyContent: "center",
             width: "100%",
           }}
         >
@@ -188,13 +167,19 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
               onClick={(e) => handlePrevError(e)}
               disabled={currentErrorIndex === 0}
               aria-label="previous error"
-              style={{ padding: "2px" }}
+              disableRipple
+              style={{
+                backgroundColor: "transparent", // To ensure no background appears
+                '&:hover': {
+                  backgroundColor: "transparent"  // Override hover style
+                }
+              }}
             >
-              <ArrowBackIosIcon />
+              <ArrowBackIosIcon fontSize="small" />
             </IconButton>
           )}
 
-          <span style={{ marginBottom: "2px" }}>
+          <span style={{ marginBottom: "2px"}}>
             {cellContent(row, header, hasError, rowIndex)}
           </span>
           {isErrorFocused && (
@@ -202,13 +187,18 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
               onClick={(e) => handleNextError(e)}
               disabled={currentErrorIndex === errorCells.length - 1}
               aria-label="next error"
-              style={{ padding: "2px" }}
+              disableRipple
+              style={{
+                backgroundColor: "transparent", // To ensure no background appears
+                '&:hover': {
+                  backgroundColor: "transparent"  // Override hover style
+                }
+              }}
             >
-              <ArrowForwardIosIcon />
+              <ArrowForwardIosIcon fontSize="small"/>
             </IconButton>
           )}
         </div>
-      </div>
     );
   };
 
@@ -224,7 +214,7 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
               backgroundColor: "#8080801a",
             }}
             align="center"
-          ></TableCell>
+          />
           {tableHeaders.map((header) => (
             <TableCell
               style={{
@@ -270,111 +260,102 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
               // width: "100%",
             }}
             align="center"
-          ></TableCell>
+          />
         ))}
       </TableRow>
     );
   };
 
-  const validate = (header, rowIndex) => {
-    let object = {};
-    if (editingValue.length > 0) {
-      object = { [header.headerFieldName]: editingValue };
-    }
-    let validate = ajv.compile(header.headerSchema);
-    let valid = validate(object);
-    if (!valid) {
-      const error = ajv.errorsText(validate.errors);
-      const newData = [...data];
-
-      newData[rowIndex]["errorObj"][header.headerFieldName] = error;
-      const obj = newData[rowIndex]["errorObj"];
-
-      const sortedErrorObj = Object.fromEntries(
-        columnOrder
-          .filter((key) => obj.hasOwnProperty(key)) // Filter out keys not in the object
-          .map((key) => [key, obj[key]])
-      );
-      newData[rowIndex]["errorObj"] = sortedErrorObj;
-    }
-  };
-
-  const customTextField = (header, rowIndex) => {
-    validate(header, rowIndex);
+  const customDateField = (header, rowIndex) => {
     return (
       <TextField
-        style={{
-          padding: "0px",
-        }}
-        type={header.headerCellType === "number" ? "number" : "text"}
-        // variant="outlined"
+        type="date"
         value={editingValue}
         onBlur={handleBlur}
         onChange={(e) => setEditingValue(e.target.value)}
+        InputLabelProps={{
+          shrink: true,
+        }}
         autoFocus
       />
     );
   };
 
   const customSelectField = (header, rowIndex) => {
-    validate(header, rowIndex);
     return (
-      <>
-        {/* <TextField
-          style={{
-            padding: "0px",
-          }}
-          type={header.headerCellType === "number" ? "number" : "text"}
-          variant="outlined"
-          value={editingValue}
-          onBlur={handleBlur}
-          onChange={(e) => setEditingValue(e.target.value)}
-          autoFocus
-        /> */}
-        <Autocomplete
-          style={{
-            padding: "0px",
-          }}
-          id="city"
-          options={header.headerOptions}
-          getOptionLabel={(option) => option.label || ""}
-          value={editingValue}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              margin="dense"
-              // label="City"
-              variant="outlined"
-              placeholder="All"
-            />
-          )}
-          onChange={(e) => {
-            console.log("E", e);
-            console.log(e.target.textContent);
-            setEditingValue(e.target.textContent);
-          }}
-        />
-      </>
+      <TextField
+        select
+        value={editingValue}
+        onChange={(e) => setEditingValue(e.target.value)}
+        onBlur={handleBlur}
+        variant="outlined"
+        SelectProps={{
+          native: true,
+        }}
+      >
+        {header.headerOptions.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </TextField>
     );
+  };
+
+  const customComponent = () => {
+    // Implement your custom component here
+    return <div>Custom Component</div>;
+  };
+
+  const customTextField = (header) => {
+    return(
+      <TextField
+        style={{
+          padding: "0px",
+        }}
+        type={header.headerFieldType === "number" ? "number" : "text"}
+        value={editingValue}
+        onBlur={handleBlur}
+        onChange={(e) => setEditingValue(e.target.value)}
+        autoFocus
+      />
+    )
   };
 
   const getCellType = (header, rowIndex) => {
     switch (header.headerCellType) {
       case "textField":
         return customTextField(header, rowIndex);
-      // case "date":
-      //   return customDateField;
-      // case "select":
-      //   return customSelectField(header, rowIndex);
+      case "date":
+        return customDateField(header, rowIndex);
+      case "select":
+        return customSelectField(header, rowIndex);
       default:
-        return "";
+        return customComponent();
     }
   };
+
+  const validateRowData = (rowData, headers) => {
+    const errors = {};
+    headers.forEach(header => {
+      const schema = header.headerSchema;
+      const fieldKey = header.headerFieldName;
+      const valueToValidate = { [fieldKey]: rowData[fieldKey] };
+      if (schema) {
+        const validate = ajv.compile(schema);
+        if (!validate(valueToValidate)) {
+          errors[fieldKey] = validate.errors[0].message;
+        }
+      }
+    });
+    return errors;
+  };
+
 
   return (
     <div>
       <Table stickyHeader>
-        {/* {header()} */}
+         {header()}
         <TableBody>
           {data.map((row, rowIndex) => (
             <TableRow key={rowIndex} style={{ height: "60px" }}>
@@ -420,19 +401,6 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
                     onDragEnter={() => handleDragEnter(rowIndex, header)}
                     onDragEnd={handleDragEnd}
                     onDrop={() => handleDrop(rowIndex, header)}
-                    // style={{
-                    //   ...(isHighlighted
-                    //     ? {
-                    //         border: isEditing ? "" : "2px dotted black",
-                    //         position: "relative",
-                    //       }
-                    //     : {
-                    //         border: "1px solid #8080801a",
-                    //       }),
-                    //   padding: "0px", // Reduced padding
-                    //   fontSize: "0.75em", // Reduced font size if needed
-                    //   // border: "1px solid #8080801a",
-                    // }}
                     style={{
                       width: "100px",
                       maxWidth: "100px",
@@ -452,23 +420,7 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
                         hasError || isErrorFocused ? "#ffe6e6" : "#fff",
                     }}
                   >
-                    {isEditing ? (
-                      // <TextField
-                      //   style={{
-                      //     padding: "0px",
-                      //   }}
-                      //   type={
-                      //     header.headerCellType === "number" ? "number" : "text"
-                      //   }
-                      //   variant="outlined"
-                      //   value={editingValue}
-                      //   onBlur={handleBlur}
-                      //   onChange={(e) => setEditingValue(e.target.value)}
-                      //   autoFocus
-                      // />
-                      getCellType(header, rowIndex)
-                    ) : (
-                      // customTextField(header, rowIndex)
+                    {isEditing ? getCellType(header, rowIndex) : (
                       <>
                         {hasError || isErrorFocused
                           ? renderErrorCell(
@@ -486,7 +438,7 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
               })}
             </TableRow>
           ))}
-          {/* {footer()} */}
+           {footer()}
         </TableBody>
       </Table>
     </div>
