@@ -6,7 +6,7 @@ import {
   TableHead,
   TableRow,
   TextField,
-  Paper,
+  MenuItem,
 } from "@material-ui/core";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
@@ -79,7 +79,6 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
 
       onRowChange(newData[editingCell.rowIndex], editingCell.rowIndex);
       setError(Math.random());
-      // setData(newData);
 
       setEditingCell(null);
       setEditingValue("");
@@ -276,16 +275,44 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
     );
   };
 
-  const validate = (header, rowIndex) => {
+  const validate = (header, rowIndex, value) => {
+    const newData = [...data];
+    console.log("Initial", newData);
+    //Error Obj Handling
+    // if (
+    //   newData[rowIndex]["errorObj"] &&
+    //   newData[rowIndex]["errorObj"].hasOwnProperty(header.headerFieldName)
+    // ) {
+    //   let error = JSON.parse(JSON.stringify(newData[rowIndex]["errorObj"]));
+    //   delete error[header.headerFieldName];
+    //   let obj = { ...newData[rowIndex], errorObj: error };
+    //   newData[rowIndex] = obj;
+    // }
+
+    console.log("Existing Removal", newData);
     let object = {};
-    if (editingValue.length > 0) {
+    if (value?.length > 0 || value != undefined) {
+      let editingValue = value;
+      if (header.headerCellType === "number") {
+        editingValue = parseInt(editingValue, 10);
+      }
       object = { [header.headerFieldName]: editingValue };
     }
     let validate = ajv.compile(header.headerSchema);
     let valid = validate(object);
     if (!valid) {
       const error = ajv.errorsText(validate.errors);
-      const newData = [...data];
+      // const newData = [...data];
+
+      if (
+        newData[rowIndex]["errorObj"] &&
+        newData[rowIndex]["errorObj"].hasOwnProperty(header.headerFieldName)
+      ) {
+        let error = JSON.parse(JSON.stringify(newData[rowIndex]["errorObj"]));
+        delete error[header.headerFieldName];
+        let obj = { ...newData[rowIndex], errorObj: error };
+        newData[rowIndex] = obj;
+      }
 
       newData[rowIndex]["errorObj"][header.headerFieldName] = error;
       const obj = newData[rowIndex]["errorObj"];
@@ -297,64 +324,102 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
       );
       newData[rowIndex]["errorObj"] = sortedErrorObj;
     }
+
+    console.log("Post Validation", newData);
+  };
+
+  const removeExistingError = (header, rowIndex) => {
+    const newData = [...data];
+
+    //Error Obj Handling
+    if (
+      newData[rowIndex]["errorObj"] &&
+      newData[rowIndex]["errorObj"].hasOwnProperty(header.headerFieldName)
+    ) {
+      let error = JSON.parse(JSON.stringify(newData[rowIndex]["errorObj"]));
+      delete error[header.headerFieldName];
+      let obj = { ...newData[rowIndex], errorObj: error };
+      newData[rowIndex] = obj;
+    }
   };
 
   const customTextField = (header, rowIndex) => {
-    validate(header, rowIndex);
+    // removeExistingError(header, rowIndex);
+    // validate(header, rowIndex);
     return (
       <TextField
+        margin="dense"
         style={{
+          margin: "0px",
           padding: "0px",
         }}
         type={header.headerCellType === "number" ? "number" : "text"}
-        // variant="outlined"
+        variant="outlined"
         value={editingValue}
         onBlur={handleBlur}
-        onChange={(e) => setEditingValue(e.target.value)}
-        autoFocus
+        onChange={(e) => {
+          setEditingValue(e.target.value.toString());
+          // removeExistingError(header, rowIndex);
+          validate(header, rowIndex, e.target.value.toString());
+          // const newData = [...data];
+          // console.log("Before", newData);
+          // newData[rowIndex][header.headerFieldName] = e.target.value;
+          // if (
+          //   newData[rowIndex]["errorObj"] &&
+          //   newData[rowIndex]["errorObj"].hasOwnProperty(header.headerFieldName)
+          // ) {
+          //   let error = JSON.parse(
+          //     JSON.stringify(newData[rowIndex]["errorObj"])
+          //   );
+          //   delete error[header.headerFieldName];
+          //   let obj = { ...newData[rowIndex], errorObj: error };
+          //   newData[rowIndex] = obj;
+          //   console.log("After", newData);
+          // }
+        }}
+        // autoFocus
       />
     );
   };
 
   const customSelectField = (header, rowIndex) => {
-    validate(header, rowIndex);
+    // validate(header, rowIndex);
     return (
-      <>
-        {/* <TextField
-          style={{
-            padding: "0px",
-          }}
-          type={header.headerCellType === "number" ? "number" : "text"}
-          variant="outlined"
-          value={editingValue}
-          onBlur={handleBlur}
-          onChange={(e) => setEditingValue(e.target.value)}
-          autoFocus
-        /> */}
-        <Autocomplete
-          style={{
-            padding: "0px",
-          }}
-          id="city"
-          options={header.headerOptions}
-          getOptionLabel={(option) => option.label || ""}
-          value={editingValue}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              margin="dense"
-              // label="City"
-              variant="outlined"
-              placeholder="All"
-            />
-          )}
-          onChange={(e) => {
-            console.log("E", e);
-            console.log(e.target.textContent);
-            setEditingValue(e.target.textContent);
-          }}
-        />
-      </>
+      <TextField
+        select
+        margin="dense"
+        style={{
+          margin: "0px",
+          padding: "0px",
+          width: "180px",
+        }}
+        value={editingValue}
+        onChange={(e) => {
+          setEditingValue(e.target.value);
+          const newData = [...data];
+          console.log("Before", newData);
+          newData[rowIndex][header.headerFieldName] = e.target.value;
+          if (
+            newData[rowIndex]["errorObj"] &&
+            newData[rowIndex]["errorObj"].hasOwnProperty(header.headerFieldName)
+          ) {
+            let error = JSON.parse(
+              JSON.stringify(newData[rowIndex]["errorObj"])
+            );
+            delete error[header.headerFieldName];
+            let obj = { ...newData[rowIndex], errorObj: error };
+            newData[rowIndex] = obj;
+            console.log("After", newData);
+          }
+        }}
+        variant="outlined"
+      >
+        {header.headerOptions.map((option) => (
+          <MenuItem key={option.value} value={option.value}>
+            {option.label}
+          </MenuItem>
+        ))}
+      </TextField>
     );
   };
 
@@ -362,10 +427,12 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
     switch (header.headerCellType) {
       case "textField":
         return customTextField(header, rowIndex);
+      case "number":
+        return customTextField(header, rowIndex);
       // case "date":
       //   return customDateField;
-      // case "select":
-      //   return customSelectField(header, rowIndex);
+      case "select":
+        return customSelectField(header, rowIndex);
       default:
         return "";
     }
@@ -374,7 +441,7 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
   return (
     <div>
       <Table stickyHeader>
-        {/* {header()} */}
+        {header()}
         <TableBody>
           {data.map((row, rowIndex) => (
             <TableRow key={rowIndex} style={{ height: "60px" }}>
@@ -486,7 +553,7 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
               })}
             </TableRow>
           ))}
-          {/* {footer()} */}
+          {footer()}
         </TableBody>
       </Table>
     </div>

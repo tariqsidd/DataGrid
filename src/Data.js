@@ -70,7 +70,7 @@ export const tableHeader = [
     headerName: "City",
     headerFieldName: "city",
     headerFieldType: "string",
-    headerCellType: "textField",
+    headerCellType: "select",
     headerOptions: cities,
     headerSchema: {
       type: "object",

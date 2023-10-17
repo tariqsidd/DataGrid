@@ -9,7 +9,7 @@ const Data = [
     city: "Los Karachi",
     phoneNo: 2313453453,
     country: "PK",
-    errors: [{ cellName: "city", errorMsg: "city not allowed" }],
+    // errors: [{ cellName: "city", errorMsg: "city not allowed" }],
     errorObj: { city: "city not allowed" },
   },
   {
@@ -18,7 +18,7 @@ const Data = [
     city: "New York",
     phoneNo: 1234567890,
     country: "USA",
-    errors: [{ cellName: "phoneNo", errorMsg: "wrong country code" }],
+    // errors: [{ cellName: "phoneNo", errorMsg: "wrong country code" }],
     errorObj: { phoneNo: "wrong country code" },
   },
   {
@@ -27,7 +27,7 @@ const Data = [
     city: "Los Angeles",
     phoneNo: 9876543210,
     country: "USA",
-    errors: [{ cellName: "surname", errorMsg: "surname required" }],
+    // errors: [{ cellName: "surname", errorMsg: "surname required" }],
     errorObj: { surname: "surname required" },
   },
 ];
