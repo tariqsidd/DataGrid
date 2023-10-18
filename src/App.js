@@ -6,7 +6,7 @@ const App = () => {
   return (
     <div style={{ maxWidth: "1000px" }}>
       <TableComponent
-        data={Data}
+        incomingData={Data}
         tableHeaders={tableHeader}
         onRowChange={(data, i) => {
           console.log("data", data);

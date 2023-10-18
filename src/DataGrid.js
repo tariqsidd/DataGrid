@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Table,
   TableBody,
@@ -6,7 +6,10 @@ import {
   TableHead,
   TableRow,
   TextField,
+  Menu,
   MenuItem,
+  Tooltip,
+  Button,
 } from "@material-ui/core";
 import {
   KeyboardDatePicker,
@@ -18,12 +21,14 @@ import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
 import IconButton from "@material-ui/core/IconButton";
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
+import GetAppIcon from "@material-ui/icons/GetApp";
+import { CSVLink } from "react-csv";
 
 let Ajv = require("ajv");
 let ajv = new Ajv({ allErrors: true });
 const dateFns = require("date-fns");
 
-const TableComponent = ({ data, tableHeaders, onRowChange }) => {
+const TableComponent = ({ incomingData, tableHeaders, onRowChange }) => {
   const [error, setError] = useState(Math.random());
   const [editingCell, setEditingCell] = useState(null);
   const [editingCellHeader, setEditingCellHeader] = useState(null);
@@ -33,6 +38,7 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
   const [currentErrorIndex, setCurrentErrorIndex] = useState(0);
   const [errorFocusCell, setErrorFocusCell] = useState(null);
   const columnOrder = tableHeaders.map((item) => item.headerFieldName);
+  const [data, setData] = useState(incomingData);
 
   const handleHighlight = (rowIndex, header) => {
     setHighlightedCell({ rowIndex, fieldName: header.headerFieldName });
@@ -186,6 +192,8 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
     }
   }, [error]);
 
+  useEffect(() => {}, [data]);
+
   const handleNextError = (event) => {
     event.stopPropagation(); // Stop event propagation
 
@@ -217,56 +225,58 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
   const cellContent = (row, header, hasError, rowIndex) => (
     <>
       {row[header.headerFieldName]}
-      {hasError && (
+      {/* {hasError && (
         <div style={{ color: "red", fontSize: "0.75em" }}>
           {getCellError(rowIndex, header.headerFieldName)}
         </div>
-      )}
+      )} */}
     </>
   );
 
   const renderErrorCell = (row, header, hasError, rowIndex, isErrorFocused) => {
     return (
-      <div
-        style={{
-          backgroundColor: "#ffe6e6",
-          display: "flex",
-          flexDirection: "row",
-        }}
-      >
+      <Tooltip title={getCellError(rowIndex, header.headerFieldName)} arrow>
         <div
           style={{
+            minHeight: "40px",
+            backgroundColor: "#ffe6e6",
             display: "flex",
-            justifyContent: isErrorFocused ? "space-between" : "space-around",
-            width: "100%",
+            flexDirection: "row",
           }}
         >
-          {isErrorFocused && (
-            <IconButton
-              onClick={(e) => handlePrevError(e)}
-              // disabled={currentErrorIndex === 0}
-              aria-label="previous error"
-              style={{ padding: "4px" }}
-            >
-              <ArrowBackIosIcon />
-            </IconButton>
-          )}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: isErrorFocused ? "space-between" : "space-around",
+              width: "100%",
+              alignItems: "center",
+            }}
+          >
+            {isErrorFocused && (
+              <IconButton
+                onClick={(e) => handlePrevError(e)}
+                // disabled={currentErrorIndex === 0}
+                aria-label="previous error"
+                style={{ padding: "4px" }}
+              >
+                <ArrowBackIosIcon />
+              </IconButton>
+            )}
 
-          <span style={{ marginBottom: "2px" }}>
-            {cellContent(row, header, hasError, rowIndex)}
-          </span>
-          {isErrorFocused && (
-            <IconButton
-              onClick={(e) => handleNextError(e)}
-              // disabled={currentErrorIndex === errorCells.length - 1}
-              aria-label="next error"
-              style={{ padding: "4px" }}
-            >
-              <ArrowForwardIosIcon />
-            </IconButton>
-          )}
+            <span>{cellContent(row, header, hasError, rowIndex)}</span>
+            {isErrorFocused && (
+              <IconButton
+                onClick={(e) => handleNextError(e)}
+                // disabled={currentErrorIndex === errorCells.length - 1}
+                aria-label="next error"
+                style={{ padding: "4px", margingTop: "4px" }}
+              >
+                <ArrowForwardIosIcon />
+              </IconButton>
+            )}
+          </div>
         </div>
-      </div>
+      </Tooltip>
     );
   };
 
@@ -374,7 +384,7 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
     const newData = [...data];
     newData.push(newRow);
     console.log(newData);
-    onRowChange(newData);
+    setData(newData);
   };
 
   const customTextField = (header) => {
@@ -490,13 +500,140 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
     }
   };
 
+  const prepareCSVData = (data) => {
+    const csvData = [];
+
+    // Add the header row
+    const headerRow = tableHeaders.map((header) => header.headerName);
+    csvData.push(headerRow);
+
+    // Add the data rows
+    data.forEach((row) => {
+      const rowData = tableHeaders.map((header) => row[header.headerFieldName]);
+      csvData.push(rowData);
+    });
+
+    return csvData;
+  };
+
+  const csvLinkRef = useRef();
+
+  const [contextMenuVisible, setContextMenuVisible] = useState(false);
+  const [contextMenuPosition, setContextMenuPosition] = useState({
+    top: 0,
+    left: 0,
+    rowIndex: -1,
+  });
+
+  // Function to open the context menu
+  const openContextMenu = (event, rowIndex) => {
+    event.preventDefault();
+    setContextMenuPosition({
+      top: event.clientY,
+      left: event.clientX,
+      rowIndex: rowIndex,
+    });
+    setContextMenuVisible(true);
+  };
+
+  // Function to close the context menu
+  const closeContextMenu = () => {
+    setContextMenuVisible(false);
+  };
+
+  const duplicateRow = (rowIndex) => {
+    const newData = [...data];
+    const duplicateRow = newData[rowIndex];
+    newData.push(duplicateRow);
+    setData(newData);
+    closeContextMenu();
+  };
+
+  const deleteRow = (rowIndex) => {
+    const newData = [...data];
+    newData.splice(rowIndex, 1);
+    setData(newData);
+    closeContextMenu();
+  };
+
+  // Render the context menu
+  const renderContextMenu = (
+    <div
+      style={{
+        position: "fixed",
+        top: contextMenuPosition.top,
+        left: contextMenuPosition.left,
+        background: "white",
+        border: "1px solid #ccc",
+        boxShadow: "2px 2px 5px #888888",
+        zIndex: 1000,
+      }}
+    >
+      <Menu
+        keepMounted
+        open={contextMenuVisible}
+        onClose={closeContextMenu}
+        anchorReference="anchorPosition"
+        anchorPosition={
+          contextMenuVisible
+            ? { top: contextMenuPosition.top, left: contextMenuPosition.left }
+            : undefined
+        }
+      >
+        <MenuItem
+          onClick={() => {
+            deleteRow(contextMenuPosition.rowIndex);
+          }}
+        >
+          Delete Row
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            duplicateRow(contextMenuPosition.rowIndex);
+          }}
+        >
+          Duplicate Row
+        </MenuItem>
+      </Menu>
+    </div>
+  );
+
   return (
     <div>
-      <Table stickyHeader sx={{ maxWidth: "1000px" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          padding: "8px",
+        }}
+      >
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => {
+            if (csvLinkRef.current) {
+              csvLinkRef.current.link.click();
+            }
+          }}
+          startIcon={<GetAppIcon />}
+        >
+          Export CSV
+        </Button>
+        <CSVLink
+          data={prepareCSVData(data)} // Call your data preparation function
+          filename="table-data.csv"
+          ref={csvLinkRef} // Specify the CSV file name
+        />
+      </div>
+      <Table stickyHeader>
         {header()}
         <TableBody>
           {data.map((row, rowIndex) => (
-            <TableRow key={rowIndex} style={{ height: "40px" }}>
+            <TableRow
+              key={rowIndex}
+              style={{ height: "40px" }}
+              onContextMenu={(event) => openContextMenu(event, rowIndex)}
+            >
               <TableCell
                 style={{
                   border: "1px solid #8080801a",
@@ -580,6 +717,7 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
           {footer()}
         </TableBody>
       </Table>
+      {renderContextMenu}
     </div>
   );
 };
