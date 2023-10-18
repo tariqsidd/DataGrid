@@ -39,6 +39,23 @@ const TableComponent = ({ incomingData, tableHeaders, onRowChange }) => {
   const [errorFocusCell, setErrorFocusCell] = useState(null);
   const columnOrder = tableHeaders.map((item) => item.headerFieldName);
   const [data, setData] = useState(incomingData);
+  const [tableOptions, setTableOptions] = useState({
+    addRow: false,
+    deleteRow: false,
+    duplicateRow: false,
+    tableEditing: true,
+    columnHeight: "40px",
+  });
+
+  useEffect(() => {
+    const contextMenu = tableOptions.deleteRow || tableOptions.duplicateRow;
+
+    setTableOptions({
+      ...tableOptions,
+      contextMenu: contextMenu,
+    });
+  }, []);
+  console.log(tableOptions);
 
   const handleHighlight = (rowIndex, header) => {
     setHighlightedCell({ rowIndex, fieldName: header.headerFieldName });
@@ -238,7 +255,7 @@ const TableComponent = ({ incomingData, tableHeaders, onRowChange }) => {
       <Tooltip title={getCellError(rowIndex, header.headerFieldName)} arrow>
         <div
           style={{
-            minHeight: "40px",
+            minHeight: tableOptions.columnHeight,
             backgroundColor: "#ffe6e6",
             display: "flex",
             flexDirection: "row",
@@ -283,23 +300,25 @@ const TableComponent = ({ incomingData, tableHeaders, onRowChange }) => {
   const header = () => {
     return (
       <TableHead>
-        <TableRow style={{ height: "40px" }}>
+        <TableRow style={{ height: tableOptions.columnHeight }}>
           <TableCell
             style={{
-              width: "50px",
-              maxWidth: "50px",
+              width: "30px",
+              maxWidth: "30px",
               padding: "4px", // Reduced padding
               fontSize: "0.75em", // Reduced font size if needed
               border: "1px solid #8080801a",
               backgroundColor: "#8080801a",
             }}
             align="center"
-          ></TableCell>
+          >
+            #
+          </TableCell>
           {tableHeaders.map((header) => (
             <TableCell
               style={{
-                width: "50px",
-                maxWidth: "50px",
+                width: "30px",
+                maxWidth: "30px",
                 padding: "4px", // Reduced padding
                 fontSize: "0.75em", // Reduced font size if needed
                 border: "1px solid #8080801a",
@@ -317,11 +336,11 @@ const TableComponent = ({ incomingData, tableHeaders, onRowChange }) => {
 
   const footer = () => {
     return (
-      <TableRow style={{ height: "40px" }}>
+      <TableRow style={{ height: tableOptions.columnHeight }}>
         <TableCell
           style={{
-            width: "50px",
-            maxWidth: "50px",
+            width: "30px",
+            maxWidth: "30px",
             padding: "4px",
             fontSize: "0.75em",
             border: "1px solid #8080801a",
@@ -580,20 +599,24 @@ const TableComponent = ({ incomingData, tableHeaders, onRowChange }) => {
             : undefined
         }
       >
-        <MenuItem
-          onClick={() => {
-            deleteRow(contextMenuPosition.rowIndex);
-          }}
-        >
-          Delete Row
-        </MenuItem>
-        <MenuItem
-          onClick={() => {
-            duplicateRow(contextMenuPosition.rowIndex);
-          }}
-        >
-          Duplicate Row
-        </MenuItem>
+        {tableOptions.deleteRow && (
+          <MenuItem
+            onClick={() => {
+              deleteRow(contextMenuPosition.rowIndex);
+            }}
+          >
+            Delete Row
+          </MenuItem>
+        )}
+        {tableOptions.duplicateRow && (
+          <MenuItem
+            onClick={() => {
+              duplicateRow(contextMenuPosition.rowIndex);
+            }}
+          >
+            Duplicate Row
+          </MenuItem>
+        )}
       </Menu>
     </div>
   );
@@ -631,14 +654,18 @@ const TableComponent = ({ incomingData, tableHeaders, onRowChange }) => {
           {data.map((row, rowIndex) => (
             <TableRow
               key={rowIndex}
-              style={{ height: "40px" }}
-              onContextMenu={(event) => openContextMenu(event, rowIndex)}
+              style={{ height: tableOptions.columnHeight }}
+              onContextMenu={(event) =>
+                tableOptions.contextMenu
+                  ? openContextMenu(event, rowIndex)
+                  : null
+              }
             >
               <TableCell
                 style={{
                   border: "1px solid #8080801a",
-                  width: "50px",
-                  maxWidth: "50px",
+                  width: "30px",
+                  maxWidth: "30px",
                   overflow: "hidden",
                   padding: "0px",
                   fontSize: "0.75em",
@@ -714,7 +741,7 @@ const TableComponent = ({ incomingData, tableHeaders, onRowChange }) => {
               })}
             </TableRow>
           ))}
-          {footer()}
+          {tableOptions.addRow && footer()}
         </TableBody>
       </Table>
       {renderContextMenu}
