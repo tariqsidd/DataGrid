@@ -14,7 +14,6 @@ import {
 } from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
 import "date-fns";
-// import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
 import IconButton from "@material-ui/core/IconButton";
@@ -76,7 +75,6 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
       setHighlightedCell(null);
       onRowChange(newData);
       setError(Math.random());
-      // setData(newData);
     }
   };
 
@@ -233,7 +231,7 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
         <div
           style={{
             display: "flex",
-            justifyContent: "space-between",
+            justifyContent: isErrorFocused ? "space-between" : "space-around",
             width: "100%",
           }}
         >
@@ -242,7 +240,7 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
               onClick={(e) => handlePrevError(e)}
               disabled={currentErrorIndex === 0}
               aria-label="previous error"
-              style={{ padding: "2px" }}
+              style={{ padding: "4px" }}
             >
               <ArrowBackIosIcon />
             </IconButton>
@@ -256,7 +254,7 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
               onClick={(e) => handleNextError(e)}
               disabled={currentErrorIndex === errorCells.length - 1}
               aria-label="next error"
-              style={{ padding: "2px" }}
+              style={{ padding: "4px" }}
             >
               <ArrowForwardIosIcon />
             </IconButton>
@@ -269,10 +267,12 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
   const header = () => {
     return (
       <TableHead>
-        <TableRow>
+        <TableRow style={{ height: "40px" }}>
           <TableCell
             style={{
-              padding: "8px", // Reduced padding
+              width: "50px",
+              maxWidth: "50px",
+              padding: "4px", // Reduced padding
               fontSize: "0.75em", // Reduced font size if needed
               border: "1px solid #8080801a",
               backgroundColor: "#8080801a",
@@ -282,7 +282,9 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
           {tableHeaders.map((header) => (
             <TableCell
               style={{
-                padding: "8px", // Reduced padding
+                width: "50px",
+                maxWidth: "50px",
+                padding: "4px", // Reduced padding
                 fontSize: "0.75em", // Reduced font size if needed
                 border: "1px solid #8080801a",
                 backgroundColor: "#8080801a",
@@ -299,10 +301,12 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
 
   const footer = () => {
     return (
-      <TableRow>
+      <TableRow style={{ height: "40px" }}>
         <TableCell
           style={{
-            padding: "0px",
+            width: "50px",
+            maxWidth: "50px",
+            padding: "4px",
             fontSize: "0.75em",
             border: "1px solid #8080801a",
             backgroundColor: "#8080801a",
@@ -316,16 +320,18 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
             onClick={() => {
               // addRow();
             }}
-            size="large"
+            style={{ padding: "0px" }}
           >
-            <AddCircleOutlineIcon style={{ color: "#000000de" }} />
+            <AddCircleOutlineIcon
+              style={{ color: "#000000de", height: "25px" }}
+            />
           </IconButton>
         </TableCell>
         {Array.from({ length: tableHeaders.length }, (_, index) => (
           <TableCell
             key={index} // Provide a unique key for each cell
             style={{
-              padding: "8px",
+              padding: "4px",
               fontSize: "0.75em",
               border: "1px solid #8080801a",
               backgroundColor: "#8080801a",
@@ -480,16 +486,16 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
 
   return (
     <div>
-      <Table stickyHeader>
+      <Table stickyHeader sx={{ maxWidth: "1000px" }}>
         {header()}
         <TableBody>
           {data.map((row, rowIndex) => (
-            <TableRow key={rowIndex} style={{ height: "60px" }}>
+            <TableRow key={rowIndex} style={{ height: "40px" }}>
               <TableCell
                 style={{
                   border: "1px solid #8080801a",
-                  width: "100px",
-                  height: "50px",
+                  width: "50px",
+                  maxWidth: "50px",
                   overflow: "hidden",
                   padding: "0px",
                   fontSize: "0.75em",
@@ -530,7 +536,6 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
                     style={{
                       width: "100px",
                       maxWidth: "100px",
-                      height: "50px",
                       overflow: "hidden",
                       ...(isHighlighted
                         ? {
