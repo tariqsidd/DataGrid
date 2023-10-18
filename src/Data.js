@@ -11,7 +11,6 @@ export const tableHeader = [
     headerFieldName: "name",
     headerFieldType: "string",
     headerCellType: "textField",
-    headerOptions: null,
     headerSchema: {
       type: "object",
       properties: {
@@ -26,7 +25,6 @@ export const tableHeader = [
     headerFieldName: "surname",
     headerFieldType: "string",
     headerCellType: "textField",
-    headerOptions: null,
     headerSchema: {
       type: "object",
       properties: {
@@ -41,7 +39,6 @@ export const tableHeader = [
     headerFieldName: "date",
     headerFieldType: "Date",
     headerCellType: "date",
-    headerOptions: null,
     headerSchema: {
       type: "object",
       properties: {
@@ -55,21 +52,6 @@ export const tableHeader = [
       max: "13/11/2023",
     },
   },
-  // {
-  //   headerName: "Present",
-  //   headerFieldName: "present",
-  //   headerFieldType: "boolean",
-  //   headerCellType: "checkbox",
-  //   headerOptions: null,
-  //   headerSchema: {
-  //     type: "object",
-  //     properties: {
-  //       present: { type: "boolean" },
-  //     },
-  //     required: ["present"],
-  //     additionalProperties: false,
-  //   },
-  // },
   {
     headerName: "City",
     headerFieldName: "city",
@@ -90,7 +72,6 @@ export const tableHeader = [
     headerFieldName: "phoneNo",
     headerFieldType: "number",
     headerCellType: "number",
-    // headerOptions: cities,
     headerSchema: {
       type: "object",
       properties: {
@@ -105,81 +86,108 @@ export const tableHeader = [
     headerFieldName: "country",
     headerFieldType: "string",
     headerCellType: "textField",
-    headerOptions: null,
   },
 ];
 
-export const _tableHeader = [
+// export const _tableHeader = [
+//   {
+//     headerName: "Name",
+//     headerFieldName: "name",
+//     headerFieldType: "string",
+//     headerCellType: "textField",
+//     headerSchema: {
+//       type: "object",
+//       properties: {
+//         name: { type: "string", minLength: 2, maxLength: 8 },
+//       },
+//       required: ["name"],
+//       additionalProperties: false,
+//     },
+//   },
+//   {
+//     headerName: "Surname",
+//     headerFieldName: "surname",
+//     headerFieldType: "string",
+//     headerCellType: "textField",
+//     headerSchema: {
+//       type: "object",
+//       properties: {
+//         name: { type: "string", minLength: 2, maxLength: 8 },
+//       },
+//       required: ["name"],
+//       additionalProperties: false,
+//     },
+//   },
+//   {
+//     headerName: "City",
+//     headerFieldName: "city",
+//     headerFieldType: "string",
+//     headerCellType: "textField",
+//     headerSchema: {
+//       type: "object",
+//       properties: {
+//         name: { type: "string", minLength: 2, maxLength: 8 },
+//       },
+//       required: ["name"],
+//       additionalProperties: false,
+//     },
+//   },
+//   {
+//     headerName: "Phone Number",
+//     headerFieldName: "phoneNo",
+//     headerFieldType: "number",
+//     headerCellType: "number",
+//     headerSchema: {
+//       type: "object",
+//       properties: {
+//         name: { type: "string", minLength: 2, maxLength: 8 },
+//       },
+//       required: ["name"],
+//       additionalProperties: false,
+//     },
+//   },
+//   {
+//     headerName: "Country",
+//     headerFieldName: "country",
+//     headerFieldType: "string",
+//     headerCellType: "textField",
+//     headerSchema: {
+//       type: "object",
+//       properties: {
+//         name: { type: "string", minLength: 2, maxLength: 8 },
+//       },
+//       required: ["name"],
+//       additionalProperties: false,
+//     },
+//   },
+// ];
+
+export const Data = [
   {
-    headerName: "Name",
-    headerFieldName: "name",
-    headerFieldType: "string",
-    headerCellType: "textField",
-    headerSchema: {
-      type: "object",
-      properties: {
-        name: { type: "string", minLength: 2, maxLength: 8 },
-      },
-      required: ["name"],
-      additionalProperties: false,
-    },
+    name: "Jamil",
+    surname: "Smith",
+    date: "17/10/2023",
+    city: "Los Karachi",
+    phoneNo: 2313453453,
+    country: "PK",
+    errorObj: { city: "city not allowed" },
   },
   {
-    headerName: "Surname",
-    headerFieldName: "surname",
-    headerFieldType: "string",
-    headerCellType: "textField",
-    headerSchema: {
-      type: "object",
-      properties: {
-        name: { type: "string", minLength: 2, maxLength: 8 },
-      },
-      required: ["name"],
-      additionalProperties: false,
-    },
+    name: "John",
+    surname: "Doe",
+    date: "18/10/2023",
+    city: "New York",
+    phoneNo: 1234567890,
+    country: "USA",
+    errorObj: { phoneNo: "wrong country code" },
   },
   {
-    headerName: "City",
-    headerFieldName: "city",
-    headerFieldType: "string",
-    headerCellType: "textField",
-    headerSchema: {
-      type: "object",
-      properties: {
-        name: { type: "string", minLength: 2, maxLength: 8 },
-      },
-      required: ["name"],
-      additionalProperties: false,
-    },
-  },
-  {
-    headerName: "Phone Number",
-    headerFieldName: "phoneNo",
-    headerFieldType: "number",
-    headerCellType: "number",
-    headerSchema: {
-      type: "object",
-      properties: {
-        name: { type: "string", minLength: 2, maxLength: 8 },
-      },
-      required: ["name"],
-      additionalProperties: false,
-    },
-  },
-  {
-    headerName: "Country",
-    headerFieldName: "country",
-    headerFieldType: "string",
-    headerCellType: "textField",
-    headerSchema: {
-      type: "object",
-      properties: {
-        name: { type: "string", minLength: 2, maxLength: 8 },
-      },
-      required: ["name"],
-      additionalProperties: false,
-    },
+    name: "Jane",
+    surname: "",
+    date: "19/10/2023",
+    city: "Los Angeles",
+    phoneNo: 9876543210,
+    country: "USA",
+    errorObj: { surname: "surname required" },
   },
 ];
-
-export const columnOrder = tableHeader.map((item) => item.headerFieldName);

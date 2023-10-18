@@ -192,6 +192,9 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
     if (currentErrorIndex < errorCells.length - 1) {
       setCurrentErrorIndex((prev) => prev + 1);
       focusOnErrorCell(currentErrorIndex + 1);
+    } else {
+      setCurrentErrorIndex(0);
+      focusOnErrorCell(0);
     }
   };
 
@@ -201,6 +204,9 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
     if (currentErrorIndex > 0) {
       setCurrentErrorIndex((prev) => prev - 1);
       focusOnErrorCell(currentErrorIndex - 1);
+    } else {
+      setCurrentErrorIndex(errorCells.length - 1);
+      focusOnErrorCell(errorCells.length - 1);
     }
   };
 
@@ -238,7 +244,7 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
           {isErrorFocused && (
             <IconButton
               onClick={(e) => handlePrevError(e)}
-              disabled={currentErrorIndex === 0}
+              // disabled={currentErrorIndex === 0}
               aria-label="previous error"
               style={{ padding: "4px" }}
             >
@@ -252,7 +258,7 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
           {isErrorFocused && (
             <IconButton
               onClick={(e) => handleNextError(e)}
-              disabled={currentErrorIndex === errorCells.length - 1}
+              // disabled={currentErrorIndex === errorCells.length - 1}
               aria-label="next error"
               style={{ padding: "4px" }}
             >
@@ -444,7 +450,7 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
           onClose={() => {
             handleBlur();
           }}
-          onBlur={handleBlur}
+          // onBlur={handleBlur}
           minDate={
             header.headerDateProperties && header.headerDateProperties.min
               ? dateFns.parse(
@@ -463,7 +469,7 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
                 )
               : undefined
           }
-          //inputProps={{ readOnly: true }}
+          inputProps={{ readOnly: true }}
         />
       </MuiPickersUtilsProvider>
     );
