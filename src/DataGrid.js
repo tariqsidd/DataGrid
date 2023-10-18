@@ -181,7 +181,6 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
 
   useEffect(() => {
     if (errorCells.length > 0) {
-      console.log(errorCells);
       focusOnErrorCell(0);
     } else {
       setErrorFocusCell(null);
@@ -371,20 +370,13 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
       <TextField
         margin="dense"
         style={{
-          margin: "0px",
-          padding: "0px",
+          width: "90%",
         }}
         type={header.headerCellType === "number" ? "number" : "text"}
         variant="outlined"
         value={editingValue}
         onBlur={handleBlur}
         onChange={(e) => {
-          // e.target.value.length < 0
-          //   ? setEditingValue(e.target.value.toString())
-          //   : header.headerCellType === "number"
-          //   ? setEditingValue(parseInt(e.target.value, 10))
-          //   : setEditingValue(e.target.value.toString());
-
           header.headerCellType === "number"
             ? e.target.value.length > 0
               ? setEditingValue(parseInt(e.target.value, 10))
@@ -402,9 +394,7 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
         select
         margin="dense"
         style={{
-          margin: "0px",
-          padding: "0px",
-          width: "180px",
+          width: "90%",
         }}
         value={editingValue}
         onBlur={handleBlur}
@@ -426,25 +416,10 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
     return (
       <MuiPickersUtilsProvider utils={DateFnsUtils}>
         <KeyboardDatePicker
-          minDate={
-            header.headerDateProperties && header.headerDateProperties.min
-              ? dateFns.parse(
-                  header.headerDateProperties.min,
-                  "dd/MM/yyyy",
-                  new Date()
-                )
-              : undefined
-          }
-          maxDate={
-            header.headerDateProperties && header.headerDateProperties.max
-              ? dateFns.parse(
-                  header.headerDateProperties.max,
-                  "dd/MM/yyyy",
-                  new Date()
-                )
-              : undefined
-          }
-          disableToolbar
+          margin="dense"
+          style={{
+            width: "90%",
+          }}
           error={false}
           helperText={null}
           variant="inline"
@@ -464,6 +439,24 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
             handleBlur();
           }}
           onBlur={handleBlur}
+          minDate={
+            header.headerDateProperties && header.headerDateProperties.min
+              ? dateFns.parse(
+                  header.headerDateProperties.min,
+                  "dd/MM/yyyy",
+                  new Date()
+                )
+              : undefined
+          }
+          maxDate={
+            header.headerDateProperties && header.headerDateProperties.max
+              ? dateFns.parse(
+                  header.headerDateProperties.max,
+                  "dd/MM/yyyy",
+                  new Date()
+                )
+              : undefined
+          }
           //inputProps={{ readOnly: true }}
         />
       </MuiPickersUtilsProvider>
@@ -556,7 +549,6 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
                     {isEditing ? (
                       getCellType(header)
                     ) : (
-                      // customTextField(header, rowIndex)
                       <>
                         {hasError || isErrorFocused
                           ? renderErrorCell(
