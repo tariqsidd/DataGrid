@@ -118,8 +118,15 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
         errors[fieldKey] = validate.errors[0].message;
       }
     }
-    // console.log(" Errors After Validation", errors);
-    return errors;
+
+    //Sorting Error
+    const sortedError = Object.fromEntries(
+      columnOrder
+        .filter((key) => errors.hasOwnProperty(key)) // Filter out keys not in the object
+        .map((key) => [key, errors[key]])
+    );
+
+    return sortedError;
   };
 
   const handleBlur = () => {
@@ -174,6 +181,7 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
 
   useEffect(() => {
     if (errorCells.length > 0) {
+      console.log(errorCells);
       focusOnErrorCell(0);
     } else {
       setErrorFocusCell(null);
@@ -358,8 +366,6 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
     onRowChange(newData);
   };
 
-  console.log("Outside", data);
-
   const customTextField = (header) => {
     return (
       <TextField
@@ -418,45 +424,49 @@ const TableComponent = ({ data, tableHeaders, onRowChange }) => {
 
   const customDateField = (header) => {
     return (
-      // <MuiPickersUtilsProvider utils={DateFnsUtils}>
-      //   <KeyboardDatePicker
-      //     disableToolbar
-      //     variant="inline"
-      //     format="dd/MM/yyyy"
-      //     inputVariant="outlined"
-      //     // value={new Date(editingValue)}
-      //     value={dateFns.parse(editingValue, "dd/MM/yyyy", new Date())}
-      //     onChange={(date) => {
-      //       // console.log(date);
-      //       // console.log(typeof date);
-      //       // console.log(new Date(new Date(date)).toISOString());
-      //       const utcDate = new Date(new Date(date)).toISOString();
-      //       setEditingValue(utcDate);
-      //     }}
-      //     autoFocus
-      //     // onBlur={handleBlur}
-      //   />
-      // </MuiPickersUtilsProvider>
-      <TextField
-        type="date"
-        // value="2017-05-24"
-        value="24/05/2018"
-        format="dd/mm/yyyy"
-        // value={dateFns.parse(editingValue, "dd-MM-yyyy", new Date())}
-        InputLabelProps={{
-          shrink: true,
-        }}
-        onChange={(event, date) => {
-          console.log(event);
-          console.log(event.target.value);
-          // console.log(typeof date);
-          // console.log(new Date(new Date(date)).toISOString());
-          // const utcDate = new Date(new Date(date)).toISOString();
-          setEditingValue(event.target.value);
-        }}
-        variant="outlined"
-        onBlur={handleBlur}
-      />
+      <MuiPickersUtilsProvider utils={DateFnsUtils}>
+        <KeyboardDatePicker
+          minDate={
+            header.headerDateProperties && header.headerDateProperties.min
+              ? dateFns.parse(
+                  header.headerDateProperties.min,
+                  "dd/MM/yyyy",
+                  new Date()
+                )
+              : undefined
+          }
+          maxDate={
+            header.headerDateProperties && header.headerDateProperties.max
+              ? dateFns.parse(
+                  header.headerDateProperties.max,
+                  "dd/MM/yyyy",
+                  new Date()
+                )
+              : undefined
+          }
+          disableToolbar
+          error={false}
+          helperText={null}
+          variant="inline"
+          format="dd/MM/yyyy"
+          inputVariant="outlined"
+          value={dateFns.parse(editingValue, "dd/MM/yyyy", new Date())}
+          onChange={(date) => {
+            const dateValid = dateFns.isValid(date);
+            if (dateValid) {
+              const formattedDate = dateFns.format(date, "dd/MM/yyyy");
+              setEditingValue(formattedDate);
+            } else {
+              setEditingValue("");
+            }
+          }}
+          onClose={() => {
+            handleBlur();
+          }}
+          onBlur={handleBlur}
+          //inputProps={{ readOnly: true }}
+        />
+      </MuiPickersUtilsProvider>
     );
   };
 

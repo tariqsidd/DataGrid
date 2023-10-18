@@ -50,6 +50,10 @@ export const tableHeader = [
       required: ["date"],
       additionalProperties: false,
     },
+    headerDateProperties: {
+      min: "10/10/2023",
+      max: "13/11/2023",
+    },
   },
   // {
   //   headerName: "Present",
