@@ -1,11 +1,11 @@
-import React, { useState } from "react";
-import TableComponent from "./DataGrid";
+import React from "react";
 import { tableHeader, Data } from "./Data";
+import DataGrid from "./DataGrid/DataGrid";
 
 const App = () => {
   return (
     <div style={{ maxWidth: "1000px" }}>
-      <TableComponent
+      <DataGrid
         incomingData={Data}
         tableHeaders={tableHeader}
         onRowChange={(data, i) => {
