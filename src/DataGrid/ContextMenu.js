@@ -2,8 +2,7 @@ import {Menu, MenuItem} from "@material-ui/core";
 
 const ContextMenu = ({
                        tableOptions = {},
-                       setData = () => {
-                       },
+                       setData = () => {},
                        data = [],
                        contextMenuVisible,
                        contextMenuPosition,

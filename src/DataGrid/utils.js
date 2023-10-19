@@ -98,16 +98,13 @@ export const addNewRow = (tableHeaders, data)=>{
 
 export const  prepareCSVData = (data, tableHeaders)=>{
   const csvData = [];
-
   // Add the header row
   const headerRow = tableHeaders.map((header) => header.headerName);
   csvData.push(headerRow);
-
   // Add the data rows
   data.forEach((row) => {
     const rowData = tableHeaders.map((header) => row[header.headerFieldName]);
     csvData.push(rowData);
   });
-
   return csvData;
 };

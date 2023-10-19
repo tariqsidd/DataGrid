@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useRef, useState, useCallback} from "react";
 import {
   Button,
   Table,
@@ -28,7 +28,6 @@ let ajv = new Ajv({allErrors: true});
 
 const DataGrid = ({incomingData, tableHeaders, onRowChange}) => {
   const csvLinkRef = useRef();
-  const [error, setError] = useState(Math.random());
   const [editingCell, setEditingCell] = useState(null);
   const [editingCellHeader, setEditingCellHeader] = useState(null);
   const [editingValue, setEditingValue] = useState("");
@@ -52,13 +51,14 @@ const DataGrid = ({incomingData, tableHeaders, onRowChange}) => {
     });
   }, []);
 
-  const handleHighlight = (rowIndex, header) => {
-    setHighlightedCell({rowIndex, fieldName: header.headerFieldName});
-  };
 
-  const handleDragStart = (rowIndex, header) => {
+  const handleHighlight = useCallback((rowIndex, header) => {
+    setHighlightedCell({rowIndex, fieldName: header.headerFieldName});
+  }, []);
+
+  const handleDragStart = useCallback((rowIndex, header) => {
     setDraggingCell({rowIndex, fieldName: header.headerFieldName});
-  };
+  }, []);
 
   const handleDragOver = (e) => {
     e.preventDefault();
@@ -77,22 +77,21 @@ const DataGrid = ({incomingData, tableHeaders, onRowChange}) => {
 
   const handleDrop = (targetRowIndex, header) => {
     if (draggingCell && draggingCell.fieldName === header.headerFieldName) {
-      const newData = [...data];
-      for (let i = draggingCell.rowIndex; i <= targetRowIndex; i++) {
-        newData[i][header.headerFieldName] =
-          data[draggingCell.rowIndex][header.headerFieldName];
-        // Validate the edited row data cell
-        newData[i].errorObj = validateRowData(
-          draggingCell.fieldName,
-          newData[i],
-          header
-        );
-      }
+      const valueToSet = data[draggingCell.rowIndex][header.headerFieldName];
+      const newData = data.map((row, index) => {
+        if (index >= draggingCell.rowIndex && index <= targetRowIndex) {
+          const updatedRow = { ...row };
+          updatedRow[header.headerFieldName] = valueToSet;
+          updatedRow.errorObj = validateRowData(draggingCell.fieldName, updatedRow, header);
+          return updatedRow;
+        }
+        return row;
+      });
 
       setDraggingCell(null);
       setHighlightedCell(null);
+      setData(newData);
       onRowChange(newData);
-      setError(Math.random());
     }
   };
 
@@ -146,7 +145,6 @@ const DataGrid = ({incomingData, tableHeaders, onRowChange}) => {
       );
 
       onRowChange(newData[editingCell.rowIndex], editingCell.rowIndex);
-      setError(Math.random());
 
       setEditingCell(null);
       setEditingCellHeader(null);
@@ -175,10 +173,7 @@ const DataGrid = ({incomingData, tableHeaders, onRowChange}) => {
       setErrorFocusCell(null);
       setHighlightedCell(null);
     }
-  }, [error]);
-
-  useEffect(() => {
-  }, [data]);
+  }, [editingCell]);
 
   const handleNextError = (event) => {
     event.stopPropagation(); // Stop event propagation

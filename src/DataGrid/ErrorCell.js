@@ -5,6 +5,7 @@ import {DataGridOptions as tableOptions} from "./Constants";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
 import IconButton from "@material-ui/core/IconButton";
+
 const ErrorCell = ({data=[], row, header, hasError, rowIndex, isErrorFocused, handlePrevError=()=>{}, handleNextError=()=>{}})=>{
   return(
     <Tooltip title={getCellError(rowIndex, header.headerFieldName, data)} arrow>
@@ -41,7 +42,7 @@ const ErrorCell = ({data=[], row, header, hasError, rowIndex, isErrorFocused, ha
               onClick={handleNextError}
               // disabled={currentErrorIndex === errorCells.length - 1}
               aria-label="next error"
-              style={{padding: "4px", margingTop: "4px"}}
+              style={{padding: "4px", marginTop: "4px"}}
             >
               <ArrowForwardIosIcon/>
             </IconButton>
