@@ -1,12 +1,6 @@
 import { TextField } from "@material-ui/core";
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-
-const useStyles = makeStyles((theme) => ({
-  textField: {
-    width: "90%",
-  },
-}));
+import { commonStyles } from "./styles";
 
 const GridTextField = ({
   header,
@@ -14,7 +8,7 @@ const GridTextField = ({
   handleBlur,
   setEditingValue,
 }) => {
-  const classes = useStyles();
+  const classes = commonStyles();
   return (
     <TextField
       autoFocus

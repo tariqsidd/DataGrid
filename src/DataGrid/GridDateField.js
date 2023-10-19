@@ -4,22 +4,7 @@ import {
 } from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-
-const useStyles = makeStyles((theme) => ({
-  dateField: {
-    width: "90%",
-    "& .MuiIconButton-root": {
-      padding: 0,
-    },
-    "& .MuiOutlinedInput-adornedEnd": {
-      paddingRight: 8,
-    },
-    "& .MuiInputAdornment-positionEnd": {
-      marginLeft: 8,
-    },
-  },
-}));
+import { commonStyles } from "./styles";
 
 const dateFns = require("date-fns");
 const GridDateField = ({
@@ -28,7 +13,7 @@ const GridDateField = ({
   setEditingValue,
   handleBlur,
 }) => {
-  const classes = useStyles();
+  const classes = commonStyles();
   return (
     <MuiPickersUtilsProvider utils={DateFnsUtils}>
       <KeyboardDatePicker

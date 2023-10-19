@@ -1,40 +1,30 @@
-import {TableCell, TableRow} from "@material-ui/core";
-import IconButton from "@material-ui/core/IconButton";
-import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
 import React from "react";
+import { TableCell, TableRow, IconButton } from "@material-ui/core";
+import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
+import { commonStyles } from "./styles";
 
-const GridFooter = ({tableOptions={}, tableHeaders=[], addRow=()=>{}}) => {
+const GridFooter = ({
+  tableOptions = {},
+  tableHeaders = [],
+  addRow = () => {},
+}) => {
+  const classes = commonStyles();
+
   return (
     <TableRow style={{ height: tableOptions.columnHeight }}>
       <TableCell
-        style={{
-          width: "30px",
-          maxWidth: "30px",
-          padding: "4px",
-          fontSize: "0.75em",
-          border: "1px solid #8080801a",
-          backgroundColor: "#8080801a",
-        }}
+        className={classes.highlightedSmallCell}
         align="center"
-        onClick={addRow}>
-        <IconButton
-          style={{ padding: "0px" }}
-        >
-          <AddCircleOutlineIcon
-            style={{ color: "#000000de", height: "25px" }}
-          />
+        onClick={addRow}
+      >
+        <IconButton style={{ padding: "0px" }}>
+          <AddCircleOutlineIcon className={classes.footerAddIcon} />
         </IconButton>
       </TableCell>
       {Array.from({ length: tableHeaders.length }, (_, index) => (
         <TableCell
-          key={index} // Provide a unique key for each cell
-          style={{
-            padding: "4px",
-            fontSize: "0.75em",
-            border: "1px solid #8080801a",
-            backgroundColor: "#8080801a",
-            // width: "100%",
-          }}
+          key={index}
+          className={classes.highlightedCell}
           align="center"
         />
       ))}
@@ -42,4 +32,4 @@ const GridFooter = ({tableOptions={}, tableHeaders=[], addRow=()=>{}}) => {
   );
 };
 
-export default GridFooter
+export default GridFooter;

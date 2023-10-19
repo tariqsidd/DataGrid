@@ -22,6 +22,8 @@ import {
 } from "./utils";
 import ContextMenu from "./ContextMenu";
 import ErrorCell from "./ErrorCell";
+import { Menu, MenuItem } from "@material-ui/core";
+import { commonStyles } from "./styles";
 
 let Ajv = require("ajv");
 let ajv = new Ajv({ allErrors: true });
@@ -221,6 +223,7 @@ const DataGrid = ({ incomingData, tableHeaders }) => {
     setContextMenuVisible(false);
   };
 
+  const classes = commonStyles();
   return (
     <div>
       <div
@@ -261,17 +264,7 @@ const DataGrid = ({ incomingData, tableHeaders }) => {
                   : null
               }
             >
-              <TableCell
-                style={{
-                  border: "1px solid #8080801a",
-                  width: "30px",
-                  maxWidth: "30px",
-                  overflow: "hidden",
-                  padding: "0px",
-                  fontSize: "0.75em",
-                }}
-                align="center"
-              >
+              <TableCell className={classes.smallCell} align="center">
                 {rowIndex}
               </TableCell>
               {tableHeaders.map((header) => {

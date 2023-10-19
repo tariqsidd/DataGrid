@@ -1,34 +1,18 @@
-import {TableCell, TableHead, TableRow} from "@material-ui/core";
+import { TableCell, TableHead, TableRow } from "@material-ui/core";
 import React from "react";
+import { commonStyles } from "./styles";
 
-const GridHeader = ({tableOptions={}, tableHeaders=[]}) => {
+const GridHeader = ({ tableOptions = {}, tableHeaders = [] }) => {
+  const classes = commonStyles();
+
   return (
     <TableHead>
       <TableRow style={{ height: tableOptions.columnHeight }}>
-        <TableCell
-          style={{
-            width: "30px",
-            maxWidth: "30px",
-            padding: "4px", // Reduced padding
-            fontSize: "0.75em", // Reduced font size if needed
-            border: "1px solid #8080801a",
-            backgroundColor: "#8080801a",
-          }}
-          align="center">
+        <TableCell className={classes.highlightedSmallCell} align="center">
           #
         </TableCell>
         {tableHeaders.map((header) => (
-          <TableCell
-            style={{
-              width: "30px",
-              maxWidth: "30px",
-              padding: "4px", // Reduced padding
-              fontSize: "0.75em", // Reduced font size if needed
-              border: "1px solid #8080801a",
-              backgroundColor: "#8080801a",
-            }}
-            align="center"
-          >
+          <TableCell className={classes.highlightedCell} align="center">
             {header.headerName}
           </TableCell>
         ))}
@@ -36,4 +20,4 @@ const GridHeader = ({tableOptions={}, tableHeaders=[]}) => {
     </TableHead>
   );
 };
-export default GridHeader
+export default GridHeader;

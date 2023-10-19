@@ -1,15 +1,5 @@
 import { Menu, MenuItem } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
-
-const useStyles = makeStyles((theme) => ({
-  contextMenu: {
-    position: "fixed",
-    background: "white",
-    border: "1px solid #ccc",
-    boxShadow: "2px 2px 5px #888888",
-    zIndex: 1000,
-  },
-}));
+import { commonStyles } from "./styles";
 
 const ContextMenu = ({
   tableOptions = {},
@@ -19,7 +9,7 @@ const ContextMenu = ({
   contextMenuPosition,
   closeContextMenu,
 }) => {
-  const classes = useStyles();
+  const classes = commonStyles();
 
   const duplicateRow = (rowIndex) => {
     const newData = [...data];

@@ -1,15 +1,9 @@
 import { MenuItem, TextField } from "@material-ui/core";
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-
-const useStyles = makeStyles((theme) => ({
-  selectField: {
-    width: "90%",
-  },
-}));
+import { commonStyles } from "./styles";
 
 const GridSelect = ({ header, editingValue, handleBlur, setEditingValue }) => {
-  const classes = useStyles();
+  const classes = commonStyles();
   return (
     <TextField
       select
