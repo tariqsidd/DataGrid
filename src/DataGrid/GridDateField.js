@@ -7,7 +7,7 @@ import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({
-  root: {
+  dateField: {
     width: "90%",
     "& .MuiIconButton-root": {
       padding: 0,
@@ -32,7 +32,7 @@ const GridDateField = ({
   return (
     <MuiPickersUtilsProvider utils={DateFnsUtils}>
       <KeyboardDatePicker
-        className={classes.root}
+        className={classes.dateField}
         margin="dense"
         error={false}
         helperText={null}
