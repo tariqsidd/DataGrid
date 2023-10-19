@@ -1,6 +1,6 @@
 import { cellContent, getCellError } from "./utils";
 import { Tooltip, IconButton } from "@material-ui/core";
-import React from "react";
+import React, { useEffect } from "react";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
 import { commonStyles } from "./styles";
@@ -12,9 +12,58 @@ const ErrorCell = ({
   hasError,
   rowIndex,
   isErrorFocused,
-  handlePrevError = () => {},
-  handleNextError = () => {},
+  errorCells,
+  currentErrorIndex,
+  setCurrentErrorIndex,
+  setErrorFocusCell,
+  setHighlightedCell,
 }) => {
+  const focusOnErrorCell = (index) => {
+    if (errorCells[index]) {
+      setErrorFocusCell({
+        rowIndex: errorCells[index].rowIndex,
+        fieldName: errorCells[index].cellName,
+      });
+      setHighlightedCell({
+        rowIndex: errorCells[index].rowIndex,
+        fieldName: errorCells[index].cellName,
+      });
+    }
+  };
+
+  const handleNextError = (event) => {
+    event.stopPropagation(); // Stop event propagation
+
+    if (currentErrorIndex < errorCells.length - 1) {
+      setCurrentErrorIndex((prev) => prev + 1);
+      focusOnErrorCell(currentErrorIndex + 1);
+    } else {
+      setCurrentErrorIndex(0);
+      focusOnErrorCell(0);
+    }
+  };
+
+  const handlePrevError = (event) => {
+    event.stopPropagation(); // Stop event propagation
+
+    if (currentErrorIndex > 0) {
+      setCurrentErrorIndex((prev) => prev - 1);
+      focusOnErrorCell(currentErrorIndex - 1);
+    } else {
+      setCurrentErrorIndex(errorCells.length - 1);
+      focusOnErrorCell(errorCells.length - 1);
+    }
+  };
+
+  useEffect(() => {
+    if (errorCells.length > 0) {
+      focusOnErrorCell(0);
+    } else {
+      setErrorFocusCell(null);
+      setHighlightedCell(null);
+    }
+  }, []);
+
   const classes = commonStyles();
 
   return (
@@ -37,7 +86,9 @@ const ErrorCell = ({
             </IconButton>
           )}
 
-          <span>{cellContent(row, header, hasError, rowIndex)}</span>
+          <span className={classes.cellValue}>
+            {cellContent(row, header, hasError, rowIndex)}
+          </span>
           {isErrorFocused && (
             <IconButton
               onClick={handleNextError}

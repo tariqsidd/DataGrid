@@ -24,7 +24,7 @@ const DataGrid = ({ incomingData, tableHeaders }) => {
   const [editingCell, setEditingCell] = useState(null);
   const [editingCellHeader, setEditingCellHeader] = useState(null);
   const [editingValue, setEditingValue] = useState("");
-  const [highlightedCell, setHighlightedCell] = useState(null); // { rowIndex, fieldName }
+  const [highlightedCell, setHighlightedCell] = useState(null);
   const [draggingCell, setDraggingCell] = useState(null);
   const [currentErrorIndex, setCurrentErrorIndex] = useState(0);
   const [errorFocusCell, setErrorFocusCell] = useState(null);
@@ -151,52 +151,6 @@ const DataGrid = ({ incomingData, tableHeaders }) => {
     }
   };
 
-  const focusOnErrorCell = (index) => {
-    if (errorCells[index]) {
-      setErrorFocusCell({
-        rowIndex: errorCells[index].rowIndex,
-        fieldName: errorCells[index].cellName,
-      });
-      setHighlightedCell({
-        rowIndex: errorCells[index].rowIndex,
-        fieldName: errorCells[index].cellName,
-      });
-    }
-  };
-
-  useEffect(() => {
-    if (errorCells.length > 0) {
-      focusOnErrorCell(0);
-    } else {
-      setErrorFocusCell(null);
-      setHighlightedCell(null);
-    }
-  }, [editingCell]);
-
-  const handleNextError = (event) => {
-    event.stopPropagation(); // Stop event propagation
-
-    if (currentErrorIndex < errorCells.length - 1) {
-      setCurrentErrorIndex((prev) => prev + 1);
-      focusOnErrorCell(currentErrorIndex + 1);
-    } else {
-      setCurrentErrorIndex(0);
-      focusOnErrorCell(0);
-    }
-  };
-
-  const handlePrevError = (event) => {
-    event.stopPropagation(); // Stop event propagation
-
-    if (currentErrorIndex > 0) {
-      setCurrentErrorIndex((prev) => prev - 1);
-      focusOnErrorCell(currentErrorIndex - 1);
-    } else {
-      setCurrentErrorIndex(errorCells.length - 1);
-      focusOnErrorCell(errorCells.length - 1);
-    }
-  };
-
   // Function to open the context menu
   const openContextMenu = (event, rowIndex) => {
     event.preventDefault();
@@ -301,8 +255,11 @@ const DataGrid = ({ incomingData, tableHeaders }) => {
                             hasError={hasError}
                             rowIndex={rowIndex}
                             isErrorFocused={isErrorFocused}
-                            handlePrevError={handlePrevError}
-                            handleNextError={handleNextError}
+                            errorCells={errorCells}
+                            currentErrorIndex={currentErrorIndex}
+                            setCurrentErrorIndex={setCurrentErrorIndex}
+                            setErrorFocusCell={setErrorFocusCell}
+                            setHighlightedCell={setHighlightedCell}
                           />
                         ) : (
                           cellContent(row, header, hasError, rowIndex)

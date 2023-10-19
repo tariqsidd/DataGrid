@@ -80,4 +80,8 @@ export const commonStyles = makeStyles((theme) => ({
     paddingTop: "16px",
     paddingBottom: "16px",
   },
+  cellValue: {
+    overflow: "hidden",
+    maxWidth: "80%",
+  },
 }));
