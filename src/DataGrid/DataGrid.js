@@ -13,7 +13,6 @@ import {
 } from "./utils";
 import ContextMenu from "./ContextMenu";
 import ErrorCell from "./ErrorCell";
-import { Menu, MenuItem } from "@material-ui/core";
 import { commonStyles } from "./styles";
 import ExportCSVButton from "./ExportCSVButton";
 
@@ -37,8 +36,7 @@ const DataGrid = ({ incomingData, tableHeaders }) => {
     left: 0,
     rowIndex: -1,
   });
-  const errorCells = errorIdentifier(data);
-
+  const errorCells = tableOptions.showErrors ? errorIdentifier(data) : [];
   useEffect(() => {
     const contextMenu = tableOptions.deleteRow || tableOptions.duplicateRow;
 
@@ -235,11 +233,9 @@ const DataGrid = ({ incomingData, tableHeaders }) => {
                 {rowIndex}
               </TableCell>
               {tableHeaders.map((header) => {
-                const hasError = cellHasError(
-                  rowIndex,
-                  header.headerFieldName,
-                  data
-                );
+                const hasError = tableOptions.showErrors
+                  ? cellHasError(rowIndex, header.headerFieldName, data)
+                  : false;
                 const isHighlighted =
                   highlightedCell &&
                   highlightedCell.rowIndex === rowIndex &&
@@ -285,7 +281,7 @@ const DataGrid = ({ incomingData, tableHeaders }) => {
                         hasError || isErrorFocused ? "#ffe6e6" : "#fff",
                     }}
                   >
-                    {isEditing ? (
+                    {tableOptions.editing && isEditing ? (
                       getCellType(
                         header,
                         editingValue,
@@ -294,7 +290,8 @@ const DataGrid = ({ incomingData, tableHeaders }) => {
                       )
                     ) : (
                       <>
-                        {hasError || isErrorFocused ? (
+                        {tableOptions.showErrors &&
+                        (hasError || isErrorFocused) ? (
                           <ErrorCell
                             data={data}
                             row={row}
