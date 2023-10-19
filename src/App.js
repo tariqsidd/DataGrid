@@ -5,14 +5,7 @@ import DataGrid from "./DataGrid/DataGrid";
 const App = () => {
   return (
     <div style={{ maxWidth: "1000px" }}>
-      <DataGrid
-        incomingData={Data}
-        tableHeaders={tableHeader}
-        // onRowChange={(data, i) => {
-        //   console.log("data", data);
-        //   console.log("index", i);
-        // }}
-      />
+      <DataGrid incomingData={Data} tableHeaders={tableHeader} />
     </div>
   );
 };

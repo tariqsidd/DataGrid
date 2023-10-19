@@ -90,7 +90,6 @@ const DataGrid = ({ incomingData, tableHeaders }) => {
       setDraggingCell(null);
       setHighlightedCell(null);
       setData(newData);
-      // onRowChange(newData);
     }
   };
 
@@ -126,7 +125,7 @@ const DataGrid = ({ incomingData, tableHeaders }) => {
     //Sorting Error
     return Object.fromEntries(
       columnOrder
-        .filter((key) => errors.hasOwnProperty(key)) // Filter out keys not in the object
+        .filter((key) => errors.hasOwnProperty(key))
         .map((key) => [key, errors[key]])
     );
   };
@@ -142,16 +141,12 @@ const DataGrid = ({ incomingData, tableHeaders }) => {
         newData[editingCell.rowIndex],
         editingCellHeader
       );
-
-      // onRowChange(newData[editingCell.rowIndex], editingCell.rowIndex);
-
       setEditingCell(null);
       setEditingCellHeader(null);
       setEditingValue("");
     }
   };
 
-  // Function to open the context menu
   const openContextMenu = (event, rowIndex) => {
     event.preventDefault();
     setContextMenuPosition({
@@ -162,7 +157,6 @@ const DataGrid = ({ incomingData, tableHeaders }) => {
     setContextMenuVisible(true);
   };
 
-  // Function to close the context menu
   const closeContextMenu = () => {
     setContextMenuVisible(false);
   };
