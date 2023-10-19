@@ -1,14 +1,6 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
-import {
-  Button,
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-} from "@material-ui/core";
+import React, { useEffect, useState, useCallback } from "react";
+import { Table, TableBody, TableCell, TableRow } from "@material-ui/core";
 import "date-fns";
-import GetAppIcon from "@material-ui/icons/GetApp";
-import { CSVLink } from "react-csv";
 import GridHeader from "./GridHeader";
 import GridFooter from "./GridFooter";
 import { DataGridOptions } from "./Constants";
@@ -18,18 +10,17 @@ import {
   cellHasError,
   errorIdentifier,
   getCellType,
-  prepareCSVData,
 } from "./utils";
 import ContextMenu from "./ContextMenu";
 import ErrorCell from "./ErrorCell";
 import { Menu, MenuItem } from "@material-ui/core";
 import { commonStyles } from "./styles";
+import ExportCSVButton from "./ExportCSVButton";
 
 let Ajv = require("ajv");
 let ajv = new Ajv({ allErrors: true });
 
 const DataGrid = ({ incomingData, tableHeaders }) => {
-  const csvLinkRef = useRef();
   const [editingCell, setEditingCell] = useState(null);
   const [editingCellHeader, setEditingCellHeader] = useState(null);
   const [editingValue, setEditingValue] = useState("");
@@ -226,31 +217,7 @@ const DataGrid = ({ incomingData, tableHeaders }) => {
   const classes = commonStyles();
   return (
     <div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          padding: "8px",
-        }}
-      >
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => {
-            if (csvLinkRef.current) {
-              csvLinkRef.current.link.click();
-            }
-          }}
-          startIcon={<GetAppIcon />}
-        >
-          Export CSV
-        </Button>
-        <CSVLink
-          data={prepareCSVData(data, tableHeaders)} // Call your data preparation function
-          filename="table-data.csv"
-          ref={csvLinkRef} // Specify the CSV file name
-        />
-      </div>
+      <ExportCSVButton data={data} tableHeaders={tableHeaders} />
       <Table stickyHeader>
         <GridHeader tableOptions={tableOptions} tableHeaders={tableHeaders} />
         <TableBody>

@@ -69,4 +69,9 @@ export const commonStyles = makeStyles((theme) => ({
   textField: {
     width: "90%",
   },
+  exportCSVButton: {
+    display: "flex",
+    justifyContent: "flex-end",
+    padding: "8px",
+  },
 }));
