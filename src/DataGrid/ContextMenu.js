@@ -1,13 +1,25 @@
-import {Menu, MenuItem} from "@material-ui/core";
+import { Menu, MenuItem } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
+
+const useStyles = makeStyles((theme) => ({
+  contextMenu: {
+    position: "fixed",
+    background: "white",
+    border: "1px solid #ccc",
+    boxShadow: "2px 2px 5px #888888",
+    zIndex: 1000,
+  },
+}));
 
 const ContextMenu = ({
-                       tableOptions = {},
-                       setData = () => {},
-                       data = [],
-                       contextMenuVisible,
-                       contextMenuPosition,
-                       closeContextMenu
-                     }) => {
+  tableOptions = {},
+  setData = () => {},
+  data = [],
+  contextMenuVisible,
+  contextMenuPosition,
+  closeContextMenu,
+}) => {
+  const classes = useStyles();
 
   const duplicateRow = (rowIndex) => {
     const newData = [...data];
@@ -26,15 +38,8 @@ const ContextMenu = ({
 
   return (
     <div
-      style={{
-        position: "fixed",
-        top: contextMenuPosition.top,
-        left: contextMenuPosition.left,
-        background: "white",
-        border: "1px solid #ccc",
-        boxShadow: "2px 2px 5px #888888",
-        zIndex: 1000,
-      }}
+      className={classes.contextMenu}
+      style={{ top: contextMenuPosition.top, left: contextMenuPosition.left }}
     >
       <Menu
         keepMounted
@@ -43,7 +48,7 @@ const ContextMenu = ({
         anchorReference="anchorPosition"
         anchorPosition={
           contextMenuVisible
-            ? {top: contextMenuPosition.top, left: contextMenuPosition.left}
+            ? { top: contextMenuPosition.top, left: contextMenuPosition.left }
             : undefined
         }
       >
@@ -67,7 +72,7 @@ const ContextMenu = ({
         )}
       </Menu>
     </div>
-  )
+  );
 };
 
-export default ContextMenu
+export default ContextMenu;

@@ -1,38 +1,64 @@
-import {cellContent, getCellError} from "./utils";
-import {Tooltip} from "@material-ui/core";
+import { cellContent, getCellError } from "./utils";
+import { Tooltip, IconButton } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
 import React from "react";
-import {DataGridOptions as tableOptions} from "./Constants";
+import { DataGridOptions as tableOptions } from "./Constants";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
-import IconButton from "@material-ui/core/IconButton";
 
-const ErrorCell = ({data=[], row, header, hasError, rowIndex, isErrorFocused, handlePrevError=()=>{}, handleNextError=()=>{}})=>{
-  return(
+const useStyles = makeStyles((theme) => ({
+  errorCell: {
+    minHeight: tableOptions.columnHeight,
+    backgroundColor: "#ffe6e6",
+    display: "flex",
+    flexDirection: "row",
+  },
+  errorCellContentFocused: {
+    display: "flex",
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  errorCellContentUnFocused: {
+    display: "flex",
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "space-around",
+  },
+  errorButton: {
+    padding: "4px",
+  },
+}));
+
+const ErrorCell = ({
+  data = [],
+  row,
+  header,
+  hasError,
+  rowIndex,
+  isErrorFocused,
+  handlePrevError = () => {},
+  handleNextError = () => {},
+}) => {
+  const classes = useStyles();
+
+  return (
     <Tooltip title={getCellError(rowIndex, header.headerFieldName, data)} arrow>
-      <div
-        style={{
-          minHeight: tableOptions.columnHeight,
-          backgroundColor: "#ffe6e6",
-          display: "flex",
-          flexDirection: "row",
-        }}
-      >
+      <div className={classes.errorCell}>
         <div
-          style={{
-            display: "flex",
-            justifyContent: isErrorFocused ? "space-between" : "space-around",
-            width: "100%",
-            alignItems: "center",
-          }}
+          className={
+            isErrorFocused
+              ? classes.errorCellContentFocused
+              : classes.errorCellContentUnFocused
+          }
         >
           {isErrorFocused && (
             <IconButton
               onClick={handlePrevError}
-              // disabled={currentErrorIndex === 0}
               aria-label="previous error"
-              style={{padding: "4px"}}
+              className={classes.errorButton}
             >
-              <ArrowBackIosIcon/>
+              <ArrowBackIosIcon />
             </IconButton>
           )}
 
@@ -40,17 +66,16 @@ const ErrorCell = ({data=[], row, header, hasError, rowIndex, isErrorFocused, ha
           {isErrorFocused && (
             <IconButton
               onClick={handleNextError}
-              // disabled={currentErrorIndex === errorCells.length - 1}
               aria-label="next error"
-              style={{padding: "4px", marginTop: "4px"}}
+              className={classes.errorButton}
             >
-              <ArrowForwardIosIcon/>
+              <ArrowForwardIosIcon />
             </IconButton>
           )}
         </div>
       </div>
     </Tooltip>
-  )
+  );
 };
 
-export default ErrorCell
+export default ErrorCell;
