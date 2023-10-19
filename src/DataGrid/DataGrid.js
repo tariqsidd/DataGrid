@@ -15,6 +15,7 @@ import ContextMenu from "./ContextMenu";
 import ErrorCell from "./ErrorCell";
 import { commonStyles } from "./styles";
 import ExportCSVButton from "./ExportCSVButton";
+import ErrorAlert from "./ErrorAlert";
 
 let Ajv = require("ajv");
 let ajv = new Ajv({ allErrors: true });
@@ -216,6 +217,7 @@ const DataGrid = ({ incomingData, tableHeaders }) => {
   return (
     <div>
       <ExportCSVButton data={data} tableHeaders={tableHeaders} />
+      {tableOptions.showErrorAlert && <ErrorAlert error={errorCells.length} />}
       <Table stickyHeader>
         <GridHeader tableOptions={tableOptions} tableHeaders={tableHeaders} />
         <TableBody>

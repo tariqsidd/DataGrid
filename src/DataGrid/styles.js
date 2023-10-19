@@ -74,4 +74,10 @@ export const commonStyles = makeStyles((theme) => ({
     justifyContent: "flex-end",
     padding: "8px",
   },
+  errorAlert: {
+    paddingRight: "4px",
+    paddingLeft: "4px",
+    paddingTop: "16px",
+    paddingBottom: "16px",
+  },
 }));

@@ -4,6 +4,7 @@ export const DataGridOptions = {
   duplicateRow: true,
   tableEditing: true,
   columnHeight: "40px",
-  editing: false,
+  editing: true,
   showErrors: true,
+  showErrorAlert: true,
 };
