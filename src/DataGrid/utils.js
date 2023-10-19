@@ -1,50 +1,60 @@
-import GridTextField from "./TextField";
+import GridTextField from "./GridTextField";
 import GridDateField from "./GridDateField";
 import GridSelect from "./GridSelect";
 import React from "react";
 
-export const getCellType = (header, editingValue, handleBlur, setEditingValue) => {
+export const getCellType = (
+  header,
+  editingValue,
+  handleBlur,
+  setEditingValue
+) => {
   switch (header.headerCellType) {
     case "textField":
-      return(
+      return (
         <GridTextField
           header={header}
           editingValue={editingValue}
           handleBlur={handleBlur}
-          setEditingValue={setEditingValue}/>
+          setEditingValue={setEditingValue}
+        />
       );
     case "number":
-      return(
+      return (
         <GridTextField
           header={header}
           editingValue={editingValue}
           handleBlur={handleBlur}
-          setEditingValue={setEditingValue}/>
+          setEditingValue={setEditingValue}
+        />
       );
     case "date":
-      return(
+      return (
         <GridDateField
           header={header}
           editingValue={editingValue}
           setEditingValue={setEditingValue}
-          handleBlur={handleBlur}/>
+          handleBlur={handleBlur}
+        />
       );
     case "select":
-      return(
+      return (
         <GridSelect
           header={header}
           editingValue={editingValue}
           handleBlur={handleBlur}
-          setEditingValue={setEditingValue}/>
+          setEditingValue={setEditingValue}
+        />
       );
     default:
-      return(
+      return (
         <GridTextField
           header={header}
           editingValue={editingValue}
           handleBlur={handleBlur}
-          setEditingValue={setEditingValue}/>
-      )
+          setEditingValue={setEditingValue}
+        />
+      );
   }
 };
 
@@ -60,19 +70,18 @@ export const cellHasError = (rowIndex, fieldName, data) => {
   return !!getCellError(rowIndex, fieldName, data);
 };
 
-export const errorIdentifier = (data)=>(
+export const errorIdentifier = (data) =>
   data.flatMap((row, rowIndex) =>
     Object.keys(row.errorObj).map((cellName) => ({
       rowIndex,
       cellName,
     }))
-  )
-);
+  );
 
-export const cellContent = (row, header) => (row[header.headerFieldName]);
+export const cellContent = (row, header) => row[header.headerFieldName];
 
-export const addNewRow = (tableHeaders, data)=>{
-  const  getDefaultForType = (type) => {
+export const addNewRow = (tableHeaders, data) => {
+  const getDefaultForType = (type) => {
     switch (type) {
       case "string":
         return "";
@@ -86,17 +95,15 @@ export const addNewRow = (tableHeaders, data)=>{
   };
   const newRow = {};
   tableHeaders.forEach((header) => {
-    newRow[header.headerFieldName] = getDefaultForType(
-      header.headerFieldType
-    );
+    newRow[header.headerFieldName] = getDefaultForType(header.headerFieldType);
   });
   newRow["errorObj"] = {};
   const newData = [...data];
   newData.push(newRow);
-  return newData
+  return newData;
 };
 
-export const  prepareCSVData = (data, tableHeaders)=>{
+export const prepareCSVData = (data, tableHeaders) => {
   const csvData = [];
   // Add the header row
   const headerRow = tableHeaders.map((header) => header.headerName);
