@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState, useCallback} from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import {
   Button,
   Table,
@@ -8,25 +8,25 @@ import {
 } from "@material-ui/core";
 import "date-fns";
 import GetAppIcon from "@material-ui/icons/GetApp";
-import {CSVLink} from "react-csv";
+import { CSVLink } from "react-csv";
 import GridHeader from "./GridHeader";
 import GridFooter from "./GridFooter";
-import {DataGridOptions} from "./Constants";
+import { DataGridOptions } from "./Constants";
 import {
   addNewRow,
   cellContent,
   cellHasError,
   errorIdentifier,
   getCellType,
-  prepareCSVData
+  prepareCSVData,
 } from "./utils";
 import ContextMenu from "./ContextMenu";
 import ErrorCell from "./ErrorCell";
 
 let Ajv = require("ajv");
-let ajv = new Ajv({allErrors: true});
+let ajv = new Ajv({ allErrors: true });
 
-const DataGrid = ({incomingData, tableHeaders, onRowChange}) => {
+const DataGrid = ({ incomingData, tableHeaders }) => {
   const csvLinkRef = useRef();
   const [editingCell, setEditingCell] = useState(null);
   const [editingCellHeader, setEditingCellHeader] = useState(null);
@@ -39,7 +39,11 @@ const DataGrid = ({incomingData, tableHeaders, onRowChange}) => {
   const [data, setData] = useState(incomingData);
   const [tableOptions, setTableOptions] = useState(DataGridOptions);
   const [contextMenuVisible, setContextMenuVisible] = useState(false);
-  const [contextMenuPosition, setContextMenuPosition] = useState({top: 0, left: 0, rowIndex: -1});
+  const [contextMenuPosition, setContextMenuPosition] = useState({
+    top: 0,
+    left: 0,
+    rowIndex: -1,
+  });
   const errorCells = errorIdentifier(data);
 
   useEffect(() => {
@@ -51,13 +55,12 @@ const DataGrid = ({incomingData, tableHeaders, onRowChange}) => {
     });
   }, []);
 
-
   const handleHighlight = useCallback((rowIndex, header) => {
-    setHighlightedCell({rowIndex, fieldName: header.headerFieldName});
+    setHighlightedCell({ rowIndex, fieldName: header.headerFieldName });
   }, []);
 
   const handleDragStart = useCallback((rowIndex, header) => {
-    setDraggingCell({rowIndex, fieldName: header.headerFieldName});
+    setDraggingCell({ rowIndex, fieldName: header.headerFieldName });
   }, []);
 
   const handleDragOver = (e) => {
@@ -82,7 +85,11 @@ const DataGrid = ({incomingData, tableHeaders, onRowChange}) => {
         if (index >= draggingCell.rowIndex && index <= targetRowIndex) {
           const updatedRow = { ...row };
           updatedRow[header.headerFieldName] = valueToSet;
-          updatedRow.errorObj = validateRowData(draggingCell.fieldName, updatedRow, header);
+          updatedRow.errorObj = validateRowData(
+            draggingCell.fieldName,
+            updatedRow,
+            header
+          );
           return updatedRow;
         }
         return row;
@@ -91,12 +98,12 @@ const DataGrid = ({incomingData, tableHeaders, onRowChange}) => {
       setDraggingCell(null);
       setHighlightedCell(null);
       setData(newData);
-      onRowChange(newData);
+      // onRowChange(newData);
     }
   };
 
   const handleDoubleClick = (rowIndex, header) => {
-    setEditingCell({rowIndex, fieldName: header.headerFieldName});
+    setEditingCell({ rowIndex, fieldName: header.headerFieldName });
     setEditingCellHeader(header);
     setEditingValue(data[rowIndex][header.headerFieldName]);
   };
@@ -112,10 +119,10 @@ const DataGrid = ({incomingData, tableHeaders, onRowChange}) => {
     let value = rowData[fieldKey];
     if (headers.headerCellType === "number") {
       if (value !== undefined) {
-        valueToValidate = {[fieldKey]: value};
+        valueToValidate = { [fieldKey]: value };
       }
     } else if (value.length > 0) {
-      valueToValidate = {[fieldKey]: value};
+      valueToValidate = { [fieldKey]: value };
     }
     if (schema) {
       const validate = ajv.compile(schema);
@@ -144,14 +151,13 @@ const DataGrid = ({incomingData, tableHeaders, onRowChange}) => {
         editingCellHeader
       );
 
-      onRowChange(newData[editingCell.rowIndex], editingCell.rowIndex);
+      // onRowChange(newData[editingCell.rowIndex], editingCell.rowIndex);
 
       setEditingCell(null);
       setEditingCellHeader(null);
       setEditingValue("");
     }
   };
-
 
   const focusOnErrorCell = (index) => {
     if (errorCells[index]) {
@@ -232,7 +238,7 @@ const DataGrid = ({incomingData, tableHeaders, onRowChange}) => {
               csvLinkRef.current.link.click();
             }
           }}
-          startIcon={<GetAppIcon/>}
+          startIcon={<GetAppIcon />}
         >
           Export CSV
         </Button>
@@ -243,14 +249,12 @@ const DataGrid = ({incomingData, tableHeaders, onRowChange}) => {
         />
       </div>
       <Table stickyHeader>
-        <GridHeader
-          tableOptions={tableOptions}
-          tableHeaders={tableHeaders}/>
+        <GridHeader tableOptions={tableOptions} tableHeaders={tableHeaders} />
         <TableBody>
           {data.map((row, rowIndex) => (
             <TableRow
               key={rowIndex}
-              style={{height: tableOptions.columnHeight}}
+              style={{ height: tableOptions.columnHeight }}
               onContextMenu={(event) =>
                 tableOptions.contextMenu
                   ? openContextMenu(event, rowIndex)
@@ -271,7 +275,11 @@ const DataGrid = ({incomingData, tableHeaders, onRowChange}) => {
                 {rowIndex}
               </TableCell>
               {tableHeaders.map((header) => {
-                const hasError = cellHasError(rowIndex, header.headerFieldName, data);
+                const hasError = cellHasError(
+                  rowIndex,
+                  header.headerFieldName,
+                  data
+                );
                 const isHighlighted =
                   highlightedCell &&
                   highlightedCell.rowIndex === rowIndex &&
@@ -305,12 +313,12 @@ const DataGrid = ({incomingData, tableHeaders, onRowChange}) => {
                       overflow: "hidden",
                       ...(isHighlighted
                         ? {
-                          border: isEditing ? "" : "2px dotted black",
-                          position: "relative",
-                        }
+                            border: isEditing ? "" : "2px dotted black",
+                            position: "relative",
+                          }
                         : {
-                          border: "1px solid #8080801a",
-                        }),
+                            border: "1px solid #8080801a",
+                          }),
                       padding: "0px",
                       fontSize: "0.75em",
                       backgroundColor:
@@ -318,11 +326,16 @@ const DataGrid = ({incomingData, tableHeaders, onRowChange}) => {
                     }}
                   >
                     {isEditing ? (
-                      getCellType(header, editingValue, handleBlur, setEditingValue)
+                      getCellType(
+                        header,
+                        editingValue,
+                        handleBlur,
+                        setEditingValue
+                      )
                     ) : (
                       <>
-                        {hasError || isErrorFocused
-                          ? (<ErrorCell
+                        {hasError || isErrorFocused ? (
+                          <ErrorCell
                             data={data}
                             row={row}
                             header={header}
@@ -331,8 +344,10 @@ const DataGrid = ({incomingData, tableHeaders, onRowChange}) => {
                             isErrorFocused={isErrorFocused}
                             handlePrevError={handlePrevError}
                             handleNextError={handleNextError}
-                          />)
-                          : cellContent(row, header, hasError, rowIndex)}
+                          />
+                        ) : (
+                          cellContent(row, header, hasError, rowIndex)
+                        )}
                       </>
                     )}
                   </TableCell>
@@ -340,12 +355,13 @@ const DataGrid = ({incomingData, tableHeaders, onRowChange}) => {
               })}
             </TableRow>
           ))}
-          {tableOptions.addRow &&
-          <GridFooter
-            addRow={()=>setData(addNewRow(tableHeaders,data))}
-            tableHeaders={tableHeaders}
-            tableOptions={tableOptions}/>
-          }
+          {tableOptions.addRow && (
+            <GridFooter
+              addRow={() => setData(addNewRow(tableHeaders, data))}
+              tableHeaders={tableHeaders}
+              tableOptions={tableOptions}
+            />
+          )}
         </TableBody>
       </Table>
       <ContextMenu

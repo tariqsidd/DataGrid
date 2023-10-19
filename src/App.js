@@ -8,10 +8,10 @@ const App = () => {
       <DataGrid
         incomingData={Data}
         tableHeaders={tableHeader}
-        onRowChange={(data, i) => {
-          console.log("data", data);
-          console.log("index", i);
-        }}
+        // onRowChange={(data, i) => {
+        //   console.log("data", data);
+        //   console.log("index", i);
+        // }}
       />
     </div>
   );
