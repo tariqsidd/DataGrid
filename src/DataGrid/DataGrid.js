@@ -101,9 +101,11 @@ const DataGrid = ({ incomingData, tableHeaders, incomingTableOptions }) => {
   };
 
   const handleDoubleClick = (rowIndex, header) => {
-    setEditingCell({ rowIndex, fieldName: header.headerFieldName });
-    setEditingCellHeader(header);
-    setEditingValue(data[rowIndex][header.headerFieldName]);
+    if (tableOptions.editing) {
+      setEditingCell({ rowIndex, fieldName: header.headerFieldName });
+      setEditingCellHeader(header);
+      setEditingValue(data[rowIndex][header.headerFieldName]);
+    }
   };
 
   const validateRowData = (fieldName, rowData, headers) => {
@@ -215,7 +217,7 @@ const DataGrid = ({ incomingData, tableHeaders, incomingTableOptions }) => {
                       if (!editingCell) handleHighlight(rowIndex, header);
                     }}
                     onDoubleClick={() => handleDoubleClick(rowIndex, header)}
-                    draggable={!editingCell}
+                    draggable={tableOptions.editing ? !editingCell : false}
                     onDragStart={() => handleDragStart(rowIndex, header)}
                     onDragOver={handleDragOver}
                     onDragEnter={() => handleDragEnter(rowIndex, header)}
