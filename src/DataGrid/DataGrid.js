@@ -302,8 +302,8 @@ const DataGrid = ({ incomingData, tableHeaders, incomingTableOptions }) => {
           )}
         </TableBody>
       </Table> */}
-      {/* <TableVirtuoso
-        style={{ height: 800 }}
+      <TableVirtuoso
+        style={{ height: 600 }}
         data={data}
         components={TableComponents}
         fixedHeaderContent={() => (
@@ -418,7 +418,7 @@ const DataGrid = ({ incomingData, tableHeaders, incomingTableOptions }) => {
             />
           )
         }
-      /> */}
+      />
       <ContextMenu
         tableOptions={tableOptions}
         setData={setData}

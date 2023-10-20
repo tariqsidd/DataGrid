@@ -46,8 +46,6 @@
     "react-router-dom": "^5.0.1",
     "react-scripts": "5.0.1",
     "react-virtuoso": "^4.6.2",
-    "react-window": "^1.8.9",
-    "resize-observer-polyfill": "^1.5.1",
     "web-vitals": "^2.1.4",
     "yarn": "^1.22.19"
   },
