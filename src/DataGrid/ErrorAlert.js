@@ -5,11 +5,15 @@ import { commonStyles } from "./styles";
 const ErrorAlert = ({ error = 0 }) => {
   const classes = commonStyles();
   return (
-    <div className={classes.errorAlert}>
-      <MuiAlert elevation={4} variant="standard" severity="error">
-        {`${error} Error(s) found !`}
-      </MuiAlert>
-    </div>
+    <>
+      {error > 0 && (
+        <div className={classes.errorAlert}>
+          <MuiAlert elevation={4} variant="standard" severity="error">
+            {`${error} Error(s) found !`}
+          </MuiAlert>
+        </div>
+      )}
+    </>
   );
 };
 

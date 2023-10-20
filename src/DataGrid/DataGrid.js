@@ -20,7 +20,7 @@ import ErrorAlert from "./ErrorAlert";
 let Ajv = require("ajv");
 let ajv = new Ajv({ allErrors: true });
 
-const DataGrid = ({ incomingData, tableHeaders }) => {
+const DataGrid = ({ incomingData, tableHeaders, incomingTableOptions }) => {
   const [editingCell, setEditingCell] = useState(null);
   const [editingCellHeader, setEditingCellHeader] = useState(null);
   const [editingValue, setEditingValue] = useState("");
@@ -37,15 +37,22 @@ const DataGrid = ({ incomingData, tableHeaders }) => {
     left: 0,
     rowIndex: -1,
   });
-  const errorCells = tableOptions.showErrors ? errorIdentifier(data) : [];
-  useEffect(() => {
-    const contextMenu = tableOptions.deleteRow || tableOptions.duplicateRow;
+  const [errorCells, setErrorCells] = useState(errorIdentifier(data));
 
-    setTableOptions({
+  useEffect(() => {
+    let updatedTableOptions = {
       ...tableOptions,
+      ...incomingTableOptions,
+    };
+    const contextMenu =
+      updatedTableOptions.deleteRow || updatedTableOptions.duplicateRow;
+    updatedTableOptions = {
+      ...updatedTableOptions,
       contextMenu: contextMenu,
-    });
-  }, []);
+    };
+    setErrorCells(tableOptions.showErrors ? errorIdentifier(data) : []);
+    setTableOptions(updatedTableOptions);
+  }, [incomingTableOptions]);
 
   const handleHighlight = useCallback((rowIndex, header) => {
     setHighlightedCell({ rowIndex, fieldName: header.headerFieldName });
@@ -165,7 +172,9 @@ const DataGrid = ({ incomingData, tableHeaders }) => {
   return (
     <div>
       <ExportCSVButton data={data} tableHeaders={tableHeaders} />
-      {tableOptions.showErrorAlert && <ErrorAlert error={errorCells.length} />}
+      {tableOptions.showErrorAlert && tableOptions.showErrors && (
+        <ErrorAlert error={errorCells.length} />
+      )}
       <Table stickyHeader>
         <GridHeader tableOptions={tableOptions} tableHeaders={tableHeaders} />
         <TableBody>
@@ -198,7 +207,6 @@ const DataGrid = ({ incomingData, tableHeaders }) => {
                   editingCell &&
                   editingCell.rowIndex === rowIndex &&
                   editingCell.fieldName === header.headerFieldName;
-
                 return (
                   <TableCell
                     key={header.headerName}
