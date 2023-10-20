@@ -1,4 +1,10 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, {
+  useEffect,
+  useState,
+  useCallback,
+  useRef,
+  createRef,
+} from "react";
 import { Table, TableBody, TableCell, TableRow } from "@material-ui/core";
 import "date-fns";
 import GridHeader from "./GridHeader";
@@ -38,6 +44,19 @@ const DataGrid = ({ incomingData, tableHeaders, incomingTableOptions }) => {
     rowIndex: -1,
   });
   const errorCells = errorIdentifier(data);
+
+  const rowRefs = data.map(() => createRef());
+  // Use a useEffect to focus the element when errorFocusCell changes
+  useEffect(() => {
+    if (errorFocusCell !== null && rowRefs[errorFocusCell.rowIndex].current) {
+      const targetRowRef = rowRefs[errorFocusCell.rowIndex].current;
+      const parentContainer = targetRowRef.closest(".table-container"); // Adjust the selector to your actual container
+
+      if (parentContainer) {
+        targetRowRef.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }
+  }, [errorFocusCell]);
 
   useEffect(() => {
     let updatedTableOptions = {
@@ -172,7 +191,7 @@ const DataGrid = ({ incomingData, tableHeaders, incomingTableOptions }) => {
 
   const classes = commonStyles();
   return (
-    <div>
+    <div className="table-container">
       <ExportCSVButton data={data} tableHeaders={tableHeaders} />
       {tableOptions.showErrorAlert && tableOptions.showErrors && (
         <ErrorAlert error={errorCells.length} />
@@ -189,6 +208,7 @@ const DataGrid = ({ incomingData, tableHeaders, incomingTableOptions }) => {
                   ? openContextMenu(event, rowIndex)
                   : null
               }
+              ref={rowRefs[rowIndex]}
             >
               <TableCell className={classes.smallCell} align="center">
                 {rowIndex}
@@ -211,6 +231,7 @@ const DataGrid = ({ incomingData, tableHeaders, incomingTableOptions }) => {
                   editingCell.fieldName === header.headerFieldName;
                 return (
                   <TableCell
+                    // ref={errorFocusCellRef}
                     key={header.headerName}
                     align="center"
                     onClick={() => {
@@ -253,6 +274,7 @@ const DataGrid = ({ incomingData, tableHeaders, incomingTableOptions }) => {
                         {tableOptions.showErrors &&
                         (hasError || isErrorFocused) ? (
                           <ErrorCell
+                            tableOptions={tableOptions}
                             data={data}
                             row={row}
                             header={header}

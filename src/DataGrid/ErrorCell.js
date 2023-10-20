@@ -6,6 +6,7 @@ import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
 import { commonStyles } from "./styles";
 
 const ErrorCell = ({
+  tableOptions = {},
   data = [],
   row,
   header,
@@ -68,7 +69,10 @@ const ErrorCell = ({
 
   return (
     <Tooltip title={getCellError(rowIndex, header.headerFieldName, data)} arrow>
-      <div className={classes.errorCell}>
+      <div
+        className={classes.errorCell}
+        style={{ height: tableOptions.columnHeight }}
+      >
         <div
           className={
             isErrorFocused
