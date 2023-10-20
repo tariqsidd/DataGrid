@@ -24,18 +24,19 @@ import ErrorCell from "./ErrorCell";
 import { commonStyles } from "./styles";
 import ExportCSVButton from "./ExportCSVButton";
 import ErrorAlert from "./ErrorAlert";
+import { TableVirtuoso } from "react-virtuoso";
 
-// const TableComponents = {
-//   Scroller: React.forwardRef((props, ref) => (
-//     <TableContainer component={Paper} {...props} ref={ref} />
-//   )),
-//   Table: (props) => <Table {...props} style={{ borderCollapse: "separate" }} />,
-//   TableHead: TableHead,
-//   TableRow: TableRow,
-//   TableBody: React.forwardRef((props, ref) => (
-//     <TableBody {...props} ref={ref} />
-//   )),
-// };
+const TableComponents = {
+  Scroller: React.forwardRef((props, ref) => (
+    <TableContainer component={Paper} {...props} ref={ref} />
+  )),
+  Table: (props) => <Table {...props} style={{ borderCollapse: "separate" }} />,
+  TableHead: TableHead,
+  TableRow: TableRow,
+  TableBody: React.forwardRef((props, ref) => (
+    <TableBody {...props} ref={ref} />
+  )),
+};
 
 let Ajv = require("ajv");
 let ajv = new Ajv({ allErrors: true });
@@ -194,7 +195,7 @@ const DataGrid = ({ incomingData, tableHeaders, incomingTableOptions }) => {
       {tableOptions.showErrorAlert && tableOptions.showErrors && (
         <ErrorAlert error={errorCells.length} />
       )}
-      <Table stickyHeader>
+      {/* <Table stickyHeader>
         <GridHeader tableOptions={tableOptions} tableHeaders={tableHeaders} />
         <TableBody>
           {data.map((row, rowIndex) => (
@@ -300,7 +301,7 @@ const DataGrid = ({ incomingData, tableHeaders, incomingTableOptions }) => {
             />
           )}
         </TableBody>
-      </Table>
+      </Table> */}
       {/* <TableVirtuoso
         style={{ height: 800 }}
         data={data}
