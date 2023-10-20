@@ -26,7 +26,12 @@ import ErrorAlert from "./ErrorAlert";
 let Ajv = require("ajv");
 let ajv = new Ajv({ allErrors: true });
 
-const DataGrid = ({ incomingData, tableHeaders, incomingTableOptions }) => {
+const DataGrid = ({
+  incomingData,
+  tableHeaders,
+  incomingTableOptions,
+  callExportCSV,
+}) => {
   const [editingCell, setEditingCell] = useState(null);
   const [editingCellHeader, setEditingCellHeader] = useState(null);
   const [editingValue, setEditingValue] = useState("");
@@ -193,7 +198,12 @@ const DataGrid = ({ incomingData, tableHeaders, incomingTableOptions }) => {
   const classes = commonStyles();
   return (
     <div className="table-container">
-      <ExportCSVButton data={data} tableHeaders={tableHeaders} />
+      <ExportCSVButton
+        data={data}
+        tableOptions={tableOptions}
+        tableHeaders={tableHeaders}
+        callExportCSV={callExportCSV}
+      />
       {tableOptions.showErrorAlert && tableOptions.showErrors && (
         <ErrorAlert error={errorCells.length} />
       )}

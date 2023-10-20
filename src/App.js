@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { tableHeader, Data } from "./Data";
+import { Button } from "@material-ui/core";
 import DataGrid from "./DataGrid/DataGrid";
 
 const tableOptions = {
@@ -10,17 +11,31 @@ const tableOptions = {
   editing: true,
   showErrors: true,
   showErrorAlert: true,
+  showExportButton: false,
 };
 
 const App = () => {
+  const [exportCSV, setExportCSV] = useState(false);
   return (
-    <div style={{ maxWidth: "1000px" }}>
-      <DataGrid
-        incomingData={Data}
-        tableHeaders={tableHeader}
-        incomingTableOptions={tableOptions}
-      />
-    </div>
+    <>
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={() => {
+          setExportCSV(true);
+        }}
+      >
+        Export CSV Outside
+      </Button>
+      <div style={{ maxWidth: "1000px" }}>
+        <DataGrid
+          incomingData={Data}
+          tableHeaders={tableHeader}
+          incomingTableOptions={tableOptions}
+          callExportCSV={exportCSV}
+        />
+      </div>
+    </>
   );
 };
 

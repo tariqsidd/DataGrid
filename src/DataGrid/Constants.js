@@ -6,4 +6,5 @@ export const DataGridOptions = {
   editing: true,
   showErrors: true,
   showErrorAlert: true,
+  showExportButton: true,
 };

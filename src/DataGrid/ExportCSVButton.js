@@ -1,10 +1,15 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import { CSVLink } from "react-csv";
 import { Button } from "@material-ui/core";
 import GetAppIcon from "@material-ui/icons/GetApp";
 import { commonStyles } from "./styles";
 
-const ExportCSVButton = ({ tableHeaders = [], data = [] }) => {
+const ExportCSVButton = ({
+  tableOptions = {},
+  tableHeaders = [],
+  data = [],
+  callExportCSV = false,
+}) => {
   const csvLinkRef = useRef();
 
   const prepareCSVData = (data, tableHeaders) => {
@@ -18,21 +23,29 @@ const ExportCSVButton = ({ tableHeaders = [], data = [] }) => {
     return csvData;
   };
 
+  useEffect(() => {
+    if (callExportCSV && csvLinkRef.current) {
+      csvLinkRef.current.link.click();
+    }
+  }, [callExportCSV]);
+
   const classes = commonStyles();
   return (
     <div className={classes.exportCSVButton}>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={() => {
-          if (csvLinkRef.current) {
-            csvLinkRef.current.link.click();
-          }
-        }}
-        startIcon={<GetAppIcon />}
-      >
-        Export CSV
-      </Button>
+      {tableOptions.showExportButton && (
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => {
+            if (csvLinkRef.current) {
+              csvLinkRef.current.link.click();
+            }
+          }}
+          startIcon={<GetAppIcon />}
+        >
+          Export CSV
+        </Button>
+      )}
       <CSVLink
         data={prepareCSVData(data, tableHeaders)}
         filename="table-data.csv"
