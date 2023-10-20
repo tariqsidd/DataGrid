@@ -11,7 +11,7 @@ const GridTextField = ({
   const classes = commonStyles();
   return (
     <TextField
-      autoFocus
+      // autoFocus
       className={classes.textField}
       margin="dense"
       type={header.headerCellType === "number" ? "number" : "text"}

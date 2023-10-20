@@ -18,6 +18,7 @@ export const commonStyles = makeStyles((theme) => ({
     backgroundColor: "#fafafa",
   },
   highlightedCell: {
+    width: "150px",
     padding: "4px",
     fontSize: "0.75em",
     border: "1px solid #8080801a",
@@ -28,6 +29,7 @@ export const commonStyles = makeStyles((theme) => ({
     height: "25px",
   },
   errorCell: {
+    width: "150px",
     backgroundColor: "#ffe6e6",
     display: "flex",
     flexDirection: "row",

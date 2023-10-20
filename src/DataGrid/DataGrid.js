@@ -1,5 +1,13 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { Table, TableBody, TableCell, TableRow } from "@material-ui/core";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableRow,
+  TableContainer,
+  TableHead,
+  Paper,
+} from "@material-ui/core";
 import "date-fns";
 import GridHeader from "./GridHeader";
 import GridFooter from "./GridFooter";
@@ -16,6 +24,18 @@ import ErrorCell from "./ErrorCell";
 import { commonStyles } from "./styles";
 import ExportCSVButton from "./ExportCSVButton";
 import ErrorAlert from "./ErrorAlert";
+
+// const TableComponents = {
+//   Scroller: React.forwardRef((props, ref) => (
+//     <TableContainer component={Paper} {...props} ref={ref} />
+//   )),
+//   Table: (props) => <Table {...props} style={{ borderCollapse: "separate" }} />,
+//   TableHead: TableHead,
+//   TableRow: TableRow,
+//   TableBody: React.forwardRef((props, ref) => (
+//     <TableBody {...props} ref={ref} />
+//   )),
+// };
 
 let Ajv = require("ajv");
 let ajv = new Ajv({ allErrors: true });
@@ -50,7 +70,7 @@ const DataGrid = ({ incomingData, tableHeaders, incomingTableOptions }) => {
       ...updatedTableOptions,
       contextMenu: contextMenu,
     };
-    setErrorCells(tableOptions.showErrors ? errorIdentifier(data) : []);
+    // setErrorCells(tableOptions.showErrors ? errorIdentifier(data) : []);
     setTableOptions(updatedTableOptions);
   }, [incomingTableOptions]);
 
@@ -282,6 +302,123 @@ const DataGrid = ({ incomingData, tableHeaders, incomingTableOptions }) => {
           )}
         </TableBody>
       </Table>
+      {/* <TableVirtuoso
+        style={{ height: 800 }}
+        data={data}
+        components={TableComponents}
+        fixedHeaderContent={() => (
+          <GridHeader tableOptions={tableOptions} tableHeaders={tableHeaders} />
+        )}
+        itemContent={(index, row) => (
+          <>
+            <TableCell
+              className={classes.smallCell}
+              align="center"
+              style={{ height: tableOptions.columnHeight }}
+              onContextMenu={(event) =>
+                tableOptions.contextMenu ? openContextMenu(event, index) : null
+              }
+            >
+              {index}
+            </TableCell>
+            {tableHeaders.map((header) => {
+              const hasError = tableOptions.showErrors
+                ? cellHasError(index, header.headerFieldName, data)
+                : false;
+              const isHighlighted =
+                highlightedCell &&
+                highlightedCell.rowIndex === index &&
+                highlightedCell.fieldName === header.headerFieldName;
+              const isErrorFocused =
+                errorFocusCell &&
+                errorFocusCell.rowIndex === index &&
+                errorFocusCell.fieldName === header.headerFieldName;
+              const isEditing =
+                editingCell &&
+                editingCell.rowIndex === index &&
+                editingCell.fieldName === header.headerFieldName;
+              return (
+                <TableCell
+                  key={header.headerName}
+                  align="center"
+                  onClick={() => {
+                    if (!editingCell) handleHighlight(index, header);
+                  }}
+                  onDoubleClick={() => handleDoubleClick(index, header)}
+                  draggable={!editingCell}
+                  onDragStart={() => handleDragStart(index, header)}
+                  onDragOver={handleDragOver}
+                  onDragEnter={() => handleDragEnter(index, header)}
+                  onDragEnd={handleDragEnd}
+                  onDrop={() => handleDrop(index, header)}
+                  onContextMenu={(event) =>
+                    tableOptions.contextMenu
+                      ? openContextMenu(event, index)
+                      : null
+                  }
+                  style={{
+                    height: tableOptions.columnHeight,
+                    width: "100px",
+                    maxWidth: "100px",
+                    overflow: "hidden",
+                    ...(isHighlighted
+                      ? {
+                          border: isEditing ? "" : "2px dotted black",
+                          position: "relative",
+                        }
+                      : {
+                          border: "1px solid #8080801a",
+                        }),
+                    padding: "0px",
+                    fontSize: "0.75em",
+                    backgroundColor:
+                      hasError || isErrorFocused ? "#ffe6e6" : "#fff",
+                  }}
+                >
+                  {tableOptions.editing && isEditing ? (
+                    getCellType(
+                      header,
+                      editingValue,
+                      handleBlur,
+                      setEditingValue
+                    )
+                  ) : (
+                    <>
+                      {tableOptions.showErrors &&
+                      (hasError || isErrorFocused) ? (
+                        <ErrorCell
+                          data={data}
+                          row={row}
+                          header={header}
+                          hasError={hasError}
+                          rowIndex={index}
+                          isErrorFocused={isErrorFocused}
+                          errorCells={errorCells}
+                          currentErrorIndex={currentErrorIndex}
+                          setCurrentErrorIndex={setCurrentErrorIndex}
+                          setErrorFocusCell={setErrorFocusCell}
+                          setHighlightedCell={setHighlightedCell}
+                        />
+                      ) : (
+                        cellContent(row, header, hasError, index)
+                      )}
+                    </>
+                  )}
+                </TableCell>
+              );
+            })}
+          </>
+        )}
+        fixedFooterContent={() =>
+          tableOptions.addRow && (
+            <GridFooter
+              addRow={() => setData(addNewRow(tableHeaders, data))}
+              tableHeaders={tableHeaders}
+              tableOptions={tableOptions}
+            />
+          )
+        }
+      /> */}
       <ContextMenu
         tableOptions={tableOptions}
         setData={setData}
