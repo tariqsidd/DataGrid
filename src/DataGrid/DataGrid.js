@@ -37,7 +37,7 @@ const DataGrid = ({ incomingData, tableHeaders, incomingTableOptions }) => {
     left: 0,
     rowIndex: -1,
   });
-  const [errorCells, setErrorCells] = useState(errorIdentifier(data));
+  const errorCells = errorIdentifier(data);
 
   useEffect(() => {
     let updatedTableOptions = {
@@ -50,7 +50,7 @@ const DataGrid = ({ incomingData, tableHeaders, incomingTableOptions }) => {
       ...updatedTableOptions,
       contextMenu: contextMenu,
     };
-    setErrorCells(tableOptions.showErrors ? errorIdentifier(data) : []);
+    // setErrorCells(tableOptions.showErrors ? errorIdentifier(data) : []);
     setTableOptions(updatedTableOptions);
   }, [incomingTableOptions]);
 
