@@ -57,8 +57,7 @@ const DataGrid = ({ incomingData, tableHeaders, incomingTableOptions }) => {
     left: 0,
     rowIndex: -1,
   });
-  const [errorCells, setErrorCells] = useState(errorIdentifier(data));
-
+  const errorCells = errorIdentifier(data);
   useEffect(() => {
     let updatedTableOptions = {
       ...tableOptions,
@@ -268,8 +267,8 @@ const DataGrid = ({ incomingData, tableHeaders, incomingTableOptions }) => {
                       )
                     ) : (
                       <>
-                        {tableOptions.showErrors &&
-                        (hasError || isErrorFocused) ? (
+                        {(tableOptions.showErrors && hasError) ||
+                        isErrorFocused ? (
                           <ErrorCell
                             data={data}
                             row={row}
