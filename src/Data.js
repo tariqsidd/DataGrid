@@ -97,7 +97,7 @@ export const Data = [
     city: "Los Karachi",
     phoneNo: 2313453453,
     country: "PK",
-    errorObj: { city: "city not allowed" },
+    // errorObj: { city: "city not allowed" },
   },
   {
     name: "John",

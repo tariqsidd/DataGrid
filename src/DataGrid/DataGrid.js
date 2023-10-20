@@ -44,13 +44,12 @@ const DataGrid = ({ incomingData, tableHeaders, incomingTableOptions }) => {
     rowIndex: -1,
   });
   const errorCells = errorIdentifier(data);
-
   const rowRefs = data.map(() => createRef());
-  // Use a useEffect to focus the element when errorFocusCell changes
+
   useEffect(() => {
     if (errorFocusCell !== null && rowRefs[errorFocusCell.rowIndex].current) {
       const targetRowRef = rowRefs[errorFocusCell.rowIndex].current;
-      const parentContainer = targetRowRef.closest(".table-container"); // Adjust the selector to your actual container
+      const parentContainer = targetRowRef.closest(".table-container");
 
       if (parentContainer) {
         targetRowRef.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -128,7 +127,9 @@ const DataGrid = ({ incomingData, tableHeaders, incomingTableOptions }) => {
   };
 
   const validateRowData = (fieldName, rowData, headers) => {
-    const errors = JSON.parse(JSON.stringify(rowData.errorObj));
+    const errors = rowData.errorObj
+      ? JSON.parse(JSON.stringify(rowData.errorObj))
+      : {};
     if (errors.hasOwnProperty(fieldName)) {
       delete errors[fieldName];
     }
