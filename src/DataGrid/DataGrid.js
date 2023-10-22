@@ -181,6 +181,52 @@ const DataGrid = ({
     }
   };
 
+  const focusOnErrorCell = (index) => {
+    if (errorCells[index]) {
+      setErrorFocusCell({
+        rowIndex: errorCells[index].rowIndex,
+        fieldName: errorCells[index].cellName,
+      });
+      setHighlightedCell({
+        rowIndex: errorCells[index].rowIndex,
+        fieldName: errorCells[index].cellName,
+      });
+    }
+  };
+
+  const handleNextError = (event) => {
+    event.stopPropagation();
+
+    if (currentErrorIndex < errorCells.length - 1) {
+      setCurrentErrorIndex((prev) => prev + 1);
+      focusOnErrorCell(currentErrorIndex + 1);
+    } else {
+      setCurrentErrorIndex(0);
+      focusOnErrorCell(0);
+    }
+  };
+
+  const handlePrevError = (event) => {
+    event.stopPropagation();
+
+    if (currentErrorIndex > 0) {
+      setCurrentErrorIndex((prev) => prev - 1);
+      focusOnErrorCell(currentErrorIndex - 1);
+    } else {
+      setCurrentErrorIndex(errorCells.length - 1);
+      focusOnErrorCell(errorCells.length - 1);
+    }
+  };
+
+  useEffect(() => {
+    if (errorCells.length > 0) {
+      focusOnErrorCell(0);
+    } else {
+      setErrorFocusCell(null);
+      setHighlightedCell(null);
+    }
+  }, []);
+
   const openContextMenu = (event, rowIndex) => {
     event.preventDefault();
     setContextMenuPosition({
@@ -205,7 +251,11 @@ const DataGrid = ({
         callExportCSV={callExportCSV}
       />
       {tableOptions.showErrorAlert && tableOptions.showErrors && (
-        <ErrorAlert error={errorCells.length} />
+        <ErrorAlert
+          error={errorCells.length}
+          handlePrevError={handlePrevError}
+          handleNextError={handleNextError}
+        />
       )}
       <Table stickyHeader>
         <GridHeader tableOptions={tableOptions} tableHeaders={tableHeaders} />
@@ -292,11 +342,13 @@ const DataGrid = ({
                             hasError={hasError}
                             rowIndex={rowIndex}
                             isErrorFocused={isErrorFocused}
-                            errorCells={errorCells}
-                            currentErrorIndex={currentErrorIndex}
-                            setCurrentErrorIndex={setCurrentErrorIndex}
-                            setErrorFocusCell={setErrorFocusCell}
-                            setHighlightedCell={setHighlightedCell}
+                            // errorCells={errorCells}
+                            // currentErrorIndex={currentErrorIndex}
+                            // setCurrentErrorIndex={setCurrentErrorIndex}
+                            // setErrorFocusCell={setErrorFocusCell}
+                            // setHighlightedCell={setHighlightedCell}
+                            handlePrevError={handlePrevError}
+                            handleNextError={handleNextError}
                           />
                         ) : (
                           cellContent(row, header, hasError, rowIndex)
