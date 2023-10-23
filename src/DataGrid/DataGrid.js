@@ -210,7 +210,9 @@ const DataGrid = ({
   };
 
   const validateRowData = useCallback((fieldName, rowData, headers) => {
-    const errors = JSON.parse(JSON.stringify(rowData.errorObj));
+    const errors = rowData.errorObj
+      ? JSON.parse(JSON.stringify(rowData.errorObj))
+      : {};
     if (errors.hasOwnProperty(fieldName)) {
       delete errors[fieldName];
     }
