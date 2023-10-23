@@ -311,8 +311,28 @@ export const dataSample = [
   },
 ];
 
-export let dataArray = [];
+function generateData(rows = 1000) {
+  const baseData = {
+    name: "Jamil",
+    surname: "Smith",
+    date: "17/10/2023",
+    city: "Los Karachi",
+    phoneNo: 2313453453,
+    country: "PK",
+  };
 
-for (let i = 0; i < 5000 / dataSample.length; i++) {
-  dataArray = dataArray.concat(dataSample);
+  const dataList = [];
+
+  for (let i = 0; i < rows; i++) {
+    const newData = { ...baseData };
+    newData.name = `${baseData.name}${i}`;
+    newData.surname = `${baseData.surname}${i}`;
+    newData.phoneNo += Math.floor(Math.random() * 10000); // Add a small random increment for variation
+    dataList.push(newData);
+  }
+
+  return dataList;
 }
+
+// Example usage
+export const dataArray = generateData();
