@@ -246,7 +246,7 @@ const DataGrid = ({
                   visibleRangeRef.current[0],
                   visibleRangeRef.current[1]
                 )}
-                rowrefs={rowRefs[rowIndex]}
+                // rowrefs={rowRefs[rowIndex]}
                 openContextMenu={openContextMenu}
               />
             ))}
