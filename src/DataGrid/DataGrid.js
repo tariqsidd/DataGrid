@@ -22,6 +22,7 @@ let ajv = new Ajv({ allErrors: true });
 const DataGrid = ({
   incomingData,
   tableHeaders,
+  incomingTableOptions,
   itemHeight = 40,
   buffer = 15,
 }) => {
@@ -78,13 +79,18 @@ const DataGrid = ({
   }, [itemHeight, buffer, data.length]);
 
   useEffect(() => {
-    const contextMenu = tableOptions.deleteRow || tableOptions.duplicateRow;
+    let updatedTableOptions = {
+      ...tableOptions,
+      ...incomingTableOptions,
+    };
+    const contextMenu =
+      updatedTableOptions.deleteRow || updatedTableOptions.duplicateRow;
 
     setTableOptions({
-      ...tableOptions,
+      ...updatedTableOptions,
       contextMenu: contextMenu,
     });
-  }, []);
+  }, [incomingTableOptions]);
 
   const _handleHighlight = useCallback((rowIndex, header) => {
     setHighlightedCell({ rowIndex, fieldName: header.headerFieldName });
@@ -282,7 +288,9 @@ const DataGrid = ({
   return (
     <div>
       <ExportCSVButton data={data} tableHeaders={tableHeaders} />
-      {tableOptions.showErrorAlert && <ErrorAlert error={errorCells.length} />}
+      {tableOptions.showErrorAlert && tableOptions.showErrors && (
+        <ErrorAlert error={errorCells.length} />
+      )}
       <Table
         stickyHeader
         ref={containerRef}
