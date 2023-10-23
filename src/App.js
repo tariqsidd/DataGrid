@@ -29,8 +29,8 @@ const App = () => {
       </Button>
       <div style={{ maxWidth: "1000px" }}>
         <DataGrid
-          // incomingData={Data}
-          incomingData={dataArray}
+          incomingData={Data}
+          // incomingData={dataArray}
           tableHeaders={tableHeader}
           incomingTableOptions={tableOptions}
           callExportCSV={exportCSV}

@@ -31,6 +31,8 @@ export const commonStyles = makeStyles((theme) => ({
     backgroundColor: "#ffe6e6",
     display: "flex",
     flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
   errorCellContentFocused: {
     display: "flex",
@@ -79,6 +81,22 @@ export const commonStyles = makeStyles((theme) => ({
     paddingLeft: "4px",
     paddingTop: "16px",
     paddingBottom: "16px",
+  },
+  errorAlert2: {
+    paddingRight: "6px",
+    paddingLeft: "8px",
+    paddingTop: "8px",
+    paddingBottom: "8px",
+    backgroundColor: "#ffe6e6",
+    display: "flex",
+    borderRadius: "4px",
+    boxShadow:
+      "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)",
+    justifyContent: "space-between",
+  },
+  errorTitle: {
+    display: "flex",
+    alignItems: "center",
   },
   cellValue: {
     overflow: "hidden",

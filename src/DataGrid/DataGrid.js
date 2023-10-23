@@ -9,6 +9,7 @@ import ContextMenu from "./ContextMenu";
 import { commonStyles } from "./styles";
 import ExportCSVButton from "./ExportCSVButton";
 import ErrorAlert from "./ErrorAlert";
+import { subscribeToData, unsubscribe } from "./Reactive/subscriber";
 
 const DataGrid = ({
   incomingData,
@@ -19,7 +20,7 @@ const DataGrid = ({
   buffer = 15,
 }) => {
   console.log("RE-Render");
-  const [currentErrorIndex, setCurrentErrorIndex] = useState(0);
+  // const [errorFocusCell, setErrorFocusCell] = useState(null);
   const [data, setData] = useState(incomingData);
   const [tableOptions, setTableOptions] = useState(DataGridOptions);
   const [contextMenuVisible, setContextMenuVisible] = useState(false);
@@ -32,11 +33,25 @@ const DataGrid = ({
   const visibleRangeRef = useRef([0, 0]);
   const errorCells = tableOptions.showErrors ? errorIdentifier(data) : [];
 
-  const rowRefs = data.map(() => createRef());
-
-  // Use a useEffect to focus the element when errorFocusCell changes
   // useEffect(() => {
+  //   subscribeToData("errorFocusCell", getErrorFocusCell);
+  //   return () => {
+  //     // Run on unmount
+  //     unsubscribe("errorFocusCell");
+  //   };
+  // }, []);
+
+  // const getErrorFocusCell = (value) => {
+  //   setErrorFocusCell(value);
+  // };
+
+  // const rowRefs = data.map(() => createRef());
+
+  // useEffect(() => {
+  //   console.log(errorFocusCell);
+  //   console.log(rowRefs);
   //   if (errorFocusCell !== null && rowRefs[errorFocusCell.rowIndex].current) {
+  //     console.log("here");
   //     const targetRowRef = rowRefs[errorFocusCell.rowIndex].current;
   //     const parentContainer = targetRowRef.closest(".table-container");
 
@@ -111,7 +126,7 @@ const DataGrid = ({
         callExportCSV={callExportCSV}
       />
       {tableOptions.showErrorAlert && tableOptions.showErrors && (
-        <ErrorAlert error={errorCells.length} />
+        <ErrorAlert errorCells={errorCells} />
       )}
       <Table
         stickyHeader
@@ -231,6 +246,7 @@ const DataGrid = ({
                   visibleRangeRef.current[0],
                   visibleRangeRef.current[1]
                 )}
+                rowrefs={rowRefs[rowIndex]}
                 openContextMenu={openContextMenu}
               />
             ))}

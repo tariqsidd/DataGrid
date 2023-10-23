@@ -1,9 +1,16 @@
-import React, { useState, useCallback, useRef, useEffect } from "react";
+import React, {
+  useState,
+  useCallback,
+  useRef,
+  useEffect,
+  createRef,
+} from "react";
 import { TableCell, TableRow } from "@material-ui/core";
 import { commonStyles } from "./styles";
 import { cellContent, cellHasError, getCellType } from "./utils";
 import { subscribeToData, unsubscribe } from "./Reactive/subscriber";
-import { setSubscribedData } from "./Reactive/subscriber";
+import { setSubscribedData, getSubscribedData } from "./Reactive/subscriber";
+import ErrorCellCopy from "./ErrorCell2";
 
 let Ajv = require("ajv");
 let ajv = new Ajv({ allErrors: true });
@@ -14,6 +21,7 @@ const GridRow = ({
   rowIndex,
   row,
   data = [],
+  rowRefs,
   openContextMenu,
 }) => {
   const columnOrder = tableHeaders.map((item) => item.headerFieldName);
@@ -28,13 +36,30 @@ const GridRow = ({
     highlightedCell.current = value;
   };
 
+  // const rowRefs = data.map(() => createRef());
+
+  // useEffect(() => {
+  //   if (errorFocusCell !== null && rowRefs[errorFocusCell.rowIndex].current) {
+  //     console.log("here");
+  //     const targetRowRef = rowRefs[errorFocusCell.rowIndex].current;
+  //     const parentContainer = targetRowRef.closest(".table-container");
+
+  //     if (parentContainer) {
+  //       targetRowRef.scrollIntoView({ behavior: "smooth", block: "center" });
+  //     }
+  //   }
+  // }, [errorFocusCell]);
+
   useEffect(() => {
     subscribeToData("draggingCell", getDraggingCell);
     subscribeToData("highlightedCell", getHighlightedCell);
+    subscribeToData("errorFocusCell", getErrorFocusCell);
+    setErrorFocusCell(getSubscribedData("errorFocusCell"));
     return () => {
       // Run on unmount
       unsubscribe("draggingCell");
       unsubscribe("highlightedCell");
+      unsubscribe("errorFocusCell");
     };
   }, []);
 
@@ -45,16 +70,10 @@ const GridRow = ({
   const getHighlightedCell = (value) => {
     setHighlightedCell(value);
   };
-  //   useEffect(() => {
-  //     if (errorFocusCell !== null && rowRefs[errorFocusCell.rowIndex].current) {
-  //       const targetRowRef = rowRefs[errorFocusCell.rowIndex].current;
-  //       const parentContainer = targetRowRef.closest(".table-container");
 
-  //       if (parentContainer) {
-  //         targetRowRef.scrollIntoView({ behavior: "smooth", block: "center" });
-  //       }
-  //     }
-  //   }, [errorFocusCell]);
+  const getErrorFocusCell = (value) => {
+    setErrorFocusCell(value);
+  };
 
   const applyHighlightedStyle = (cell) => {
     if (cell) {
@@ -188,7 +207,6 @@ const GridRow = ({
       highlightedCell.current &&
       highlightedCell.current.rowIndex === rowIndex &&
       highlightedCell.current.fieldName === header.headerFieldName;
-
     const hasError = tableOptions.showErrors
       ? cellHasError(rowIndex, header.headerFieldName, data)
       : false;
@@ -200,16 +218,16 @@ const GridRow = ({
       editingCell &&
       editingCell.rowIndex === rowIndex &&
       editingCell.fieldName === header.headerFieldName;
-
     return {
       width: "100px",
       maxWidth: "100px",
       overflow: "hidden",
-      border: isHighlighted
-        ? isEditing
-          ? ""
-          : "2px dotted black"
-        : "1px solid #8080801a",
+      border: isErrorFocused ? "2px solid #f44336" : "1px solid #8080801a",
+      // border: isHighlighted
+      //   ? isEditing
+      //     ? ""
+      //     : "2px dotted black"
+      //   : "1px solid #8080801a",
       position: isHighlighted ? "relative" : undefined,
       padding: "0px",
       fontSize: "0.75em",
@@ -225,6 +243,7 @@ const GridRow = ({
       onContextMenu={(event) =>
         tableOptions.contextMenu ? openContextMenu(event, rowIndex) : null
       }
+      ref={rowRefs}
     >
       <TableCell className={classes.smallCell} align="center">
         {rowIndex}
@@ -265,22 +284,14 @@ const GridRow = ({
             ) : (
               <>
                 {tableOptions.showErrors && (hasError || isErrorFocused) ? (
-                  //   <ErrorCell
-                  //     tableOptions={tableOptions}
-                  //     data={data}
-                  //     row={row}
-                  //     header={header}
-                  //     hasError={hasError}
-                  //     rowIndex={rowIndex}
-                  //     isErrorFocused={isErrorFocused}
-                  //     errorCells={errorCells}
-                  //     currentErrorIndex={currentErrorIndex}
-                  //     setCurrentErrorIndex={setCurrentErrorIndex}
-                  //     setErrorFocusCell={setErrorFocusCell}
-                  //     setHighlightedCell={setHighlightedCell}
-                  //     handleHighlight={handleHighlight}
-                  //   />
-                  <></>
+                  <ErrorCellCopy
+                    tableOptions={tableOptions}
+                    data={data}
+                    row={row}
+                    header={header}
+                    hasError={hasError}
+                    rowIndex={rowIndex}
+                  />
                 ) : (
                   cellContent(row, header, hasError, rowIndex)
                 )}
