@@ -17,7 +17,6 @@ const ErrorCell = ({
   currentErrorIndex,
   setCurrentErrorIndex,
   setErrorFocusCell,
-  setHighlightedCell,
   handleHighlight,
 }) => {
   const focusOnErrorCell = (index) => {
