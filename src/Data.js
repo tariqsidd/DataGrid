@@ -89,79 +89,6 @@ export const tableHeader = [
   },
 ];
 
-// export const _tableHeader = [
-//   {
-//     headerName: "Name",
-//     headerFieldName: "name",
-//     headerFieldType: "string",
-//     headerCellType: "textField",
-//     headerSchema: {
-//       type: "object",
-//       properties: {
-//         name: { type: "string", minLength: 2, maxLength: 8 },
-//       },
-//       required: ["name"],
-//       additionalProperties: false,
-//     },
-//   },
-//   {
-//     headerName: "Surname",
-//     headerFieldName: "surname",
-//     headerFieldType: "string",
-//     headerCellType: "textField",
-//     headerSchema: {
-//       type: "object",
-//       properties: {
-//         name: { type: "string", minLength: 2, maxLength: 8 },
-//       },
-//       required: ["name"],
-//       additionalProperties: false,
-//     },
-//   },
-//   {
-//     headerName: "City",
-//     headerFieldName: "city",
-//     headerFieldType: "string",
-//     headerCellType: "textField",
-//     headerSchema: {
-//       type: "object",
-//       properties: {
-//         name: { type: "string", minLength: 2, maxLength: 8 },
-//       },
-//       required: ["name"],
-//       additionalProperties: false,
-//     },
-//   },
-//   {
-//     headerName: "Phone Number",
-//     headerFieldName: "phoneNo",
-//     headerFieldType: "number",
-//     headerCellType: "number",
-//     headerSchema: {
-//       type: "object",
-//       properties: {
-//         name: { type: "string", minLength: 2, maxLength: 8 },
-//       },
-//       required: ["name"],
-//       additionalProperties: false,
-//     },
-//   },
-//   {
-//     headerName: "Country",
-//     headerFieldName: "country",
-//     headerFieldType: "string",
-//     headerCellType: "textField",
-//     headerSchema: {
-//       type: "object",
-//       properties: {
-//         name: { type: "string", minLength: 2, maxLength: 8 },
-//       },
-//       required: ["name"],
-//       additionalProperties: false,
-//     },
-//   },
-// ];
-
 export const Data = [
   {
     name: "Jamil",
@@ -362,7 +289,7 @@ const dataSample = [
     city: "Los Karachi",
     phoneNo: 2313453453,
     country: "PK",
-    errorObj: { city: "city not allowed" }
+    errorObj: { city: "city not allowed" },
   },
   {
     name: "John",
@@ -371,7 +298,7 @@ const dataSample = [
     city: "New York",
     phoneNo: 1234567890,
     country: "USA",
-    errorObj: { phoneNo: "wrong country code" }
+    errorObj: { phoneNo: "wrong country code" },
   },
   {
     name: "Jane",
@@ -380,13 +307,12 @@ const dataSample = [
     city: "Los Angeles",
     phoneNo: 9876543210,
     country: "USA",
-    errorObj: { surname: "surname required" }
+    errorObj: { surname: "surname required" },
   },
 ];
 
 export let dataArray = [];
 
-for(let i = 0; i < (5000 / dataSample.length); i++) {
+for (let i = 0; i < 5000 / dataSample.length; i++) {
   dataArray = dataArray.concat(dataSample);
 }
-

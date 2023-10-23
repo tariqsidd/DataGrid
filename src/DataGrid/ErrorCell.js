@@ -32,7 +32,7 @@ const ErrorCell = ({
   };
 
   const handleNextError = (event) => {
-    event.stopPropagation(); // Stop event propagation
+    event.stopPropagation();
 
     if (currentErrorIndex < errorCells.length - 1) {
       setCurrentErrorIndex((prev) => prev + 1);
@@ -44,7 +44,7 @@ const ErrorCell = ({
   };
 
   const handlePrevError = (event) => {
-    event.stopPropagation(); // Stop event propagation
+    event.stopPropagation();
 
     if (currentErrorIndex > 0) {
       setCurrentErrorIndex((prev) => prev - 1);
