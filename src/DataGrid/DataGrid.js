@@ -29,6 +29,7 @@ const DataGrid = ({
   incomingData,
   tableHeaders,
   incomingTableOptions,
+  callExportCSV,
   itemHeight = 40,
   buffer = 15,
 }) => {
@@ -311,7 +312,12 @@ const DataGrid = ({
   const classes = commonStyles();
   return (
     <div className="table-container">
-      <ExportCSVButton data={data} tableHeaders={tableHeaders} />
+      <ExportCSVButton
+        data={data}
+        tableOptions={tableOptions}
+        tableHeaders={tableHeaders}
+        callExportCSV={callExportCSV}
+      />
       {tableOptions.showErrorAlert && tableOptions.showErrors && (
         <ErrorAlert error={errorCells.length} />
       )}
