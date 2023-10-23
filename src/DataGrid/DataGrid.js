@@ -1,6 +1,5 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, {useEffect, useState, useCallback, useRef} from "react";
 import { Table, TableBody, TableCell, TableRow } from "@material-ui/core";
-import "date-fns";
 import GridHeader from "./GridHeader";
 import GridFooter from "./GridFooter";
 import { DataGridOptions } from "./Constants";
@@ -20,11 +19,12 @@ import ErrorAlert from "./ErrorAlert";
 let Ajv = require("ajv");
 let ajv = new Ajv({ allErrors: true });
 
-const DataGrid = ({ incomingData, tableHeaders }) => {
+const DataGrid = ({ incomingData, tableHeaders, itemHeight=40, buffer=15 }) => {
+  console.log('RE-Render')
   const [editingCell, setEditingCell] = useState(null);
   const [editingCellHeader, setEditingCellHeader] = useState(null);
   const [editingValue, setEditingValue] = useState("");
-  const [highlightedCell, setHighlightedCell] = useState(null);
+  // const [highlightedCell, setHighlightedCell] = useState(null);
   const [draggingCell, setDraggingCell] = useState(null);
   const [currentErrorIndex, setCurrentErrorIndex] = useState(0);
   const [errorFocusCell, setErrorFocusCell] = useState(null);
@@ -37,7 +37,33 @@ const DataGrid = ({ incomingData, tableHeaders }) => {
     left: 0,
     rowIndex: -1,
   });
+  const containerRef = useRef(null);
+  const visibleRangeRef = useRef([0,0]);
+  const highlightedCell = useRef(null);
+  const setHighlightedCell = (value)=>{
+    highlightedCell.current = value
+  }
   const errorCells = tableOptions.showErrors ? errorIdentifier(data) : [];
+
+  useEffect(() => {
+    function updateVisibleItems() {
+      if (containerRef.current) {
+        const scrollTop = containerRef.current.scrollTop;
+        const startIndex = Math.max(0, Math.floor(scrollTop / itemHeight) - buffer);
+        const endIndex = Math.min(data.length, startIndex + Math.ceil(containerRef.current.clientHeight / itemHeight) + 2 * buffer);
+        visibleRangeRef.current = [startIndex, endIndex]
+        // setVisibleRange([startIndex, endIndex]);
+      }
+    }
+
+    updateVisibleItems();
+    window.addEventListener('scroll', updateVisibleItems);
+
+    return () => {
+      window.removeEventListener('scroll', updateVisibleItems);
+    };
+  }, [itemHeight, buffer, data.length]);
+
   useEffect(() => {
     const contextMenu = tableOptions.deleteRow || tableOptions.duplicateRow;
 
@@ -47,17 +73,47 @@ const DataGrid = ({ incomingData, tableHeaders }) => {
     });
   }, []);
 
-  const handleHighlight = useCallback((rowIndex, header) => {
+  const _handleHighlight = useCallback((rowIndex, header) => {
     setHighlightedCell({ rowIndex, fieldName: header.headerFieldName });
   }, []);
+
+  const applyHighlightedStyle = (cell) => {
+    if (cell) {
+      cell.style.border = '2px dotted black';
+      cell.style.position = 'relative';
+    }
+  };
+
+  const clearHighlightedStyle = (cell) => {
+    if (cell) {
+      cell.style.border = '1px solid #8080801a';
+      cell.style.position = '';
+    }
+  };
+
+  const handleHighlight = useCallback((rowIndex, header) => {
+    // Clear previously highlighted cell
+    if (highlightedCell.current) {
+      const prevCell = document.getElementById(highlightedCell.current);
+      clearHighlightedStyle(prevCell);
+    }
+
+    // Highlight the new cell
+    const cellId = `cell-${rowIndex}-${header.headerFieldName}`;
+    const newCell = document.getElementById(cellId);
+    applyHighlightedStyle(newCell);
+
+    setHighlightedCell(cellId);
+  }, []);
+
 
   const handleDragStart = useCallback((rowIndex, header) => {
     setDraggingCell({ rowIndex, fieldName: header.headerFieldName });
   }, []);
 
-  const handleDragOver = (e) => {
+  const handleDragOver = useCallback((e) => {
     e.preventDefault();
-  };
+  },[]);
 
   const handleDragEnter = (targetRowIndex, header) => {
     setHighlightedCell({
@@ -70,7 +126,7 @@ const DataGrid = ({ incomingData, tableHeaders }) => {
     setHighlightedCell(null);
   };
 
-  const handleDrop = (targetRowIndex, header) => {
+  const handleDrop = useCallback((targetRowIndex, header) => {
     if (draggingCell && draggingCell.fieldName === header.headerFieldName) {
       const valueToSet = data[draggingCell.rowIndex][header.headerFieldName];
       const newData = data.map((row, index) => {
@@ -92,15 +148,23 @@ const DataGrid = ({ incomingData, tableHeaders }) => {
       setData(newData);
       // onRowChange(newData);
     }
-  };
+  },[draggingCell, data]);
+
+  const _handleDoubleClick = useCallback((rowIndex, header) => {
+    setEditingCell({ rowIndex, fieldName: header.headerFieldName });
+    setEditingCellHeader(header);
+    setEditingValue(data[rowIndex][header.headerFieldName]);
+  },[editingCell, editingCellHeader, editingValue]);
 
   const handleDoubleClick = (rowIndex, header) => {
+    const cell = document.getElementById(highlightedCell.current);
+    clearHighlightedStyle(cell);
     setEditingCell({ rowIndex, fieldName: header.headerFieldName });
     setEditingCellHeader(header);
     setEditingValue(data[rowIndex][header.headerFieldName]);
   };
 
-  const validateRowData = (fieldName, rowData, headers) => {
+  const validateRowData = useCallback((fieldName, rowData, headers) => {
     const errors = JSON.parse(JSON.stringify(rowData.errorObj));
     if (errors.hasOwnProperty(fieldName)) {
       delete errors[fieldName];
@@ -129,7 +193,7 @@ const DataGrid = ({ incomingData, tableHeaders }) => {
         .filter((key) => errors.hasOwnProperty(key)) // Filter out keys not in the object
         .map((key) => [key, errors[key]])
     );
-  };
+  },[]);
 
   const handleBlur = () => {
     if (editingCell && editingCellHeader) {
@@ -167,18 +231,48 @@ const DataGrid = ({ incomingData, tableHeaders }) => {
     setContextMenuVisible(false);
   };
 
+  const getCellStyle = (rowIndex, header) => {
+    const isHighlighted =
+      highlightedCell.current &&
+      highlightedCell.current.rowIndex === rowIndex &&
+      highlightedCell.current.fieldName === header.headerFieldName;
+
+    const hasError = tableOptions.showErrors
+      ? cellHasError(rowIndex, header.headerFieldName, data)
+      : false;
+    const isErrorFocused =
+      errorFocusCell &&
+      errorFocusCell.rowIndex === rowIndex &&
+      errorFocusCell.fieldName === header.headerFieldName;
+    const isEditing =
+      editingCell &&
+      editingCell.rowIndex === rowIndex &&
+      editingCell.fieldName === header.headerFieldName;
+
+    return {
+      width: "100px",
+      maxWidth: "100px",
+      overflow: "hidden",
+      border: isHighlighted ? (isEditing ? "" : "2px dotted black") : "1px solid #8080801a",
+      position: isHighlighted ? "relative" : undefined,
+      padding: "0px",
+      fontSize: "0.75em",
+      backgroundColor: hasError || isErrorFocused ? "#ffe6e6" : "#fff",
+    };
+  };
+
   const classes = commonStyles();
   return (
     <div>
       <ExportCSVButton data={data} tableHeaders={tableHeaders} />
       {tableOptions.showErrorAlert && <ErrorAlert error={errorCells.length} />}
-      <Table stickyHeader>
+      <Table stickyHeader ref={containerRef} style={{ overflowY: 'auto', height: '100%' }}>
         <GridHeader tableOptions={tableOptions} tableHeaders={tableHeaders} />
-        <TableBody>
-          {data.map((row, rowIndex) => (
+        <TableBody style={{ height: data.length * itemHeight }}>
+          {data.slice(visibleRangeRef.current[0], visibleRangeRef.current[1]).map((row, rowIndex) => (
             <TableRow
               key={rowIndex}
-              style={{ height: tableOptions.columnHeight }}
+              style={{ height: tableOptions.columnHeight}}
               onContextMenu={(event) =>
                 tableOptions.contextMenu
                   ? openContextMenu(event, rowIndex)
@@ -192,10 +286,10 @@ const DataGrid = ({ incomingData, tableHeaders }) => {
                 const hasError = tableOptions.showErrors
                   ? cellHasError(rowIndex, header.headerFieldName, data)
                   : false;
-                const isHighlighted =
-                  highlightedCell &&
-                  highlightedCell.rowIndex === rowIndex &&
-                  highlightedCell.fieldName === header.headerFieldName;
+                // const isHighlighted =
+                //   highlightedCell &&
+                //   highlightedCell.rowIndex === rowIndex &&
+                //   highlightedCell.fieldName === header.headerFieldName;
                 const isErrorFocused =
                   errorFocusCell &&
                   errorFocusCell.rowIndex === rowIndex &&
@@ -207,6 +301,7 @@ const DataGrid = ({ incomingData, tableHeaders }) => {
 
                 return (
                   <TableCell
+                    id={`cell-${rowIndex}-${header.headerFieldName}`}
                     key={header.headerName}
                     align="center"
                     onClick={() => {
@@ -219,23 +314,24 @@ const DataGrid = ({ incomingData, tableHeaders }) => {
                     onDragEnter={() => handleDragEnter(rowIndex, header)}
                     onDragEnd={handleDragEnd}
                     onDrop={() => handleDrop(rowIndex, header)}
-                    style={{
-                      width: "100px",
-                      maxWidth: "100px",
-                      overflow: "hidden",
-                      ...(isHighlighted
-                        ? {
-                            border: isEditing ? "" : "2px dotted black",
-                            position: "relative",
-                          }
-                        : {
-                            border: "1px solid #8080801a",
-                          }),
-                      padding: "0px",
-                      fontSize: "0.75em",
-                      backgroundColor:
-                        hasError || isErrorFocused ? "#ffe6e6" : "#fff",
-                    }}
+                    style={getCellStyle(rowIndex, header)}
+                    // style={{
+                    //   width: "100px",
+                    //   maxWidth: "100px",
+                    //   overflow: "hidden",
+                    //   ...(isHighlighted
+                    //     ? {
+                    //         border: isEditing ? "" : "2px dotted black",
+                    //         position: "relative",
+                    //       }
+                    //     : {
+                    //         border: "1px solid #8080801a",
+                    //       }),
+                    //   padding: "0px",
+                    //   fontSize: "0.75em",
+                    //   backgroundColor:
+                    //     hasError || isErrorFocused ? "#ffe6e6" : "#fff",
+                    // }}
                   >
                     {tableOptions.editing && isEditing ? (
                       getCellType(

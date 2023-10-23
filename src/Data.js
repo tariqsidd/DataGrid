@@ -353,3 +353,40 @@ export const Data = [
     errorObj: { surname: "surname required" },
   },
 ];
+
+const dataSample = [
+  {
+    name: "Jamil",
+    surname: "Smith",
+    date: "17/10/2023",
+    city: "Los Karachi",
+    phoneNo: 2313453453,
+    country: "PK",
+    errorObj: { city: "city not allowed" }
+  },
+  {
+    name: "John",
+    surname: "Doe",
+    date: "18/10/2023",
+    city: "New York",
+    phoneNo: 1234567890,
+    country: "USA",
+    errorObj: { phoneNo: "wrong country code" }
+  },
+  {
+    name: "Jane",
+    surname: "",
+    date: "19/10/2023",
+    city: "Los Angeles",
+    phoneNo: 9876543210,
+    country: "USA",
+    errorObj: { surname: "surname required" }
+  },
+];
+
+export let dataArray = [];
+
+for(let i = 0; i < (5000 / dataSample.length); i++) {
+  dataArray = dataArray.concat(dataSample);
+}
+
