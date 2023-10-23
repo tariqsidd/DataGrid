@@ -18,6 +18,7 @@ const ErrorCell = ({
   setCurrentErrorIndex,
   setErrorFocusCell,
   setHighlightedCell,
+  handleHighlight,
 }) => {
   const focusOnErrorCell = (index) => {
     if (errorCells[index]) {
@@ -25,10 +26,7 @@ const ErrorCell = ({
         rowIndex: errorCells[index].rowIndex,
         fieldName: errorCells[index].cellName,
       });
-      setHighlightedCell({
-        rowIndex: errorCells[index].rowIndex,
-        fieldName: errorCells[index].cellName,
-      });
+      handleHighlight();
     }
   };
 
@@ -61,7 +59,6 @@ const ErrorCell = ({
       focusOnErrorCell(0);
     } else {
       setErrorFocusCell(null);
-      setHighlightedCell(null);
     }
   }, []);
 

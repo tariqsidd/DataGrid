@@ -281,7 +281,7 @@ export const Data = [
   },
 ];
 
-const dataSample = [
+export const dataSample = [
   {
     name: "Jamil",
     surname: "Smith",
@@ -289,7 +289,7 @@ const dataSample = [
     city: "Los Karachi",
     phoneNo: 2313453453,
     country: "PK",
-    errorObj: { city: "city not allowed" },
+    // errorObj: { city: "city not allowed" },
   },
   {
     name: "John",
@@ -298,7 +298,7 @@ const dataSample = [
     city: "New York",
     phoneNo: 1234567890,
     country: "USA",
-    errorObj: { phoneNo: "wrong country code" },
+    // errorObj: { phoneNo: "wrong country code" },
   },
   {
     name: "Jane",
@@ -307,7 +307,7 @@ const dataSample = [
     city: "Los Angeles",
     phoneNo: 9876543210,
     country: "USA",
-    errorObj: { surname: "surname required" },
+    //errorObj: { surname: "surname required" },
   },
 ];
 

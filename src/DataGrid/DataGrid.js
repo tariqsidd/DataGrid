@@ -131,19 +131,20 @@ const DataGrid = ({
     }
   };
 
-  const handleHighlight = useCallback((rowIndex, header) => {
+  const handleHighlight = useCallback((rowIndex, headerFieldName) => {
     // Clear previously highlighted cell
+    console.log("Handle Highlight");
     if (highlightedCell.current) {
       const prevCell = document.getElementById(highlightedCell.current);
       clearHighlightedStyle(prevCell);
     }
-
-    // Highlight the new cell
-    const cellId = `cell-${rowIndex}-${header.headerFieldName}`;
-    const newCell = document.getElementById(cellId);
-    applyHighlightedStyle(newCell);
-
-    setHighlightedCell(cellId);
+    if (rowIndex != null && headerFieldName != null) {
+      // Highlight the new cell
+      const cellId = `cell-${rowIndex}-${headerFieldName}`;
+      const newCell = document.getElementById(cellId);
+      applyHighlightedStyle(newCell);
+      setHighlightedCell(cellId);
+    }
   }, []);
 
   const handleDragStart = useCallback((rowIndex, header) => {
@@ -366,7 +367,8 @@ const DataGrid = ({
                       key={header.headerName}
                       align="center"
                       onClick={() => {
-                        if (!editingCell) handleHighlight(rowIndex, header);
+                        if (!editingCell)
+                          handleHighlight(rowIndex, header.headerFieldName);
                       }}
                       onDoubleClick={() => handleDoubleClick(rowIndex, header)}
                       draggable={tableOptions.editing ? !editingCell : false}
@@ -418,6 +420,7 @@ const DataGrid = ({
                               setCurrentErrorIndex={setCurrentErrorIndex}
                               setErrorFocusCell={setErrorFocusCell}
                               setHighlightedCell={setHighlightedCell}
+                              handleHighlight={handleHighlight}
                             />
                           ) : (
                             cellContent(row, header, hasError, rowIndex)

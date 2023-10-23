@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { tableHeader, Data, dataArray } from "./Data";
+import { tableHeader, Data, dataArray, dataSample } from "./Data";
 import { Button } from "@material-ui/core";
 import DataGrid from "./DataGrid/DataGrid";
 
