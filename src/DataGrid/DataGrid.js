@@ -1,4 +1,10 @@
-import React, { useEffect, useState, useCallback, useRef } from "react";
+import React, {
+  useEffect,
+  useState,
+  useCallback,
+  useRef,
+  createRef,
+} from "react";
 import { Table, TableBody, TableCell, TableRow } from "@material-ui/core";
 import GridHeader from "./GridHeader";
 import GridFooter from "./GridFooter";
@@ -50,6 +56,20 @@ const DataGrid = ({
     highlightedCell.current = value;
   };
   const errorCells = tableOptions.showErrors ? errorIdentifier(data) : [];
+
+  const rowRefs = data.map(() => createRef());
+
+  // Use a useEffect to focus the element when errorFocusCell changes
+  useEffect(() => {
+    if (errorFocusCell !== null && rowRefs[errorFocusCell.rowIndex].current) {
+      const targetRowRef = rowRefs[errorFocusCell.rowIndex].current;
+      const parentContainer = targetRowRef.closest(".table-container");
+
+      if (parentContainer) {
+        targetRowRef.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }
+  }, [errorFocusCell]);
 
   useEffect(() => {
     function updateVisibleItems() {
@@ -288,7 +308,7 @@ const DataGrid = ({
 
   const classes = commonStyles();
   return (
-    <div>
+    <div className="table-container">
       <ExportCSVButton data={data} tableHeaders={tableHeaders} />
       {tableOptions.showErrorAlert && tableOptions.showErrors && (
         <ErrorAlert error={errorCells.length} />
@@ -378,6 +398,7 @@ const DataGrid = ({
                           {tableOptions.showErrors &&
                           (hasError || isErrorFocused) ? (
                             <ErrorCell
+                              tableOptions={tableOptions}
                               data={data}
                               row={row}
                               header={header}
