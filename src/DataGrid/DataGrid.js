@@ -30,10 +30,6 @@ const DataGrid = ({
   });
   const containerRef = useRef(null);
   const visibleRangeRef = useRef([0, 0]);
-  // const highlightedCell = useRef(null);
-  // const setHighlightedCell = (value) => {
-  //   highlightedCell.current = value;
-  // };
   const errorCells = tableOptions.showErrors ? errorIdentifier(data) : [];
 
   const rowRefs = data.map(() => createRef());
@@ -235,7 +231,6 @@ const DataGrid = ({
                   visibleRangeRef.current[0],
                   visibleRangeRef.current[1]
                 )}
-                setData={setData}
                 openContextMenu={openContextMenu}
               />
             ))}

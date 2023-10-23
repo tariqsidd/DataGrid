@@ -30,14 +30,20 @@ const GridRow = ({
 
   useEffect(() => {
     subscribeToData("draggingCell", getDraggingCell);
+    subscribeToData("highlightedCell", getHighlightedCell);
     return () => {
       // Run on unmount
       unsubscribe("draggingCell");
+      unsubscribe("highlightedCell");
     };
   }, []);
 
   const getDraggingCell = (value) => {
     setDraggingCell(value);
+  };
+
+  const getHighlightedCell = (value) => {
+    setHighlightedCell(value);
   };
   //   useEffect(() => {
   //     if (errorFocusCell !== null && rowRefs[errorFocusCell.rowIndex].current) {
@@ -66,7 +72,6 @@ const GridRow = ({
 
   const handleHighlight = useCallback((rowIndex, headerFieldName) => {
     // Clear previously highlighted cell
-    console.log("Handle Highlight");
     if (highlightedCell.current) {
       const prevCell = document.getElementById(highlightedCell.current);
       clearHighlightedStyle(prevCell);
@@ -76,7 +81,7 @@ const GridRow = ({
       const cellId = `cell-${rowIndex}-${headerFieldName}`;
       const newCell = document.getElementById(cellId);
       applyHighlightedStyle(newCell);
-      setHighlightedCell(cellId);
+      setSubscribedData("highlightedCell", cellId);
     }
   }, []);
 
@@ -90,28 +95,25 @@ const GridRow = ({
     }
   };
 
-  const handleDragStart = useCallback((rowIndex, header) => {
-    console.log("Handle Drag Start");
+  const handleDragStart = (rowIndex, header) => {
     setSubscribedData("draggingCell", {
       rowIndex,
       fieldName: header.headerFieldName,
     });
-  }, []);
+  };
 
   const handleDragOver = useCallback((e) => {
     e.preventDefault();
   }, []);
 
   const handleDragEnter = (targetRowIndex, header) => {
-    setHighlightedCell({
-      rowIndex: targetRowIndex,
-      headerFieldName: header.headerFieldName,
-    });
+    if (header.headerFieldName === draggingCell.fieldName) {
+      const cellId = `cell-${targetRowIndex}-${header.headerFieldName}`;
+      handleHighlight(targetRowIndex, header.headerFieldName);
+    }
   };
 
-  const handleDragEnd = () => {
-    setHighlightedCell(null);
-  };
+  const handleDragEnd = () => {};
 
   const handleDrop = (targetRowIndex, header) => {
     if (draggingCell && draggingCell.fieldName === header.headerFieldName) {
@@ -126,8 +128,7 @@ const GridRow = ({
         );
       }
       setSubscribedData("draggingCell", null);
-      setHighlightedCell(null);
-      //   setData(newData);
+      handleHighlight(targetRowIndex, header.headerFieldName);
     }
   };
 
