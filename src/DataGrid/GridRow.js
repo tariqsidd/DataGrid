@@ -28,6 +28,7 @@ const GridRow = forwardRef(
     },
     ref
   ) => {
+    console.log("Table Row Rendered");
     // console.log(ref);
     const columnOrder = tableHeaders.map((item) => item.headerFieldName);
     const [errorFocusCell, setErrorFocusCell] = useState(null);
@@ -45,18 +46,30 @@ const GridRow = forwardRef(
       subscribeToData("draggingCell", getDraggingCell);
       subscribeToData("highlightedCell", getHighlightedCell);
       subscribeToData("errorFocusCell", getErrorFocusCell);
+      subscribeToData("dropCell", getDropCell);
       setErrorFocusCell(getSubscribedData("errorFocusCell"));
       return () => {
         // Run on unmount
         unsubscribe("draggingCell");
         unsubscribe("highlightedCell");
         unsubscribe("errorFocusCell");
+        unsubscribe("dropCell");
       };
     }, []);
 
-    const getDraggingCell = (value) => {
-      setDraggingCell(value);
+    const getDropCell = (value) => {
+      const draggingCell = getSubscribedData("draggingCell");
+      const dropCell = value;
+      if (
+        rowIndex > draggingCell.rowIndex &&
+        rowIndex <= dropCell.targetRowIndex
+      ) {
+        setDraggingCell(value);
+        setOnDrop(dropCell.targetRowIndex, dropCell.header, draggingCell);
+      }
     };
+
+    const getDraggingCell = (value) => {};
 
     const getHighlightedCell = (value) => {
       setHighlightedCell(value);
@@ -117,15 +130,19 @@ const GridRow = forwardRef(
     }, []);
 
     const handleDragEnter = (targetRowIndex, header) => {
-      if (header.headerFieldName === draggingCell.fieldName) {
-        const cellId = `cell-${targetRowIndex}-${header.headerFieldName}`;
-        handleHighlight(targetRowIndex, header.headerFieldName);
-      }
+      // if (header.headerFieldName === draggingCell.fieldName) {
+      //   const cellId = `cell-${targetRowIndex}-${header.headerFieldName}`;
+      //   handleHighlight(targetRowIndex, header.headerFieldName);
+      // }
     };
 
     const handleDragEnd = () => {};
 
     const handleDrop = (targetRowIndex, header) => {
+      setSubscribedData("dropCell", { targetRowIndex, header });
+    };
+
+    const setOnDrop = (targetRowIndex, header, draggingCell) => {
       if (draggingCell && draggingCell.fieldName === header.headerFieldName) {
         const newData = [...data];
         for (let i = draggingCell.rowIndex; i <= targetRowIndex; i++) {
@@ -137,7 +154,6 @@ const GridRow = forwardRef(
             header
           );
         }
-        setSubscribedData("draggingCell", null);
         handleHighlight(targetRowIndex, header.headerFieldName);
       }
     };
