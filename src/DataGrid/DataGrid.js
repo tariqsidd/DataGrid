@@ -4,10 +4,10 @@ import GridHeader from "./GridHeader";
 import GridFooter from "./GridFooter";
 import GridRow from "./GridRow";
 import { DataGridOptions } from "./Constants";
-import { addNewRow, errorIdentifier } from "./utils";
+import { addNewRow } from "./utils";
 import ContextMenu from "./ContextMenu";
 import { commonStyles } from "./styles";
-import ExportCSVButton from "./ExportCSVButton";
+import ExportAndSubmitButton from "./ExportAndSubmitButton";
 import ErrorAlert from "./ErrorAlert";
 
 const DataGrid = ({
@@ -15,6 +15,7 @@ const DataGrid = ({
   tableHeaders,
   incomingTableOptions,
   callExportCSV,
+  onSubmit,
   itemHeight = 40,
   buffer = 15,
 }) => {
@@ -88,11 +89,12 @@ const DataGrid = ({
   const classes = commonStyles();
   return (
     <div className="table-container">
-      <ExportCSVButton
+      <ExportAndSubmitButton
         data={data}
         tableOptions={tableOptions}
         tableHeaders={tableHeaders}
         callExportCSV={callExportCSV}
+        onSubmit={onSubmit}
       />
       {tableOptions.showErrorAlert && tableOptions.showErrors && (
         <ErrorAlert data={data} tableOptions={tableOptions} />

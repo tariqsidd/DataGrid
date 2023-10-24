@@ -86,11 +86,13 @@ const GridRow = ({
   };
 
   const getErrorFocusCell = (value) => {
-    if (
-      rowIndex === value.current.rowIndex ||
-      rowIndex === value.next.rowIndex
-    ) {
-      handleErrorFocus(value.next.rowIndex, value.next.fieldName);
+    if (value) {
+      if (
+        rowIndex === value.current.rowIndex ||
+        rowIndex === value.next.rowIndex
+      ) {
+        handleErrorFocus(value.next.rowIndex, value.next.fieldName);
+      }
     }
   };
 
