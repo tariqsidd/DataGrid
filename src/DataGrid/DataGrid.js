@@ -20,7 +20,8 @@ const DataGrid = ({
   buffer = 15,
 }) => {
   console.log("RE-Render");
-  // const [errorFocusCell, setErrorFocusCell] = useState(null);
+  const [errorFocusCell, setErrorFocusCell] = useState(null);
+  const [refs, setRefs] = useState(false);
   const [data, setData] = useState(incomingData);
   const [tableOptions, setTableOptions] = useState(DataGridOptions);
   const [contextMenuVisible, setContextMenuVisible] = useState(false);
@@ -32,34 +33,40 @@ const DataGrid = ({
   const containerRef = useRef(null);
   const visibleRangeRef = useRef([0, 0]);
   const errorCells = tableOptions.showErrors ? errorIdentifier(data) : [];
+  const rowRefs = data.map(() => createRef());
 
-  // useEffect(() => {
-  //   subscribeToData("errorFocusCell", getErrorFocusCell);
-  //   return () => {
-  //     // Run on unmount
-  //     unsubscribe("errorFocusCell");
-  //   };
-  // }, []);
-
-  // const getErrorFocusCell = (value) => {
-  //   setErrorFocusCell(value);
-  // };
-
-  // const rowRefs = data.map(() => createRef());
+  useEffect(() => {
+    subscribeToData("errorFocusCell", getErrorFocusCell);
+    return () => {
+      // Run on unmount
+      unsubscribe("errorFocusCell");
+    };
+  }, []);
+  const getErrorFocusCell = (value) => {
+    console.log("Get Error Cell", rowRefs);
+    // console.log(value);
+    // if (value !== null && rowRefs[value.rowIndex].current) {
+    //   console.log("here");
+    //   const targetRowRef = rowRefs[value.rowIndex].current;
+    //   const parentContainer = targetRowRef.closest(".table-container");
+    //   if (parentContainer) {
+    //     targetRowRef.scrollIntoView({ behavior: "smooth", block: "center" });
+    //   }
+    // }
+  };
 
   // useEffect(() => {
   //   console.log(errorFocusCell);
-  //   console.log(rowRefs);
-  //   if (errorFocusCell !== null && rowRefs[errorFocusCell.rowIndex].current) {
-  //     console.log("here");
-  //     const targetRowRef = rowRefs[errorFocusCell.rowIndex].current;
-  //     const parentContainer = targetRowRef.closest(".table-container");
-
-  //     if (parentContainer) {
-  //       targetRowRef.scrollIntoView({ behavior: "smooth", block: "center" });
-  //     }
-  //   }
-  // }, [errorFocusCell]);
+  //   console.log("Inside Use EFfect", rowRefs);
+  //   // if (errorFocusCell !== null && rowRefs[errorFocusCell.rowIndex].current) {
+  //   //   console.log("here");
+  //   //   const targetRowRef = rowRefs[errorFocusCell.rowIndex].current;
+  //   //   const parentContainer = targetRowRef.closest(".table-container");
+  //   //   if (parentContainer) {
+  //   //     targetRowRef.scrollIntoView({ behavior: "smooth", block: "center" });
+  //   //   }
+  //   // }
+  // }, []);
 
   useEffect(() => {
     function updateVisibleItems() {
@@ -138,105 +145,6 @@ const DataGrid = ({
           {data
             .slice(visibleRangeRef.current[0], visibleRangeRef.current[1])
             .map((row, rowIndex) => (
-              // <TableRow
-              //   key={rowIndex}
-              //   style={{ height: tableOptions.columnHeight }}
-              //   onContextMenu={(event) =>
-              //     tableOptions.contextMenu
-              //       ? openContextMenu(event, rowIndex)
-              //       : null
-              //   }
-              // >
-              //   <TableCell className={classes.smallCell} align="center">
-              //     {rowIndex}
-              //   </TableCell>
-              //   {tableHeaders.map((header) => {
-              //     const hasError = tableOptions.showErrors
-              //       ? cellHasError(rowIndex, header.headerFieldName, data)
-              //       : false;
-              //     // const isHighlighted =
-              //     //   highlightedCell &&
-              //     //   highlightedCell.rowIndex === rowIndex &&
-              //     //   highlightedCell.fieldName === header.headerFieldName;
-              //     const isErrorFocused =
-              //       errorFocusCell &&
-              //       errorFocusCell.rowIndex === rowIndex &&
-              //       errorFocusCell.fieldName === header.headerFieldName;
-              //     const isEditing =
-              //       editingCell &&
-              //       editingCell.rowIndex === rowIndex &&
-              //       editingCell.fieldName === header.headerFieldName;
-
-              //     return (
-              //       <TableCell
-              //         id={`cell-${rowIndex}-${header.headerFieldName}`}
-              //         key={header.headerName}
-              //         align="center"
-              //         onClick={() => {
-              //           if (!editingCell)
-              //             handleHighlight(rowIndex, header.headerFieldName);
-              //         }}
-              //         onDoubleClick={() => handleDoubleClick(rowIndex, header)}
-              //         draggable={tableOptions.editing ? !editingCell : false}
-              //         onDragStart={() => handleDragStart(rowIndex, header)}
-              //         onDragOver={handleDragOver}
-              //         onDragEnter={() => handleDragEnter(rowIndex, header)}
-              //         onDragEnd={handleDragEnd}
-              //         onDrop={() => handleDrop(rowIndex, header)}
-              //         style={getCellStyle(rowIndex, header)}
-              //         // style={{
-              //         //   width: "100px",
-              //         //   maxWidth: "100px",
-              //         //   overflow: "hidden",
-              //         //   ...(isHighlighted
-              //         //     ? {
-              //         //         border: isEditing ? "" : "2px dotted black",
-              //         //         position: "relative",
-              //         //       }
-              //         //     : {
-              //         //         border: "1px solid #8080801a",
-              //         //       }),
-              //         //   padding: "0px",
-              //         //   fontSize: "0.75em",
-              //         //   backgroundColor:
-              //         //     hasError || isErrorFocused ? "#ffe6e6" : "#fff",
-              //         // }}
-              //       >
-              //         {tableOptions.editing && isEditing ? (
-              //           getCellType(
-              //             header,
-              //             editingValue,
-              //             handleBlur,
-              //             setEditingValue
-              //           )
-              //         ) : (
-              //           <>
-              //             {tableOptions.showErrors &&
-              //             (hasError || isErrorFocused) ? (
-              //               <ErrorCell
-              //                 tableOptions={tableOptions}
-              //                 data={data}
-              //                 row={row}
-              //                 header={header}
-              //                 hasError={hasError}
-              //                 rowIndex={rowIndex}
-              //                 isErrorFocused={isErrorFocused}
-              //                 errorCells={errorCells}
-              //                 currentErrorIndex={currentErrorIndex}
-              //                 setCurrentErrorIndex={setCurrentErrorIndex}
-              //                 setErrorFocusCell={setErrorFocusCell}
-              //                 setHighlightedCell={setHighlightedCell}
-              //                 handleHighlight={handleHighlight}
-              //               />
-              //             ) : (
-              //               cellContent(row, header, hasError, rowIndex)
-              //             )}
-              //           </>
-              //         )}
-              //       </TableCell>
-              //     );
-              //   })}
-              // </TableRow>
               <GridRow
                 tableOptions={tableOptions}
                 tableHeaders={tableHeaders}
@@ -246,8 +154,8 @@ const DataGrid = ({
                   visibleRangeRef.current[0],
                   visibleRangeRef.current[1]
                 )}
-                // rowrefs={rowRefs[rowIndex]}
                 openContextMenu={openContextMenu}
+                ref={rowRefs}
               />
             ))}
           {tableOptions.addRow && (
