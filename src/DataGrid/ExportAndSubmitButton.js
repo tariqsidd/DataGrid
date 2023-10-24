@@ -65,15 +65,18 @@ const ExportAndSubmitButton = ({
           Export CSV
         </Button>
       )}
-      <Button
-        variant="contained"
-        color="primary"
-        className={classes.button}
-        onClick={onSubmit}
-        disabled={errorCells.length > 0}
-      >
-        Submit
-      </Button>
+      {tableOptions.showSubmitButton && (
+        <Button
+          variant="contained"
+          color="primary"
+          className={classes.button}
+          onClick={onSubmit}
+          disabled={errorCells.length > 0}
+        >
+          Submit
+        </Button>
+      )}
+
       <CSVLink
         data={prepareCSVData(data, tableHeaders)}
         filename="table-data.csv"
