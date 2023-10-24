@@ -29,7 +29,6 @@ const GridRow = forwardRef(
     ref
   ) => {
     console.log("Table Row Rendered");
-    // console.log(ref);
     const columnOrder = tableHeaders.map((item) => item.headerFieldName);
     const [editingCell, setEditingCell] = useState(null);
     const [editingCellHeader, setEditingCellHeader] = useState(null);
@@ -256,33 +255,14 @@ const GridRow = forwardRef(
     };
 
     const getCellStyle = (rowIndex, header) => {
-      const isHighlighted =
-        highlightedCell.current &&
-        highlightedCell.current.rowIndex === rowIndex &&
-        highlightedCell.current.fieldName === header.headerFieldName;
       const hasError = tableOptions.showErrors
         ? cellHasError(rowIndex, header.headerFieldName, data)
         : false;
-      // const isErrorFocused =
-      //   errorFocusCell.current &&
-      //   errorFocusCell.current.rowIndex === rowIndex &&
-      //   errorFocusCell.current.fieldName === header.headerFieldName;
-      const isEditing =
-        editingCell &&
-        editingCell.rowIndex === rowIndex &&
-        editingCell.fieldName === header.headerFieldName;
       return {
         width: "100px",
         maxWidth: "100px",
         overflow: "hidden",
         border: "1px solid #8080801a",
-        //border: isErrorFocused ? "2px solid #f44336" : "1px solid #8080801a",
-        // border: isHighlighted
-        //   ? isEditing
-        //     ? ""
-        //     : "2px dotted black"
-        //   : "1px solid #8080801a",
-        position: isHighlighted ? "relative" : undefined,
         padding: "0px",
         fontSize: "0.75em",
         backgroundColor: hasError ? "#ffe6e6" : "#fff",
@@ -306,10 +286,6 @@ const GridRow = forwardRef(
           const hasError = tableOptions.showErrors
             ? cellHasError(rowIndex, header.headerFieldName, data)
             : false;
-          // const isErrorFocused =
-          //   errorFocusCell &&
-          //   errorFocusCell.rowIndex === rowIndex &&
-          //   errorFocusCell.fieldName === header.headerFieldName;
           const isEditing =
             editingCell &&
             editingCell.rowIndex === rowIndex &&
