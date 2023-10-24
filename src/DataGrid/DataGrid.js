@@ -43,7 +43,7 @@ const DataGrid = ({
     };
   }, []);
   const getErrorFocusCell = (value) => {
-    console.log("Get Error Cell", rowRefs);
+    //console.log("Get Error Cell", rowRefs);
     // console.log(value);
     // if (value !== null && rowRefs[value.rowIndex].current) {
     //   console.log("here");

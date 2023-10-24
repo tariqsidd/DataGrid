@@ -31,7 +31,6 @@ const GridRow = forwardRef(
     console.log("Table Row Rendered");
     // console.log(ref);
     const columnOrder = tableHeaders.map((item) => item.headerFieldName);
-    const [errorFocusCell, setErrorFocusCell] = useState(null);
     const [editingCell, setEditingCell] = useState(null);
     const [editingCellHeader, setEditingCellHeader] = useState(null);
     const [editingValue, setEditingValue] = useState("");
@@ -42,18 +41,26 @@ const GridRow = forwardRef(
       highlightedCell.current = value;
     };
 
+    const errorFocusedCellRef = useRef(null);
+    const setErrorFocusedCellRef = (value) => {
+      errorFocusedCellRef.current = value;
+    };
+
     useEffect(() => {
       subscribeToData("draggingCell", getDraggingCell);
       subscribeToData("highlightedCell", getHighlightedCell);
       subscribeToData("errorFocusCell", getErrorFocusCell);
+      subscribeToData("errorFocusedCellRef", getErrorFocusedCellRef);
       subscribeToData("dropCell", getDropCell);
-      setErrorFocusCell(getSubscribedData("errorFocusCell"));
+      const errorFocusCell = getSubscribedData("errorFocusCell");
+      handleErrorFocus(errorFocusCell.rowIndex, errorFocusCell.fieldName);
       return () => {
         // Run on unmount
         unsubscribe("draggingCell");
         unsubscribe("highlightedCell");
         unsubscribe("errorFocusCell");
         unsubscribe("dropCell");
+        unsubscribe("errorFocusedCellRef");
       };
     }, []);
 
@@ -75,8 +82,38 @@ const GridRow = forwardRef(
       setHighlightedCell(value);
     };
 
+    const getErrorFocusedCellRef = (value) => {
+      setErrorFocusedCellRef(value);
+    };
+
     const getErrorFocusCell = (value) => {
-      setErrorFocusCell(value);
+      handleErrorFocus(value.rowIndex, value.fieldName);
+    };
+
+    const applyErrorFocusStyle = (cell) => {
+      if (cell) {
+        cell.style.border = "2px solid #f44336";
+      }
+    };
+
+    const clearErrorFocusStyle = (cell) => {
+      if (cell) {
+        cell.style.border = "1px solid #8080801a";
+      }
+    };
+
+    const handleErrorFocus = (rowIndex, headerFieldName) => {
+      if (errorFocusedCellRef.current) {
+        const prevCell = document.getElementById(errorFocusedCellRef.current);
+        clearErrorFocusStyle(prevCell);
+      }
+      if (rowIndex != null && headerFieldName != null) {
+        // Error Focus the new cell
+        const cellId = `cell-${rowIndex}-${headerFieldName}`;
+        const newCell = document.getElementById(cellId);
+        applyErrorFocusStyle(newCell);
+        setSubscribedData("errorFocusedCellRef", cellId);
+      }
     };
 
     const applyHighlightedStyle = (cell) => {
@@ -93,7 +130,8 @@ const GridRow = forwardRef(
       }
     };
 
-    const handleHighlight = useCallback((rowIndex, headerFieldName) => {
+    const handleHighlight = (rowIndex, headerFieldName) => {
+      console.log(highlightedCell);
       // Clear previously highlighted cell
       if (highlightedCell.current) {
         const prevCell = document.getElementById(highlightedCell.current);
@@ -106,7 +144,7 @@ const GridRow = forwardRef(
         applyHighlightedStyle(newCell);
         setSubscribedData("highlightedCell", cellId);
       }
-    }, []);
+    };
 
     const handleDoubleClick = (rowIndex, header) => {
       if (tableOptions.editing) {
@@ -182,6 +220,14 @@ const GridRow = forwardRef(
           errors[fieldKey] = validate.errors[0].message;
         }
       }
+      if (headers.headerCellType === "select") {
+        const options = headers.headerOptions.map((option) => option.value);
+        let valid = options.includes(value);
+        if (!valid) {
+          let error = `"${value}" is not a valid selection. Please choose from the available options in the dropdown`;
+          errors[fieldKey] = error;
+        }
+      }
 
       //Sorting Error
       return Object.fromEntries(
@@ -217,10 +263,10 @@ const GridRow = forwardRef(
       const hasError = tableOptions.showErrors
         ? cellHasError(rowIndex, header.headerFieldName, data)
         : false;
-      const isErrorFocused =
-        errorFocusCell &&
-        errorFocusCell.rowIndex === rowIndex &&
-        errorFocusCell.fieldName === header.headerFieldName;
+      // const isErrorFocused =
+      //   errorFocusCell.current &&
+      //   errorFocusCell.current.rowIndex === rowIndex &&
+      //   errorFocusCell.current.fieldName === header.headerFieldName;
       const isEditing =
         editingCell &&
         editingCell.rowIndex === rowIndex &&
@@ -229,7 +275,8 @@ const GridRow = forwardRef(
         width: "100px",
         maxWidth: "100px",
         overflow: "hidden",
-        border: isErrorFocused ? "2px solid #f44336" : "1px solid #8080801a",
+        border: "1px solid #8080801a",
+        //border: isErrorFocused ? "2px solid #f44336" : "1px solid #8080801a",
         // border: isHighlighted
         //   ? isEditing
         //     ? ""
@@ -238,7 +285,7 @@ const GridRow = forwardRef(
         position: isHighlighted ? "relative" : undefined,
         padding: "0px",
         fontSize: "0.75em",
-        backgroundColor: hasError || isErrorFocused ? "#ffe6e6" : "#fff",
+        backgroundColor: hasError ? "#ffe6e6" : "#fff",
       };
     };
 
@@ -259,10 +306,10 @@ const GridRow = forwardRef(
           const hasError = tableOptions.showErrors
             ? cellHasError(rowIndex, header.headerFieldName, data)
             : false;
-          const isErrorFocused =
-            errorFocusCell &&
-            errorFocusCell.rowIndex === rowIndex &&
-            errorFocusCell.fieldName === header.headerFieldName;
+          // const isErrorFocused =
+          //   errorFocusCell &&
+          //   errorFocusCell.rowIndex === rowIndex &&
+          //   errorFocusCell.fieldName === header.headerFieldName;
           const isEditing =
             editingCell &&
             editingCell.rowIndex === rowIndex &&
@@ -290,7 +337,7 @@ const GridRow = forwardRef(
                 getCellType(header, editingValue, handleBlur, setEditingValue)
               ) : (
                 <>
-                  {tableOptions.showErrors && (hasError || isErrorFocused) ? (
+                  {tableOptions.showErrors && hasError ? (
                     <ErrorCellCopy
                       tableOptions={tableOptions}
                       data={data}

@@ -8,6 +8,7 @@ import { setSubscribedData } from "./Reactive/subscriber";
 import { commonStyles } from "./styles";
 
 const ErrorAlert = ({ errorCells }) => {
+  console.log("Error Alert Rendered");
   const [currentErrorIndex, setCurrentErrorIndex] = useState(0);
   const [errorFocusCell, setErrorFocusCell] = useState(null);
 
