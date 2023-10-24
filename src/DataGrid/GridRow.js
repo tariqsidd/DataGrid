@@ -178,7 +178,6 @@ const GridRow = ({
 
   const setOnDrop = (targetRowIndex, header, draggingCell) => {
     if (draggingCell && draggingCell.fieldName === header.headerFieldName) {
-      console.log(draggingCell);
       const newData = [...data];
       for (let i = draggingCell.rowIndex; i <= targetRowIndex; i++) {
         newData[i][header.headerFieldName] =
