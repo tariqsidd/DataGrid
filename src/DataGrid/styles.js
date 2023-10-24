@@ -76,6 +76,9 @@ export const commonStyles = makeStyles((theme) => ({
     justifyContent: "flex-end",
     padding: "8px",
   },
+  button: {
+    margin: "4px",
+  },
   errorAlert: {
     paddingRight: "4px",
     paddingLeft: "4px",

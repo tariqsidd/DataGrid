@@ -11,7 +11,8 @@ const tableOptions = {
   editing: true,
   showErrors: true,
   showErrorAlert: true,
-  showExportButton: false,
+  showExportButton: true,
+  showSubmitButton: true,
 };
 
 const App = () => {
