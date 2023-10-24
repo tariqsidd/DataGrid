@@ -1,27 +1,25 @@
 import React, { useEffect, useState, useRef, createRef } from "react";
-import { Table, TableBody, TableCell, TableRow } from "@material-ui/core";
+import { Table, TableBody } from "@material-ui/core";
 import GridHeader from "./GridHeader";
 import GridFooter from "./GridFooter";
 import GridRow from "./GridRow";
 import { DataGridOptions } from "./Constants";
-import { addNewRow, errorIdentifier } from "./utils";
+import { addNewRow } from "./utils";
 import ContextMenu from "./ContextMenu";
 import { commonStyles } from "./styles";
-import ExportCSVButton from "./ExportCSVButton";
+import ExportAndSubmitButton from "./ExportAndSubmitButton";
 import ErrorAlert from "./ErrorAlert";
-import { subscribeToData, unsubscribe } from "./Reactive/subscriber";
 
 const DataGrid = ({
   incomingData,
   tableHeaders,
   incomingTableOptions,
   callExportCSV,
+  onSubmit,
   itemHeight = 40,
   buffer = 15,
 }) => {
   console.log("RE-Render");
-  const [errorFocusCell, setErrorFocusCell] = useState(null);
-  const [refs, setRefs] = useState(false);
   const [data, setData] = useState(incomingData);
   const [tableOptions, setTableOptions] = useState(DataGridOptions);
   const [contextMenuVisible, setContextMenuVisible] = useState(false);
@@ -32,41 +30,6 @@ const DataGrid = ({
   });
   const containerRef = useRef(null);
   const visibleRangeRef = useRef([0, 0]);
-  const errorCells = tableOptions.showErrors ? errorIdentifier(data) : [];
-  const rowRefs = data.map(() => createRef());
-
-  useEffect(() => {
-    subscribeToData("errorFocusCell", getErrorFocusCell);
-    return () => {
-      // Run on unmount
-      unsubscribe("errorFocusCell");
-    };
-  }, []);
-  const getErrorFocusCell = (value) => {
-    //console.log("Get Error Cell", rowRefs);
-    // console.log(value);
-    // if (value !== null && rowRefs[value.rowIndex].current) {
-    //   console.log("here");
-    //   const targetRowRef = rowRefs[value.rowIndex].current;
-    //   const parentContainer = targetRowRef.closest(".table-container");
-    //   if (parentContainer) {
-    //     targetRowRef.scrollIntoView({ behavior: "smooth", block: "center" });
-    //   }
-    // }
-  };
-
-  // useEffect(() => {
-  //   console.log(errorFocusCell);
-  //   console.log("Inside Use EFfect", rowRefs);
-  //   // if (errorFocusCell !== null && rowRefs[errorFocusCell.rowIndex].current) {
-  //   //   console.log("here");
-  //   //   const targetRowRef = rowRefs[errorFocusCell.rowIndex].current;
-  //   //   const parentContainer = targetRowRef.closest(".table-container");
-  //   //   if (parentContainer) {
-  //   //     targetRowRef.scrollIntoView({ behavior: "smooth", block: "center" });
-  //   //   }
-  //   // }
-  // }, []);
 
   useEffect(() => {
     function updateVisibleItems() {
@@ -126,14 +89,15 @@ const DataGrid = ({
   const classes = commonStyles();
   return (
     <div className="table-container">
-      <ExportCSVButton
+      <ExportAndSubmitButton
         data={data}
         tableOptions={tableOptions}
         tableHeaders={tableHeaders}
         callExportCSV={callExportCSV}
+        onSubmit={onSubmit}
       />
       {tableOptions.showErrorAlert && tableOptions.showErrors && (
-        <ErrorAlert errorCells={errorCells} />
+        <ErrorAlert data={data} tableOptions={tableOptions} />
       )}
       <Table
         stickyHeader
@@ -155,7 +119,6 @@ const DataGrid = ({
                   visibleRangeRef.current[1]
                 )}
                 openContextMenu={openContextMenu}
-                ref={rowRefs}
               />
             ))}
           {tableOptions.addRow && (

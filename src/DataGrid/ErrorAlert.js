@@ -3,32 +3,80 @@ import { IconButton, Typography } from "@material-ui/core";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
 import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
-import { subscribeToData, unsubscribe } from "./Reactive/subscriber";
-import { setSubscribedData } from "./Reactive/subscriber";
+import {
+  subscribeToData,
+  unsubscribe,
+  setSubscribedData,
+} from "./Reactive/subscriber";
 import { commonStyles } from "./styles";
+import { errorIdentifier } from "./utils";
 
-const ErrorAlert = ({ errorCells }) => {
+const ErrorAlert = ({ tableOptions = {}, data = [] }) => {
   console.log("Error Alert Rendered");
   const [currentErrorIndex, setCurrentErrorIndex] = useState(0);
-  const [errorFocusCell, setErrorFocusCell] = useState(null);
+  const [errorCells, setErrorCells] = useState([]);
 
   useEffect(() => {
-    subscribeToData("errorFocusCell", getErrorFocusCell);
+    subscribeToData("gridData", getGridData);
     return () => {
       // Run on unmount
-      unsubscribe("errorFocusCell");
+      unsubscribe("gridData");
     };
   }, []);
 
-  const getErrorFocusCell = (value) => {
-    setErrorFocusCell(value);
+  useEffect(() => {
+    const errors = tableOptions.showErrors ? errorIdentifier(data) : [];
+    if (errors.length > 0) {
+      if (errors[0]) {
+        setSubscribedData("errorFocusCell", {
+          current: {
+            rowIndex: errors[errors.length - 1].rowIndex,
+            fieldName: errors[errors.length - 1].cellName,
+          },
+          next: {
+            rowIndex: errors[0].rowIndex,
+            fieldName: errors[0].cellName,
+          },
+        });
+      }
+    } else {
+      setSubscribedData("errorFocusCell", null);
+    }
+    setErrorCells(errors);
+  }, []);
+
+  const getGridData = (value) => {
+    const errors = tableOptions.showErrors ? errorIdentifier(value) : [];
+    if (errors.length > 0) {
+      if (errors[0]) {
+        setSubscribedData("errorFocusCell", {
+          current: {
+            rowIndex: errors[errors.length - 1].rowIndex,
+            fieldName: errors[errors.length - 1].cellName,
+          },
+          next: {
+            rowIndex: errors[0].rowIndex,
+            fieldName: errors[0].cellName,
+          },
+        });
+      }
+    } else {
+      setSubscribedData("errorFocusCell", null);
+    }
+    setErrorCells(errors);
   };
 
-  const focusOnErrorCell = (index) => {
-    if (errorCells[index]) {
+  const focusOnErrorCell = (currentErrorIndex, nextErrorIndex) => {
+    if (errorCells[currentErrorIndex] && errorCells[nextErrorIndex]) {
       setSubscribedData("errorFocusCell", {
-        rowIndex: errorCells[index].rowIndex,
-        fieldName: errorCells[index].cellName,
+        current: {
+          rowIndex: errorCells[currentErrorIndex].rowIndex,
+          fieldName: errorCells[currentErrorIndex].cellName,
+        },
+        next: {
+          rowIndex: errorCells[nextErrorIndex].rowIndex,
+          fieldName: errorCells[nextErrorIndex].cellName,
+        },
       });
     }
   };
@@ -38,10 +86,10 @@ const ErrorAlert = ({ errorCells }) => {
 
     if (currentErrorIndex < errorCells.length - 1) {
       setCurrentErrorIndex((prev) => prev + 1);
-      focusOnErrorCell(currentErrorIndex + 1);
+      focusOnErrorCell(currentErrorIndex, currentErrorIndex + 1);
     } else {
       setCurrentErrorIndex(0);
-      focusOnErrorCell(0);
+      focusOnErrorCell(currentErrorIndex, 0);
     }
   };
 
@@ -50,20 +98,12 @@ const ErrorAlert = ({ errorCells }) => {
 
     if (currentErrorIndex > 0) {
       setCurrentErrorIndex((prev) => prev - 1);
-      focusOnErrorCell(currentErrorIndex - 1);
+      focusOnErrorCell(currentErrorIndex, currentErrorIndex - 1);
     } else {
       setCurrentErrorIndex(errorCells.length - 1);
-      focusOnErrorCell(errorCells.length - 1);
+      focusOnErrorCell(currentErrorIndex, errorCells.length - 1);
     }
   };
-
-  useEffect(() => {
-    if (errorCells.length > 0) {
-      focusOnErrorCell(0);
-    } else {
-      setSubscribedData("errorFocusCell", null);
-    }
-  }, []);
 
   const classes = commonStyles();
   return (

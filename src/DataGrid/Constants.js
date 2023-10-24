@@ -7,4 +7,5 @@ export const DataGridOptions = {
   showErrors: true,
   showErrorAlert: true,
   showExportButton: true,
+  showSubmitButton: false,
 };

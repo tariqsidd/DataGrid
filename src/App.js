@@ -11,7 +11,8 @@ const tableOptions = {
   editing: true,
   showErrors: true,
   showErrorAlert: true,
-  showExportButton: false,
+  showExportButton: true,
+  showSubmitButton: true,
 };
 
 const App = () => {
@@ -34,6 +35,9 @@ const App = () => {
           tableHeaders={tableHeader}
           incomingTableOptions={tableOptions}
           callExportCSV={exportCSV}
+          onSubmit={() => {
+            console.log("On submit pressed");
+          }}
         />
       </div>
     </>
