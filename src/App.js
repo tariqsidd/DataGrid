@@ -9,7 +9,7 @@ const tableOptions = {
   duplicateRow: true,
   columnHeight: "40px",
   editing: true,
-  showErrors: true,
+  showErrors: false,
   showErrorAlert: true,
   showExportButton: true,
   showSubmitButton: true,
