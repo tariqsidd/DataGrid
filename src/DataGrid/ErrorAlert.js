@@ -46,6 +46,7 @@ const ErrorAlert = ({ tableOptions = {}, data = [] }) => {
   }, []);
 
   const getGridData = (value) => {
+    console.log("notified on grid data", value);
     const errors = tableOptions.showErrors ? errorIdentifier(value) : [];
     if (errors.length > 0) {
       if (errors[0]) {

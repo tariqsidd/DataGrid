@@ -9,3 +9,5 @@ export const DataGridOptions = {
   showExportButton: true,
   showSubmitButton: false,
 };
+
+export const maxRowCount = 5000;

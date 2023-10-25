@@ -1,5 +1,6 @@
 import { Menu, MenuItem } from "@material-ui/core";
 import { commonStyles } from "./styles";
+import { setSubscribedData } from "./Reactive/subscriber";
 
 const ContextMenu = ({
   tableOptions = {},
@@ -15,6 +16,7 @@ const ContextMenu = ({
     const newData = [...data];
     const duplicateRow = newData[rowIndex];
     newData.push(duplicateRow);
+    setSubscribedData("gridData", newData);
     setData(newData);
     closeContextMenu();
   };
@@ -22,6 +24,7 @@ const ContextMenu = ({
   const deleteRow = (rowIndex) => {
     const newData = [...data];
     newData.splice(rowIndex, 1);
+    setSubscribedData("gridData", newData);
     setData(newData);
     closeContextMenu();
   };
@@ -51,15 +54,16 @@ const ContextMenu = ({
             Delete Row
           </MenuItem>
         )}
-        {tableOptions.duplicateRow && (
-          <MenuItem
-            onClick={() => {
-              duplicateRow(contextMenuPosition.rowIndex);
-            }}
-          >
-            Duplicate Row
-          </MenuItem>
-        )}
+        {tableOptions.duplicateRow &&
+          data.length < tableOptions.maxRowCount && (
+            <MenuItem
+              onClick={() => {
+                duplicateRow(contextMenuPosition.rowIndex);
+              }}
+            >
+              Duplicate Row
+            </MenuItem>
+          )}
       </Menu>
     </div>
   );

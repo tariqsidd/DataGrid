@@ -16,6 +16,7 @@ const tableOptions = {
 };
 
 const App = () => {
+  console.log("App.js rendering");
   const [exportCSV, setExportCSV] = useState(false);
   return (
     <>
@@ -35,6 +36,9 @@ const App = () => {
           tableHeaders={tableHeader}
           incomingTableOptions={tableOptions}
           callExportCSV={exportCSV}
+          onDataChange={(data) => {
+            //console.log(data);
+          }}
           onSubmit={() => {
             console.log("On submit pressed");
           }}

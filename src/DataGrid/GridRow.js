@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect } from "react";
-import { TableCell, TableRow } from "@material-ui/core";
+import { TableCell, TableRow, Checkbox } from "@material-ui/core";
 import { commonStyles } from "./styles";
 import { cellContent, cellHasError, getCellType } from "./utils";
 import {
@@ -19,14 +19,18 @@ const GridRow = ({
   rowIndex,
   row,
   data = [],
-  openContextMenu,
+  //openContextMenu,
+  id,
 }) => {
+  //console.log(id);
   console.log("Table Row Rendered");
+  console.log(data);
   const columnOrder = tableHeaders.map((item) => item.headerFieldName);
   const [editingCell, setEditingCell] = useState(null);
   const [editingCellHeader, setEditingCellHeader] = useState(null);
   const [editingValue, setEditingValue] = useState("");
   const [draggingCell, setDraggingCell] = useState(null);
+  const [selected, setSelected] = useState(false);
 
   const highlightedCell = useRef(null);
   const setHighlightedCell = (value) => {
@@ -58,23 +62,27 @@ const GridRow = ({
       }
     }
 
-    return () => {
-      // Run on unmount
-      unsubscribe("highlightedCell");
-      unsubscribe("errorFocusCell");
-      unsubscribe("dropCell");
-      unsubscribe("errorFocusedCellRef");
-    };
+    // return () => {
+    //   // Run on unmount
+    //   console.log("Unmounting");
+    //   //unsubscribe("highlightedCell");
+    //   // unsubscribe("errorFocusCell");
+    //   // unsubscribe("dropCell");
+    //   // unsubscribe("errorFocusedCellRef");
+    // };
   }, []);
 
   const getDropCell = (value) => {
+    // console.log("Drop Cell Value", value);
     const draggingCell = getSubscribedData("draggingCell");
     const dropCell = value;
+    const rowIndex = data.findIndex((item) => item.id === id);
     if (
       rowIndex > draggingCell.rowIndex &&
       rowIndex <= dropCell.targetRowIndex
     ) {
-      setDraggingCell(value);
+      console.log("Rows where drop happening", rowIndex);
+      // setDraggingCell(value);
       setOnDrop(dropCell.targetRowIndex, dropCell.header, draggingCell);
     }
   };
@@ -164,8 +172,11 @@ const GridRow = ({
   };
 
   const handleDragStart = (rowIndex, header) => {
+    console.log(rowIndex);
+    const rowIndex2 = data.findIndex((item) => item.id === id);
+    console.log(rowIndex2);
     setSubscribedData("draggingCell", {
-      rowIndex,
+      rowIndex: rowIndex2,
       fieldName: header.headerFieldName,
     });
   };
@@ -175,12 +186,19 @@ const GridRow = ({
   }, []);
 
   const handleDrop = (targetRowIndex, header) => {
-    setSubscribedData("dropCell", { targetRowIndex, header });
+    // console.log("HandleDRop");
+    const rowIndex2 = data.findIndex((item) => item.id === id);
+    setSubscribedData("dropCell", { targetRowIndex: rowIndex2, header });
   };
 
   const setOnDrop = (targetRowIndex, header, draggingCell) => {
+    console.log("Target Row Index", targetRowIndex);
+    console.log("Header", header);
+    console.log("Dragging Cell", draggingCell);
     if (draggingCell && draggingCell.fieldName === header.headerFieldName) {
+      //const newData = getSubscribedData("gridData");
       const newData = [...data];
+      console.log("IN SET DROP", newData);
       for (let i = draggingCell.rowIndex; i <= targetRowIndex; i++) {
         newData[i][header.headerFieldName] =
           data[draggingCell.rowIndex][header.headerFieldName];
@@ -191,6 +209,7 @@ const GridRow = ({
         );
         setSubscribedData("gridData", newData);
       }
+      setDraggingCell(draggingCell);
       handleHighlight(targetRowIndex, header.headerFieldName);
     }
   };
@@ -238,6 +257,7 @@ const GridRow = ({
 
   const handleBlur = () => {
     if (editingCell && editingCellHeader) {
+      //const newData = getSubscribedData("gridData");
       const newData = [...data];
       newData[editingCell.rowIndex][editingCell.fieldName] = editingValue;
 
@@ -275,12 +295,28 @@ const GridRow = ({
     <TableRow
       key={rowIndex}
       style={{ height: tableOptions.columnHeight }}
-      onContextMenu={(event) =>
-        tableOptions.contextMenu ? openContextMenu(event, rowIndex) : null
-      }
+      // onContextMenu={(event) =>
+      //   tableOptions.contextMenu ? openContextMenu(event, rowIndex) : null
+      // }
     >
       <TableCell className={classes.smallCell} align="center">
-        {rowIndex}
+        <Checkbox
+          checked={selected}
+          onChange={(event) => {
+            const array = getSubscribedData("selectedRows");
+            const index = array.indexOf(id);
+            console.log(index);
+            if (index === -1) {
+              array.push(id);
+            } else {
+              array.splice(index, 1);
+            }
+            console.log(array);
+            setSubscribedData("selectedRows", array);
+            setSelected(!selected);
+          }}
+        />
+        {/* {rowIndex} */}
       </TableCell>
       {tableHeaders.map((header) => {
         const hasError = tableOptions.showErrors
