@@ -66,12 +66,15 @@ const GridRow = ({
   }, []);
 
   const getDropCell = (value) => {
+    console.log("Get Drop Cell");
     const draggingCell = getSubscribedData("draggingCell");
+    console.log("Dragging Value", draggingCell);
     const dropCell = value;
     if (
       rowIndex > draggingCell.rowIndex &&
       rowIndex <= dropCell.targetRowIndex
     ) {
+      console.log("Values set");
       setDraggingCell(value);
       setOnDrop(dropCell.targetRowIndex, dropCell.header, draggingCell);
     }
@@ -162,6 +165,7 @@ const GridRow = ({
   };
 
   const handleDragStart = (rowIndex, header) => {
+    console.log("Drag Start");
     setSubscribedData("draggingCell", {
       rowIndex,
       fieldName: header.headerFieldName,
@@ -173,6 +177,7 @@ const GridRow = ({
   }, []);
 
   const handleDrop = (targetRowIndex, header) => {
+    console.log("Drop");
     setSubscribedData("dropCell", { targetRowIndex, header });
   };
 

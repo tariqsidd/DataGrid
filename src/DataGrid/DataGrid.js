@@ -9,7 +9,7 @@ import ContextMenu from "./ContextMenu";
 import { commonStyles } from "./styles";
 import ExportAndSubmitButton from "./ExportAndSubmitButton";
 import ErrorAlert from "./ErrorAlert";
-import { List, AutoSizer } from "react-virtualized";
+import { List, AutoSizer, Table as TableVirtual } from "react-virtualized";
 
 const DataGrid = ({
   incomingData,
@@ -29,7 +29,6 @@ const DataGrid = ({
     left: 0,
     rowIndex: -1,
   });
-
 
   useEffect(() => {
     let updatedTableOptions = {
@@ -74,6 +73,13 @@ const DataGrid = ({
     );
   };
 
+  const headerRowRenderer = ({ style }) => {
+    return (
+      <div style={style}>
+        <GridHeader tableOptions={tableOptions} tableHeaders={tableHeaders} />
+      </div>
+    );
+  };
   const classes = commonStyles();
   return (
     <div className="table-container">
@@ -87,18 +93,28 @@ const DataGrid = ({
       {tableOptions.showErrorAlert && tableOptions.showErrors && (
         <ErrorAlert data={data} tableOptions={tableOptions} />
       )}
-      <Table
-        stickyHeader
-      >
-        <GridHeader tableOptions={tableOptions} tableHeaders={tableHeaders} />
+      <Table stickyHeader>
+        {/* <GridHeader tableOptions={tableOptions} tableHeaders={tableHeaders} /> */}
         <AutoSizer>
           {({ height, width }) => (
-            <List
+            // <List
+            //   height={500}
+            //   width={width}
+            //   rowCount={data.length}
+            //   rowHeight={itemHeight}
+            //   rowRenderer={rowRenderer}
+            // />
+            <TableVirtual
+              //overscanRowCount={100}
               height={500}
-              width={width}
+              headerHeight={40}
+              rowHeight={40}
               rowCount={data.length}
-              rowHeight={itemHeight}
+              rowGetter={({ index }) => data[index]}
+              headerRowRenderer={headerRowRenderer}
               rowRenderer={rowRenderer}
+              width={width}
+              headerStyle={{ width: "100px" }}
             />
           )}
         </AutoSizer>
