@@ -321,8 +321,8 @@ function generateData(rows = 5000) {
     country: "PK",
   };
 
-  const dataList = Data;
-  //const dataList = [];
+  // const dataList = Data;
+  const dataList = [];
 
   for (let i = 0; i < rows; i++) {
     const newData = { ...baseData };
