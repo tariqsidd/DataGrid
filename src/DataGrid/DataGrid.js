@@ -1,26 +1,25 @@
-import React, {useEffect, useState, useRef, createRef} from "react";
-import {Table, TableBody, TableContainer} from "@material-ui/core";
+import React, { useEffect, useState, useRef, createRef } from "react";
+import { Table, TableBody, TableContainer } from "@material-ui/core";
 import GridHeader from "./GridHeader";
 import GridFooter from "./GridFooter";
 import GridRow from "./GridRow";
-import {DataGridOptions} from "./Constants";
-import {addNewRow} from "./utils";
+import { DataGridOptions } from "./Constants";
+import { addNewRow } from "./utils";
 import ContextMenu from "./ContextMenu";
-import {commonStyles} from "./styles";
+import { commonStyles } from "./styles";
 import ExportAndSubmitButton from "./ExportAndSubmitButton";
 import ErrorAlert from "./ErrorAlert";
-import './grid.css'
-
+import "./grid.css";
 
 const DataGrid = ({
-                    incomingData,
-                    tableHeaders,
-                    incomingTableOptions,
-                    callExportCSV,
-                    onSubmit,
-                    itemHeight = 40,
-                    buffer = 15,
-                  }) => {
+  incomingData,
+  tableHeaders,
+  incomingTableOptions,
+  callExportCSV,
+  onSubmit,
+  itemHeight = 40,
+  buffer = 15,
+}) => {
   console.log("RE-Render");
   let numVisibleItems = Math.trunc(300 / itemHeight);
   const [data, setData] = useState(incomingData);
@@ -34,7 +33,7 @@ const DataGrid = ({
     rowIndex: -1,
   });
   const viewPort = useRef(null);
-  let containerStyle = {height: data.length * itemHeight};
+  let containerStyle = { height: data.length * itemHeight };
 
   useEffect(() => {
     let updatedTableOptions = {
@@ -66,20 +65,37 @@ const DataGrid = ({
 
   const onScroll = () => {
     let currentIndex = Math.trunc(viewPort.current.scrollTop / itemHeight);
-    currentIndex = currentIndex - numVisibleItems >= data.length ? currentIndex - numVisibleItems : currentIndex;
+    currentIndex =
+      currentIndex - numVisibleItems >= data.length
+        ? currentIndex - numVisibleItems
+        : currentIndex;
     if (currentIndex !== start) {
       setStart(currentIndex);
-      setEnd(currentIndex + numVisibleItems >= data.length ? data.length - 1 : currentIndex + numVisibleItems);
+      setEnd(
+        currentIndex + numVisibleItems >= data.length
+          ? data.length - 1
+          : currentIndex + numVisibleItems
+      );
     }
-
   };
 
   const renderRows = (top) => {
     let result = [];
-    for (let i = start; i <= end; i++) {
+    result.push(
+      <div
+        className="item"
+        style={{ top: start * itemHeight, height: itemHeight }}
+      >
+        <GridHeader tableOptions={tableOptions} tableHeaders={tableHeaders} />
+      </div>
+    );
+    for (let i = start + 1; i <= end; i++) {
       let item = data[i];
       result.push(
-        <div className="item" style={{top:i*itemHeight,height:itemHeight}}>
+        <div
+          className="item"
+          style={{ top: i * itemHeight, height: itemHeight }}
+        >
           <GridRow
             tableOptions={tableOptions}
             tableHeaders={tableHeaders}
@@ -92,7 +108,7 @@ const DataGrid = ({
       );
     }
     return result;
-  }
+  };
 
   const classes = commonStyles();
   return (
@@ -105,18 +121,17 @@ const DataGrid = ({
         onSubmit={onSubmit}
       />
       {tableOptions.showErrorAlert && tableOptions.showErrors && (
-        <ErrorAlert data={data} tableOptions={tableOptions}/>
+        <ErrorAlert data={data} tableOptions={tableOptions} />
       )}
       <TableContainer
         className="viewPort"
         ref={viewPort}
         //style={{position:'relative', overflowY:'scroll', height:500}}
         component="div"
-        onScroll={onScroll}>
-        <Table
-          stickyHeader
-        >
-          <GridHeader tableOptions={tableOptions} tableHeaders={tableHeaders} />
+        onScroll={onScroll}
+      >
+        <Table>
+          {/* <GridHeader tableOptions={tableOptions} tableHeaders={tableHeaders} /> */}
           <TableBody>
             <div className="itemContainer" style={containerStyle}>
               {renderRows()}

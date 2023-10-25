@@ -258,8 +258,11 @@ const GridRow = ({
       ? cellHasError(rowIndex, header.headerFieldName, data)
       : false;
     return {
-      width: "100px",
-      maxWidth: "100px",
+      // minWidth: "150px",
+      height: "40px",
+      minWidth: "150px",
+      width: "150px",
+      maxWidth: "150px",
       overflow: "hidden",
       border: "1px solid #8080801a",
       padding: "0px",
@@ -272,7 +275,7 @@ const GridRow = ({
   return (
     <TableRow
       key={rowIndex}
-      style={{ height: tableOptions.columnHeight }}
+      style={{ height: tableOptions.columnHeight, width: "100%" }}
       onContextMenu={(event) =>
         tableOptions.contextMenu ? openContextMenu(event, rowIndex) : null
       }
