@@ -258,6 +258,7 @@ const GridRow = ({
       ? cellHasError(rowIndex, header.headerFieldName, data)
       : false;
     return {
+      height: tableOptions.columnHeight,
       width: "100px",
       maxWidth: "100px",
       overflow: "hidden",
@@ -270,14 +271,19 @@ const GridRow = ({
 
   const classes = commonStyles();
   return (
-    <TableRow
-      key={rowIndex}
-      style={{ height: tableOptions.columnHeight }}
-      onContextMenu={(event) =>
-        tableOptions.contextMenu ? openContextMenu(event, rowIndex) : null
-      }
-    >
-      <TableCell className={classes.smallCell} align="center">
+    <>
+      {/* //<TableRow
+    //   key={rowIndex}
+    //   style={{ height: tableOptions.columnHeight }}
+    //   onContextMenu={(event) =>
+    //     tableOptions.contextMenu ? openContextMenu(event, rowIndex) : null
+    //   }
+    // > */}
+      <TableCell
+        className={classes.smallCell}
+        style={{ height: tableOptions.columnHeight }}
+        align="center"
+      >
         {rowIndex}
       </TableCell>
       {tableHeaders.map((header) => {
@@ -326,7 +332,8 @@ const GridRow = ({
           </TableCell>
         );
       })}
-    </TableRow>
+    </>
+    // </TableRow>
   );
 };
 

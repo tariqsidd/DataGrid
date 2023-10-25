@@ -1,5 +1,12 @@
 import React, { useEffect, useState, useRef, createRef } from "react";
-import { Table, TableBody } from "@material-ui/core";
+import {
+  Table,
+  TableBody,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+} from "@material-ui/core";
 import GridHeader from "./GridHeader";
 import GridFooter from "./GridFooter";
 import GridRow from "./GridRow";
@@ -9,6 +16,19 @@ import ContextMenu from "./ContextMenu";
 import { commonStyles } from "./styles";
 import ExportAndSubmitButton from "./ExportAndSubmitButton";
 import ErrorAlert from "./ErrorAlert";
+import { TableVirtuoso } from "react-virtuoso";
+
+const TableComponents = {
+  Scroller: React.forwardRef((props, ref) => (
+    <TableContainer component={Paper} {...props} ref={ref} />
+  )),
+  Table: (props) => <Table {...props} style={{ borderCollapse: "separate" }} />,
+  TableHead: TableHead,
+  TableRow: TableRow,
+  TableBody: React.forwardRef((props, ref) => (
+    <TableBody {...props} ref={ref} />
+  )),
+};
 
 const DataGrid = ({
   incomingData,
@@ -99,7 +119,7 @@ const DataGrid = ({
       {tableOptions.showErrorAlert && tableOptions.showErrors && (
         <ErrorAlert data={data} tableOptions={tableOptions} />
       )}
-      <Table
+      {/* <Table
         stickyHeader
         ref={containerRef}
         style={{ overflowY: "auto", height: "100%" }}
@@ -129,7 +149,36 @@ const DataGrid = ({
             />
           )}
         </TableBody>
-      </Table>
+      </Table> */}
+      <TableVirtuoso
+        style={{ height: 600 }}
+        data={data}
+        components={TableComponents}
+        fixedHeaderContent={() => (
+          <GridHeader tableOptions={tableOptions} tableHeaders={tableHeaders} />
+        )}
+        itemContent={(index, row) => (
+          <>
+            <GridRow
+              tableOptions={tableOptions}
+              tableHeaders={tableHeaders}
+              rowIndex={index}
+              row={row}
+              data={data}
+              openContextMenu={openContextMenu}
+            />
+          </>
+        )}
+        fixedFooterContent={() =>
+          tableOptions.addRow && (
+            <GridFooter
+              addRow={() => setData(addNewRow(tableHeaders, data))}
+              tableHeaders={tableHeaders}
+              tableOptions={tableOptions}
+            />
+          )
+        }
+      />
       <ContextMenu
         tableOptions={tableOptions}
         setData={setData}
