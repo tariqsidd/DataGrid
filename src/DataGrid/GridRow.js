@@ -43,16 +43,18 @@ const GridRow = ({
     subscribeToData("errorFocusCell", getErrorFocusCell);
     subscribeToData("errorFocusedCellRef", getErrorFocusedCellRef);
     subscribeToData("dropCell", getDropCell);
-    const errorFocusCell = getSubscribedData("errorFocusCell");
-    if (errorFocusCell) {
-      if (
-        rowIndex === errorFocusCell.current.rowIndex ||
-        rowIndex === errorFocusCell.next.rowIndex
-      ) {
-        handleErrorFocus(
-          errorFocusCell.next.rowIndex,
-          errorFocusCell.next.fieldName
-        );
+    if (tableOptions.showErrors) {
+      const errorFocusCell = getSubscribedData("errorFocusCell");
+      if (errorFocusCell) {
+        if (
+          rowIndex === errorFocusCell.current.rowIndex ||
+          rowIndex === errorFocusCell.next.rowIndex
+        ) {
+          handleErrorFocus(
+            errorFocusCell.next.rowIndex,
+            errorFocusCell.next.fieldName
+          );
+        }
       }
     }
 
