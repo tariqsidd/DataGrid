@@ -9,7 +9,6 @@ import ContextMenu from "./ContextMenu";
 import { commonStyles } from "./styles";
 import ExportAndSubmitButton from "./ExportAndSubmitButton";
 import ErrorAlert from "./ErrorAlert";
-import { List, AutoSizer, Table as TableVirtual } from "react-virtualized";
 
 const DataGrid = ({
   incomingData,
@@ -29,6 +28,35 @@ const DataGrid = ({
     left: 0,
     rowIndex: -1,
   });
+  const containerRef = useRef(null);
+  const visibleRangeRef = useRef([0, 0]);
+
+  useEffect(() => {
+    function updateVisibleItems() {
+      if (containerRef.current) {
+        const scrollTop = containerRef.current.scrollTop;
+        const startIndex = Math.max(
+          0,
+          Math.floor(scrollTop / itemHeight) - buffer
+        );
+        const endIndex = Math.min(
+          data.length,
+          startIndex +
+            Math.ceil(containerRef.current.clientHeight / itemHeight) +
+            2 * buffer
+        );
+        visibleRangeRef.current = [startIndex, endIndex];
+        // setVisibleRange([startIndex, endIndex]);
+      }
+    }
+
+    updateVisibleItems();
+    window.addEventListener("scroll", updateVisibleItems);
+
+    return () => {
+      window.removeEventListener("scroll", updateVisibleItems);
+    };
+  }, [itemHeight, buffer, data.length]);
 
   useEffect(() => {
     let updatedTableOptions = {
@@ -58,29 +86,6 @@ const DataGrid = ({
     setContextMenuVisible(false);
   };
 
-  const rowRenderer = ({ index, key, style }) => {
-    console.log("Index", index, "Key", key);
-    return (
-      <div key={key} style={style}>
-        <GridRow
-          tableOptions={tableOptions}
-          tableHeaders={tableHeaders}
-          rowIndex={index}
-          row={data[index]}
-          data={data}
-          openContextMenu={openContextMenu}
-        />
-      </div>
-    );
-  };
-
-  const headerRowRenderer = ({ style }) => {
-    return (
-      <div style={style}>
-        <GridHeader tableOptions={tableOptions} tableHeaders={tableHeaders} />
-      </div>
-    );
-  };
   const classes = commonStyles();
   return (
     <div className="table-container">
@@ -94,31 +99,36 @@ const DataGrid = ({
       {tableOptions.showErrorAlert && tableOptions.showErrors && (
         <ErrorAlert data={data} tableOptions={tableOptions} />
       )}
-      <Table stickyHeader>
-        {/* <GridHeader tableOptions={tableOptions} tableHeaders={tableHeaders} /> */}
-        <AutoSizer>
-          {({ height, width }) => (
-            // <List
-            //   height={500}
-            //   width={width}
-            //   rowCount={data.length}
-            //   rowHeight={itemHeight}
-            //   rowRenderer={rowRenderer}
-            // />
-            <TableVirtual
-              //overscanRowCount={100}
-              height={500}
-              headerHeight={40}
-              rowHeight={40}
-              rowCount={data.length}
-              rowGetter={({ index }) => data[index]}
-              headerRowRenderer={headerRowRenderer}
-              rowRenderer={rowRenderer}
-              width={width}
-              headerStyle={{ width: "100px" }}
+      <Table
+        stickyHeader
+        ref={containerRef}
+        style={{ overflowY: "auto", height: "100%" }}
+      >
+        <GridHeader tableOptions={tableOptions} tableHeaders={tableHeaders} />
+        <TableBody style={{ height: data.length * itemHeight }}>
+          {data
+            .slice(visibleRangeRef.current[0], visibleRangeRef.current[1])
+            .map((row, rowIndex) => (
+              <GridRow
+                tableOptions={tableOptions}
+                tableHeaders={tableHeaders}
+                rowIndex={rowIndex}
+                row={row}
+                data={data.slice(
+                  visibleRangeRef.current[0],
+                  visibleRangeRef.current[1]
+                )}
+                openContextMenu={openContextMenu}
+              />
+            ))}
+          {tableOptions.addRow && (
+            <GridFooter
+              addRow={() => setData(addNewRow(tableHeaders, data))}
+              tableHeaders={tableHeaders}
+              tableOptions={tableOptions}
             />
           )}
-        </AutoSizer>
+        </TableBody>
       </Table>
       <ContextMenu
         tableOptions={tableOptions}
