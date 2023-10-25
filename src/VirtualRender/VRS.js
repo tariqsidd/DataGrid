@@ -1,148 +1,210 @@
-import React, {
-  memo,
-  useMemo,
-  useRef,
-  useState,
-  useEffect,
-  useCallback
-} from "react";
+import React, { createElement, Component, Fragment } from 'react'
+import PropTypes from 'prop-types'
+import { Waypoint } from 'react-waypoint';
 
-// Generic hook for detecting scroll:
-const useScrollAware = () => {
-  const [scrollTop, setScrollTop] = useState(0);
-  console.log('scrollTop',scrollTop)
-  const ref = useRef();
-  const animationFrame = useRef();
+const defaultStyle = { position: 'relative' }
 
-  const onScroll = useCallback(e => {
-    if (animationFrame.current) {
-      cancelAnimationFrame(animationFrame.current);
+export default class VirtualContainer extends Component {
+  static propTypes = {
+    children: PropTypes.func,
+    className: PropTypes.string,
+    el: PropTypes.string,
+    inAndOut: PropTypes.bool,
+    onChange: PropTypes.func,
+    offsetBottom: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    offsetTop: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    optimistic: PropTypes.bool,
+    placeholder: PropTypes.func,
+    render: PropTypes.func,
+    scrollableAncestor: PropTypes.any,
+    style: PropTypes.object,
+  }
+
+  static defaultProps = {
+    children: undefined,
+    className: undefined,
+    el: 'div',
+    inAndOut: false,
+    offsetBottom: '50vh',
+    offsetTop: '50vh',
+    optimistic: false,
+    onChange: undefined,
+    placeholder: undefined,
+    render: undefined,
+    scrollableAncestor: undefined,
+    style: undefined,
+  }
+
+  constructor(props) {
+    super(props)
+    this.state = {
+      virtualized: !props.optimistic,
     }
-    animationFrame.current = requestAnimationFrame(() => {
-      setScrollTop(e.target.scrollTop);
-    });
-  }, []);
+    this.initialized = false
+  }
 
-  useEffect(() => {
-    const scrollContainer = ref.current;
-
-    setScrollTop(scrollContainer.scrollTop);
-    scrollContainer.addEventListener("scroll", onScroll);
-    return () => scrollContainer.removeEventListener("scroll", onScroll);
-  }, []);
-
-  return [scrollTop, ref];
-};
-
-// VirtualScroll component
-const VirtualScroll = ({
-                         Item,
-                         itemCount,
-                         height,
-                         getChildHeight,
-                         renderAhead = 20
-                       }) => {
-  const childPositions = useMemo(() => {
-    let results = [0];
-    for (let i = 1; i < itemCount; i++) {
-      results.push(results[i - 1] + getChildHeight(i - 1));
-    }
-    return results;
-  }, [getChildHeight, itemCount]);
-
-  const [scrollTop, ref] = useScrollAware();
-  const totalHeight =
-    childPositions[itemCount - 1] + getChildHeight(itemCount - 1);
-
-  const firstVisibleNode = useMemo(
-    () => findStartNode(scrollTop, childPositions, itemCount),
-    [scrollTop, childPositions, itemCount]
-  );
-
-  const startNode = Math.max(0, firstVisibleNode - renderAhead);
-
-  const lastVisibleNode = useMemo(
-    () => findEndNode(childPositions, firstVisibleNode, itemCount, height),
-    [childPositions, firstVisibleNode, itemCount, height]
-  );
-  const endNode = Math.min(itemCount - 1, lastVisibleNode + renderAhead);
-  const visibleNodeCount = endNode - startNode + 1;
-  const offsetY = childPositions[startNode];
-  // console.log(height, scrollTop, startNode, endNode);
-  const visibleChildren = useMemo(
-    () =>
-      new Array(visibleNodeCount)
-        .fill(null)
-        .map((_, index) => (
-          <Item key={index + startNode} index={index + startNode} />
-        )),
-    [startNode, visibleNodeCount, Item]
-  );
-
-  return (
-    <div style={{ height, overflow: "auto" }} ref={ref}>
-      <div
-        className="viewport"
-        style={{
-          overflow: "hidden",
-          willChange: "transform",
-          height: totalHeight,
-          position: "relative"
-        }}
-      >
-        <div
-          style={{
-            willChange: "transform",
-            transform: `translateY(${offsetY}px)`
-          }}
-        >
-          {visibleChildren}
-        </div>
-      </div>
-    </div>
-  );
-};
-
-function findStartNode(scrollTop, nodePositions, itemCount) {
-  let startRange = 0;
-  let endRange = itemCount - 1;
-  while (endRange !== startRange) {
-    // console.log(startRange, endRange);
-    const middle = Math.floor((endRange - startRange) / 2 + startRange);
-
-    if (
-      nodePositions[middle] <= scrollTop &&
-      nodePositions[middle + 1] > scrollTop
-    ) {
-      // console.log("middle", middle);
-      return middle;
-    }
-
-    if (middle === startRange) {
-      // edge case - start and end range are consecutive
-      // console.log("endRange", endRange);
-      return endRange;
-    } else {
-      if (nodePositions[middle] <= scrollTop) {
-        startRange = middle;
-      } else {
-        endRange = middle;
+  componentDidMount() {
+    if (process.env.NODE_ENV === 'development') {
+      if (this.el && getComputedStyle(this.el).position == null) {
+        // eslint-disable-next-line no-console
+        console.warn(
+          'You must provide a "position" style to your VirtualContainer element',
+        )
       }
     }
   }
-  return itemCount;
-}
 
-function findEndNode(nodePositions, startNode, itemCount, height) {
-  let endNode;
-  for (endNode = startNode; endNode < itemCount; endNode++) {
-    // console.log(nodePositions[endNode], nodePositions[startNode]);
-    if (nodePositions[endNode] > nodePositions[startNode] + height) {
-      // console.log(endNode);
-      return endNode;
+  componentWillUnmount() {
+    this.unmounted = true
+  }
+
+  handleWaypointChange = type => ({ currentPosition, previousPosition }) => {
+    if (this.unmounted) {
+      return
+    }
+
+    const waypointIn = type === 'bottom' ? Waypoint.below : Waypoint.above
+    const waypointOut = type === 'bottom' ? Waypoint.above : Waypoint.below
+
+    const startsNotVisible =
+      previousPosition == null && currentPosition === waypointOut
+    const startsVisible =
+      previousPosition == null &&
+      (currentPosition === waypointIn || currentPosition === Waypoint.inside)
+    const isNowVisible =
+      previousPosition === waypointOut &&
+      (currentPosition === waypointIn || currentPosition === Waypoint.inside)
+    const isNowNotVisible =
+      previousPosition === Waypoint.inside && currentPosition === waypointOut
+
+    const virtualized =
+      startsNotVisible || isNowNotVisible
+        ? true
+        : startsVisible || isNowVisible
+        ? false
+        : this.state.virtualized
+
+    if (this.initialized === false) {
+      this[type] = virtualized
+      if (
+        typeof this.top !== 'undefined' &&
+        typeof this.bottom !== 'undefined'
+      ) {
+        this.initialized = true
+        this.updateVirtualization(this.top || this.bottom)
+      }
+    } else {
+      this.updateVirtualization(virtualized)
     }
   }
-  return endNode;
+
+  updateVirtualization = virtualized => {
+    if (this.state.virtualized !== virtualized) {
+      this.setState({
+        virtualized,
+      })
+      if (this.props.onChange) {
+        this.props.onChange(virtualized)
+      }
+    }
+  }
+
+  onBottomWaypointChange = this.handleWaypointChange('bottom')
+
+  onTopWaypointChange = this.handleWaypointChange('top')
+
+  refCb = el => {
+    if (el == null) {
+      return
+    }
+    this.el = el
+  }
+
+  render() {
+    const {
+      children,
+      className,
+      el,
+      inAndOut,
+      optimistic,
+      offsetTop,
+      offsetBottom,
+      placeholder: Placeholder,
+      scrollableAncestor,
+      style,
+      render,
+      ...passThroughProps
+    } = this.props
+    const { virtualized } = this.state
+    const resolvedRender = children || render
+    if (!resolvedRender) {
+      throw new Error('Must provide a children or render function')
+    }
+
+    const stopTracking = this.initialized && !inAndOut
+
+    return createElement(
+      el,
+      {
+        ...passThroughProps,
+        className,
+        style: style != null ? style : className ? undefined : defaultStyle,
+        ref: this.refCb,
+      },
+      <Fragment>
+        {!virtualized || stopTracking ? (
+          resolvedRender()
+        ) : Placeholder ? (
+          <Placeholder />
+        ) : null}
+        {stopTracking ? null : (
+          <Waypoint
+            onPositionChange={this.onTopWaypointChange}
+            scrollableAncestor={scrollableAncestor}
+          >
+            <WaypointTarget top offsetTop={offsetTop} />
+          </Waypoint>
+        )}
+        {stopTracking ? null : (
+          <Waypoint
+            onPositionChange={this.onBottomWaypointChange}
+            scrollableAncestor={scrollableAncestor}
+          >
+            <WaypointTarget offsetBottom={offsetBottom} />
+          </Waypoint>
+        )}
+      </Fragment>,
+    )
+  }
 }
 
-export default memo(VirtualScroll);
+const WaypointTarget = ({ innerRef, offsetBottom, offsetTop, top }) => (
+  <div
+    style={{
+      backgroundColor: 'red',
+      [top ? 'top' : 'bottom']: 0,
+      height: '1px',
+      left: 0,
+      position: 'absolute',
+      transform: `translateY(${top ? `-${offsetTop}` : offsetBottom})`,
+      width: '1px',
+    }}
+    ref={innerRef}
+  >
+    &nbsp;
+  </div>
+)
+
+WaypointTarget.propTypes = {
+  innerRef: PropTypes.any,
+  offsetBottom: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  offsetTop: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  top: PropTypes.bool,
+}
+
+WaypointTarget.defaultProps = {
+  innerRef: undefined,
+  offsetBottom: 0,
+  offsetTop: 0,
+  top: false,
+}
