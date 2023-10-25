@@ -70,6 +70,7 @@ const GridRow = ({
     const draggingCell = getSubscribedData("draggingCell");
     console.log("Dragging Value", draggingCell);
     const dropCell = value;
+    console.log(rowIndex);
     if (
       rowIndex > draggingCell.rowIndex &&
       rowIndex <= dropCell.targetRowIndex
@@ -140,6 +141,7 @@ const GridRow = ({
   };
 
   const handleHighlight = (rowIndex, headerFieldName) => {
+    console.log(rowIndex);
     // Clear previously highlighted cell
     if (highlightedCell.current) {
       const prevCell = document.getElementById(highlightedCell.current);
@@ -182,6 +184,7 @@ const GridRow = ({
   };
 
   const setOnDrop = (targetRowIndex, header, draggingCell) => {
+    console.log("Set on Drop");
     if (draggingCell && draggingCell.fieldName === header.headerFieldName) {
       const newData = [...data];
       for (let i = draggingCell.rowIndex; i <= targetRowIndex; i++) {

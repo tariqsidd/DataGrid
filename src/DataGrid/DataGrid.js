@@ -59,6 +59,7 @@ const DataGrid = ({
   };
 
   const rowRenderer = ({ index, key, style }) => {
+    console.log("Index", index, "Key", key);
     return (
       <div key={key} style={style}>
         <GridRow
