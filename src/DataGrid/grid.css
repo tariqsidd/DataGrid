@@ -1,28 +1,26 @@
 .viewPort {
-    position: relative;
-    width: 100%;
-    height: 300px;
-    border: solid 1px;
-    overflow-y: scroll;
+  position: relative;
+  width: 100%;
+  height: 300px;
+  border: solid 1px;
+  overflow-y: scroll;
 }
 
 .itemContainer {
-    position: absolute;
-    width: 100%;
-    background-color: azure;
-
+  position: absolute;
+  width: 100%;
+  background-color: azure;
 }
 
 .item {
-    position: absolute;
-    background-color: beige;
-    /*border: solid 1px;*/
-    width: 100%;
-    text-align:center;
+  position: absolute;
+  background-color: beige;
+  /*border: solid 1px;*/
+  width: 100%;
+  text-align: center;
 }
 
 .done {
-    color: rgba(0, 0, 0, 0.3);
-    text-decoration: line-through;
+  color: rgba(0, 0, 0, 0.3);
+  text-decoration: line-through;
 }
-
