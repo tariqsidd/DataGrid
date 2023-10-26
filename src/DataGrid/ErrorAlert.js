@@ -3,25 +3,14 @@ import { IconButton, Typography } from "@material-ui/core";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
 import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
-import {
-  subscribeToData,
-  unsubscribe,
-  setSubscribedData,
-} from "./Reactive/subscriber";
+import { setSubscribedData, subscribeToData } from "./Reactive/subscriber";
 import { commonStyles } from "./styles";
 import { errorIdentifier } from "./utils";
 
 const ErrorAlert = ({ tableOptions = {}, data = [] }) => {
   const [currentErrorIndex, setCurrentErrorIndex] = useState(0);
   const [errorCells, setErrorCells] = useState([]);
-
-  useEffect(() => {
-    subscribeToData("gridData", getGridData);
-    return () => {
-      // Run on unmount
-      unsubscribe("gridData");
-    };
-  }, []);
+  console.log("Error Alert Rendered");
 
   useEffect(() => {
     const errors = tableOptions.showErrors ? errorIdentifier(data) : [];
@@ -31,10 +20,12 @@ const ErrorAlert = ({ tableOptions = {}, data = [] }) => {
           current: {
             rowIndex: errors[errors.length - 1].rowIndex,
             fieldName: errors[errors.length - 1].cellName,
+            rowId: errors[errors.length - 1].id,
           },
           next: {
             rowIndex: errors[0].rowIndex,
             fieldName: errors[0].cellName,
+            rowId: errors[0].id,
           },
         });
       }
@@ -44,6 +35,9 @@ const ErrorAlert = ({ tableOptions = {}, data = [] }) => {
     setErrorCells(errors);
   }, []);
 
+  useEffect(() => {
+    subscribeToData("gridData", getGridData);
+  }, []);
   const getGridData = (value) => {
     const errors = tableOptions.showErrors ? errorIdentifier(value) : [];
     if (errors.length > 0) {
@@ -52,10 +46,12 @@ const ErrorAlert = ({ tableOptions = {}, data = [] }) => {
           current: {
             rowIndex: errors[errors.length - 1].rowIndex,
             fieldName: errors[errors.length - 1].cellName,
+            rowId: errors[errors.length - 1].id,
           },
           next: {
             rowIndex: errors[0].rowIndex,
             fieldName: errors[0].cellName,
+            rowId: errors[0].id,
           },
         });
       }
@@ -71,10 +67,12 @@ const ErrorAlert = ({ tableOptions = {}, data = [] }) => {
         current: {
           rowIndex: errorCells[currentErrorIndex].rowIndex,
           fieldName: errorCells[currentErrorIndex].cellName,
+          rowId: errorCells[currentErrorIndex].id,
         },
         next: {
           rowIndex: errorCells[nextErrorIndex].rowIndex,
           fieldName: errorCells[nextErrorIndex].cellName,
+          rowId: errorCells[nextErrorIndex].id,
         },
       });
     }

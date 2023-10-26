@@ -1,16 +1,14 @@
 import React, { useState, useCallback, useRef, useEffect, memo } from "react";
-import { TableCell, TableRow } from "@material-ui/core";
+import { TableCell, TableRow, Checkbox } from "@material-ui/core";
 import { commonStyles } from "./styles";
 import { cellContent, cellHasError, getCellType } from "./utils";
 import {
   subscribeToData,
-  unsubscribe,
   setSubscribedData,
   getSubscribedData,
 } from "./Reactive/subscriber";
 import ErrorCellCopy from "./ErrorCell2";
-import isEqual from 'lodash.isequal'
-import {Data} from "../Data";
+import isEqual from "lodash.isequal";
 
 let Ajv = require("ajv");
 let ajv = new Ajv({ allErrors: true });
@@ -18,20 +16,24 @@ let ajv = new Ajv({ allErrors: true });
 const GridRow = ({
   tableOptions = {},
   tableHeaders = [],
-  // rowIndex,
+  rowIndex,
   row,
-  data = [],
-  id,
   openContextMenu,
+  onRowChange,
 }) => {
   console.log("Table Row Rendered");
-  let rowIndex = data.findIndex(x => x.id === id);
-  const gridData = useRef(data);
   const columnOrder = tableHeaders.map((item) => item.headerFieldName);
+  const [rowData, setRowData] = useState(row);
   const [editingCell, setEditingCell] = useState(null);
   const [editingCellHeader, setEditingCellHeader] = useState(null);
   const [editingValue, setEditingValue] = useState("");
   const [draggingCell, setDraggingCell] = useState(null);
+  const [selected, setSelected] = useState(false);
+
+  const data = useRef(null);
+  const setData = (value) => {
+    data.current = value;
+  };
 
   const highlightedCell = useRef(null);
   const setHighlightedCell = (value) => {
@@ -44,47 +46,61 @@ const GridRow = ({
   };
 
   useEffect(() => {
+    subscribeToData("gridData", getGridData);
     subscribeToData("highlightedCell", getHighlightedCell);
     subscribeToData("errorFocusCell", getErrorFocusCell);
     subscribeToData("errorFocusedCellRef", getErrorFocusedCellRef);
     subscribeToData("dropCell", getDropCell);
-    if (tableOptions.showErrors) {
-      const errorFocusCell = getSubscribedData("errorFocusCell");
-      if (errorFocusCell) {
-        if (
-          rowIndex === errorFocusCell.current.rowIndex ||
-          rowIndex === errorFocusCell.next.rowIndex
-        ) {
-          handleErrorFocus(
-            errorFocusCell.next.rowIndex,
-            errorFocusCell.next.fieldName
-          );
-        }
-      }
-    }
-
-
+    setData(getSubscribedData("gridData"));
   }, []);
 
-  const onDraggingStart = (startIndex)=>{
-    // setEditingValue(data[rowIndex][header.headerFieldName]);
+  const getGridData = (value) => {
+    setData([...value]);
   };
-
- const onDraggingEnd = (EndIndex)=>{
-   // setEditingValue(data[rowIndex][header.headerFieldName]);
-  };
-
-
 
   const getDropCell = (value) => {
     const draggingCell = getSubscribedData("draggingCell");
     const dropCell = value;
-    if (
-      rowIndex > draggingCell.rowIndex &&
-      rowIndex <= dropCell.targetRowIndex
-    ) {
-      setDraggingCell(value);
-      setOnDrop(dropCell.targetRowIndex, dropCell.header, draggingCell);
+    if (draggingCell && dropCell) {
+      const draggingCellIndex = data.current.findIndex(
+        (x) => x.id === draggingCell.id
+      );
+      const dropCellIndex = data.current.findIndex((x) => x.id === dropCell.id);
+      const currentRowIndex = data.current.findIndex(
+        (x) => x.id === rowData.id
+      );
+      if (
+        currentRowIndex > draggingCellIndex &&
+        currentRowIndex <= dropCellIndex
+      ) {
+        setDraggingCell(value);
+        setOnDrop(
+          dropCellIndex,
+          dropCell.header,
+          draggingCellIndex,
+          draggingCell
+        );
+      }
+    }
+  };
+
+  const setOnDrop = (
+    dropCellIndex,
+    dropCellHeader,
+    draggingCellIndex,
+    draggingCell
+  ) => {
+    if (draggingCell.fieldName === dropCellHeader.headerFieldName) {
+      for (let i = draggingCellIndex; i <= dropCellIndex; i++) {
+        rowData[dropCellHeader.headerFieldName] = draggingCell.value;
+        rowData["errorObj"] = validateRowData(
+          draggingCell.fieldName,
+          rowData,
+          dropCellHeader
+        );
+      }
+      handleHighlight(dropCellIndex, dropCellHeader.headerFieldName);
+      onRowChange(rowData, rowIndex);
     }
   };
 
@@ -97,12 +113,16 @@ const GridRow = ({
   };
 
   const getErrorFocusCell = (value) => {
-    if (value) {
-      if (
-        rowIndex === value.current.rowIndex ||
-        rowIndex === value.next.rowIndex
-      ) {
-        handleErrorFocus(value.next.rowIndex, value.next.fieldName);
+    if (value && data.current) {
+      const currentRowIndex = data.current.findIndex(
+        (x) => x.id === value.current.rowId
+      );
+      const nextRowIndex = data.current.findIndex(
+        (x) => x.id === value.next.rowId
+      );
+      const selfRowIndex = data.current.findIndex((x) => x.id === rowData.id);
+      if (selfRowIndex === currentRowIndex || selfRowIndex === nextRowIndex) {
+        handleErrorFocus(nextRowIndex, value.next.fieldName, value.next.rowId);
       }
     }
   };
@@ -119,14 +139,14 @@ const GridRow = ({
     }
   };
 
-  const handleErrorFocus = (rowIndex, headerFieldName) => {
+  const handleErrorFocus = (rowIndex, headerFieldName, rowId) => {
     if (errorFocusedCellRef.current) {
       const prevCell = document.getElementById(errorFocusedCellRef.current);
       clearErrorFocusStyle(prevCell);
     }
     if (rowIndex != null && headerFieldName != null) {
       // Error Focus the new cell
-      const cellId = `cell-${rowIndex}-${headerFieldName}`;
+      const cellId = `cell-${rowId}-${headerFieldName}`;
       const newCell = document.getElementById(cellId);
       applyErrorFocusStyle(newCell);
       setSubscribedData("errorFocusedCellRef", cellId);
@@ -155,7 +175,7 @@ const GridRow = ({
     }
     if (rowIndex != null && headerFieldName != null) {
       // Highlight the new cell
-      const cellId = `cell-${rowIndex}-${headerFieldName}`;
+      const cellId = `cell-${rowData.id}-${headerFieldName}`;
       const newCell = document.getElementById(cellId);
       applyHighlightedStyle(newCell);
       setSubscribedData("highlightedCell", cellId);
@@ -168,13 +188,14 @@ const GridRow = ({
       clearHighlightedStyle(cell);
       setEditingCell({ rowIndex, fieldName: header.headerFieldName });
       setEditingCellHeader(header);
-      setEditingValue(data[rowIndex][header.headerFieldName]);
+      setEditingValue(rowData[header.headerFieldName]);
     }
   };
 
   const handleDragStart = (rowIndex, header) => {
     setSubscribedData("draggingCell", {
-      rowIndex,
+      id: rowData.id,
+      value: rowData[header.headerFieldName],
       fieldName: header.headerFieldName,
     });
   };
@@ -184,24 +205,10 @@ const GridRow = ({
   }, []);
 
   const handleDrop = (targetRowIndex, header) => {
-    setSubscribedData("dropCell", { targetRowIndex, header });
-  };
-
-  const setOnDrop = (targetRowIndex, header, draggingCell) => {
-    if (draggingCell && draggingCell.fieldName === header.headerFieldName) {
-      const newData = [...data];
-      for (let i = draggingCell.rowIndex; i <= targetRowIndex; i++) {
-        newData[i][header.headerFieldName] =
-          data[draggingCell.rowIndex][header.headerFieldName];
-        newData[i]["errorObj"] = validateRowData(
-          draggingCell.fieldName,
-          newData[i],
-          header
-        );
-        setSubscribedData("gridData", newData);
-      }
-      handleHighlight(targetRowIndex, header.headerFieldName);
-    }
+    setSubscribedData("dropCell", {
+      id: rowData.id,
+      header: header,
+    });
   };
 
   const validateRowData = useCallback((fieldName, rowData, headers) => {
@@ -247,26 +254,26 @@ const GridRow = ({
 
   const handleBlur = () => {
     if (editingCell && editingCellHeader) {
-      const newData = [...data];
-      newData[editingCell.rowIndex][editingCell.fieldName] = editingValue;
+      rowData[editingCell.fieldName] = editingValue;
 
       // Validate the edited row data cell
-      newData[editingCell.rowIndex].errorObj = validateRowData(
+      rowData.errorObj = validateRowData(
         editingCell.fieldName,
-        newData[editingCell.rowIndex],
+        rowData,
         editingCellHeader
       );
-
-      setSubscribedData("gridData", newData);
       setEditingCell(null);
       setEditingCellHeader(null);
       setEditingValue("");
     }
+    console.log("Row changed in Grid Row", rowData);
+    setRowData(rowData);
+    onRowChange(rowData, rowIndex);
   };
 
-  const getCellStyle = (rowIndex, header) => {
+  const getCellStyle = (header) => {
     const hasError = tableOptions.showErrors
-      ? cellHasError(rowIndex, header.headerFieldName, data)
+      ? cellHasError(rowData, header.headerFieldName)
       : false;
     return {
       width: "100px",
@@ -282,18 +289,34 @@ const GridRow = ({
   const classes = commonStyles();
   return (
     <TableRow
-      key={id}
+      key={rowData.id}
       style={{ height: tableOptions.columnHeight }}
       onContextMenu={(event) =>
-        tableOptions.contextMenu ? openContextMenu(event, rowIndex, id) : null
+        tableOptions.contextMenu
+          ? openContextMenu(event, rowIndex, rowData.id)
+          : null
       }
     >
       <TableCell className={classes.smallCell} align="center">
-        {rowIndex}
+        <Checkbox
+          checked={selected}
+          onChange={(event) => {
+            const array = getSubscribedData("selectedRows");
+            const index = array.indexOf(rowData.id);
+            if (index === -1) {
+              array.push(rowData.id);
+            } else {
+              array.splice(index, 1);
+            }
+            setSubscribedData("selectedRows", array);
+            setSelected(!selected);
+          }}
+        />
+        {/* {rowIndex} */}
       </TableCell>
       {tableHeaders.map((header) => {
         const hasError = tableOptions.showErrors
-          ? cellHasError(rowIndex, header.headerFieldName, data)
+          ? cellHasError(rowData, header.headerFieldName)
           : false;
         const isEditing =
           editingCell &&
@@ -302,7 +325,8 @@ const GridRow = ({
 
         return (
           <TableCell
-            id={`cell-${rowIndex}-${header.headerFieldName}`}
+            //id={`cell-${rowIndex}-${header.headerFieldName}`}
+            id={`cell-${rowData.id}-${header.headerFieldName}`}
             key={header.headerName}
             align="center"
             onClick={() => {
@@ -312,15 +336,9 @@ const GridRow = ({
             onDoubleClick={() => handleDoubleClick(rowIndex, header)}
             draggable={tableOptions.editing ? !editingCell : false}
             onDragStart={() => handleDragStart(rowIndex, header)}
-            // onDragStart={() => {
-            //   console.log('onDragStart on', rowIndex)
-            // }}
             onDragOver={handleDragOver}
             onDrop={() => handleDrop(rowIndex, header)}
-            // onDrop={() => {
-            //   console.log('onDrop on', rowIndex)
-            // }}
-            style={getCellStyle(rowIndex, header)}
+            style={getCellStyle(header)}
           >
             {tableOptions.editing && isEditing ? (
               getCellType(header, editingValue, handleBlur, setEditingValue)
@@ -329,14 +347,12 @@ const GridRow = ({
                 {tableOptions.showErrors && hasError ? (
                   <ErrorCellCopy
                     tableOptions={tableOptions}
-                    data={data}
-                    row={row}
+                    row={rowData}
                     header={header}
-                    hasError={hasError}
                     rowIndex={rowIndex}
                   />
                 ) : (
-                  cellContent(row, header, hasError, rowIndex)
+                  cellContent(rowData, header)
                 )}
               </>
             )}
@@ -347,10 +363,9 @@ const GridRow = ({
   );
 };
 
-
-export default memo(GridRow, (p,n)=>{
+export default memo(GridRow, (p, n) => {
   // console.log('PREVIOUS',p.id)
   // console.log('NEXT', n.id)
   // console.log(p.id !== n.id)
-  return p.id === n.id
+  return p.row.id === n.row.id;
 });

@@ -66,8 +66,16 @@ export const getCellError = (rowIndex, fieldName, data) => {
   return null;
 };
 
-export const cellHasError = (rowIndex, fieldName, data) => {
-  return !!getCellError(rowIndex, fieldName, data);
+export const _getCellError = (row, fieldName) => {
+  const rowErrorsObj = row.errorObj;
+  if (rowErrorsObj && rowErrorsObj[fieldName]) {
+    return rowErrorsObj[fieldName];
+  }
+  return null;
+};
+
+export const cellHasError = (row, fieldName) => {
+  return !!_getCellError(row, fieldName);
 };
 
 export const errorIdentifier = (data) =>
@@ -76,6 +84,7 @@ export const errorIdentifier = (data) =>
       ? Object.keys(row.errorObj).map((cellName) => ({
           rowIndex,
           cellName,
+          id: row.id,
         }))
       : []
   );

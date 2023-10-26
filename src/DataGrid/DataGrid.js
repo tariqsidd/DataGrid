@@ -1,39 +1,25 @@
-import React, {useEffect, useState, useRef, createRef, useCallback, memo} from "react";
-import { Table, TableBody } from "@material-ui/core";
+import React, {
+  useEffect,
+  useState,
+  useRef,
+  createRef,
+  useCallback,
+  memo,
+} from "react";
+import { Table } from "@material-ui/core";
 import GridHeader from "./GridHeader";
 import GridFooter from "./GridFooter";
-import GridRow from "./GridRow";
 import { DataGridOptions } from "./Constants";
 import { addNewRow } from "./utils";
 import ContextMenu from "./ContextMenu";
-import { commonStyles } from "./styles";
-import ExportAndSubmitButton from "./ExportAndSubmitButton";
+import GridButtons from "./GridButtons";
 import ErrorAlert from "./ErrorAlert";
-import {unsubscribe} from "./Reactive/subscriber";
-import isEqual from 'lodash.isequal'
-
-const TBody = memo(({tableOptions, tableHeaders, data, openContextMenu}) => {
-  console.log('TableBody RERENDER')
-
-  return(
-    <TableBody style={{ height: data.length * 40 }}>
-      {data.map((row, rowIndex) => {
-        return(
-          <GridRow
-            key={row.id}
-            id={row.id}
-            tableOptions={DataGridOptions}
-            tableHeaders={tableHeaders}
-            // rowIndex={rowIndex}
-            row={row}
-            data={data}
-            openContextMenu={openContextMenu}
-          />
-        )
-      })}
-    </TableBody>
-  )
-},isEqual);
+import {
+  unsubscribe,
+  setSubscribedData,
+  subscribeToData,
+} from "./Reactive/subscriber";
+import GridBody from "./GridBody";
 
 const DataGrid = ({
   incomingData,
@@ -41,11 +27,13 @@ const DataGrid = ({
   incomingTableOptions,
   callExportCSV,
   onSubmit,
-  itemHeight = 40,
-  buffer = 15,
 }) => {
   console.log("RE-Render");
   const [data, setData] = useState(incomingData);
+  // const data = useRef(incomingData);
+  // const setData = ( value) => {
+  //   data.current = value;
+  // }
   const [tableOptions, setTableOptions] = useState(DataGridOptions);
   const [contextMenuVisible, setContextMenuVisible] = useState(false);
   const [contextMenuPosition, setContextMenuPosition] = useState({
@@ -53,7 +41,6 @@ const DataGrid = ({
     left: 0,
     rowIndex: -1,
   });
-
 
   useEffect(() => {
     let updatedTableOptions = {
@@ -67,14 +54,25 @@ const DataGrid = ({
       ...updatedTableOptions,
       contextMenu: contextMenu,
     });
+  }, [incomingTableOptions]);
+
+  useEffect(() => {
+    setSubscribedData("selectedRows", []);
+    setSubscribedData("gridData", data);
     return () => {
       // Run on unmount
+      unsubscribe("gridData");
+      unsubscribe("selectedRows");
       unsubscribe("highlightedCell");
       unsubscribe("errorFocusCell");
       unsubscribe("dropCell");
       unsubscribe("errorFocusedCellRef");
     };
-  }, [incomingTableOptions]);
+  }, []);
+
+  useEffect(() => {
+    setSubscribedData("gridData", data);
+  }, [data]);
 
   const openContextMenu = useCallback((event, rowIndex, id) => {
     event.preventDefault();
@@ -85,7 +83,7 @@ const DataGrid = ({
       rowIndex: rowIndex,
     });
     setContextMenuVisible(true);
-  },[]);
+  }, []);
 
   const closeContextMenu = () => {
     setContextMenuVisible(false);
@@ -93,23 +91,31 @@ const DataGrid = ({
 
   return (
     <div className="table-container">
-      <ExportAndSubmitButton
+      <GridButtons
         data={data}
         tableOptions={tableOptions}
         tableHeaders={tableHeaders}
         callExportCSV={callExportCSV}
         onSubmit={onSubmit}
+        onDataChange={(data) => {
+          console.log("Updated Data in DataGrid", data);
+          setData([...data]);
+        }}
       />
       {tableOptions.showErrorAlert && tableOptions.showErrors && (
         <ErrorAlert data={data} tableOptions={tableOptions} />
       )}
       <Table stickyHeader>
         <GridHeader tableOptions={tableOptions} tableHeaders={tableHeaders} />
-        <TBody
+        <GridBody
           tableOptions={tableOptions}
           tableHeaders={tableHeaders}
           data={data}
           openContextMenu={openContextMenu}
+          onDataChange={(data) => {
+            console.log("Updated Data in DataGrid", data);
+            setData([...data]);
+          }}
         />
       </Table>
       <ContextMenu

@@ -311,7 +311,7 @@ export const dataSample = [
   },
 ];
 
-function generateData(rows = 10) {
+function generateData(rows = 5000) {
   const baseData = {
     name: "Jamil",
     surname: "Smith",
@@ -329,7 +329,10 @@ function generateData(rows = 10) {
     newData.name = `${baseData.name}${i}`;
     newData.surname = `${baseData.surname}${i}`;
     newData.phoneNo += Math.floor(Math.random() * 10000); // Add a small random increment for variation
-    newData.id =  Math.random().toString(36).substring(2, 6+2)
+    newData.id = Math.random()
+      .toString(36)
+      .substring(2, 6 + 2);
+    //newData.errorObj = { name: "Invalid" };
     dataList.push(newData);
   }
 
