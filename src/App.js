@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { tableHeader, Data, dataArray, dataSample } from "./Data";
 import { Button } from "@material-ui/core";
 import DataGrid from "./DataGrid/DataGrid";
+import Table from "./VirtualRender";
 
 const tableOptions = {
   addRow: true,
@@ -15,32 +16,30 @@ const tableOptions = {
   showSubmitButton: true,
 };
 
+const cities = ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix'];
+const userData = [];
+for (let i = 0; i < 500000; i++) {
+  userData.push({
+    name: `Name ${i}`,
+    surname: `Surname ${i}`,
+    date: new Date(2023, 9, i % 31 + 1).toLocaleDateString(),
+    city: cities[i % cities.length],
+    phoneNo: 1000000 + i,
+    country: `Country ${i % 10}`
+  });
+}
+
+// Define the headers for the table
+
 const App = () => {
-  const [exportCSV, setExportCSV] = useState(false);
   return (
-    <>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={() => {
-          setExportCSV(true);
-        }}
-      >
-        Export CSV Outside
-      </Button>
-      <div style={{ maxWidth: "1000px" }}>
-        <DataGrid
-          //incomingData={Data}
-          incomingData={dataArray}
-          tableHeaders={tableHeader}
-          incomingTableOptions={tableOptions}
-          callExportCSV={exportCSV}
-          onSubmit={() => {
-            console.log("On submit pressed");
-          }}
-        />
-      </div>
-    </>
+    <Table
+      buffer={5}
+      numberOfRows={50}
+      itemheight={50} // Adjust as needed
+      incomingData={userData}
+      tableHeaders={tableHeader}
+    />
   );
 };
 
