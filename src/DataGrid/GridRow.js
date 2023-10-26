@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useEffect } from "react";
+import React, { useState, useCallback, useRef, useEffect, memo } from "react";
 import { TableCell, TableRow } from "@material-ui/core";
 import { commonStyles } from "./styles";
 import { cellContent, cellHasError, getCellType } from "./utils";
@@ -9,6 +9,8 @@ import {
   getSubscribedData,
 } from "./Reactive/subscriber";
 import ErrorCellCopy from "./ErrorCell2";
+import isEqual from 'lodash.isequal'
+import {Data} from "../Data";
 
 let Ajv = require("ajv");
 let ajv = new Ajv({ allErrors: true });
@@ -16,12 +18,15 @@ let ajv = new Ajv({ allErrors: true });
 const GridRow = ({
   tableOptions = {},
   tableHeaders = [],
-  rowIndex,
+  // rowIndex,
   row,
   data = [],
+  id,
   openContextMenu,
 }) => {
   console.log("Table Row Rendered");
+  let rowIndex = data.findIndex(x => x.id === id);
+  const gridData = useRef(data);
   const columnOrder = tableHeaders.map((item) => item.headerFieldName);
   const [editingCell, setEditingCell] = useState(null);
   const [editingCellHeader, setEditingCellHeader] = useState(null);
@@ -58,14 +63,18 @@ const GridRow = ({
       }
     }
 
-    return () => {
-      // Run on unmount
-      unsubscribe("highlightedCell");
-      unsubscribe("errorFocusCell");
-      unsubscribe("dropCell");
-      unsubscribe("errorFocusedCellRef");
-    };
+
   }, []);
+
+  const onDraggingStart = (startIndex)=>{
+    // setEditingValue(data[rowIndex][header.headerFieldName]);
+  };
+
+ const onDraggingEnd = (EndIndex)=>{
+   // setEditingValue(data[rowIndex][header.headerFieldName]);
+  };
+
+
 
   const getDropCell = (value) => {
     const draggingCell = getSubscribedData("draggingCell");
@@ -273,10 +282,10 @@ const GridRow = ({
   const classes = commonStyles();
   return (
     <TableRow
-      key={rowIndex}
+      key={id}
       style={{ height: tableOptions.columnHeight }}
       onContextMenu={(event) =>
-        tableOptions.contextMenu ? openContextMenu(event, rowIndex) : null
+        tableOptions.contextMenu ? openContextMenu(event, rowIndex, id) : null
       }
     >
       <TableCell className={classes.smallCell} align="center">
@@ -303,8 +312,14 @@ const GridRow = ({
             onDoubleClick={() => handleDoubleClick(rowIndex, header)}
             draggable={tableOptions.editing ? !editingCell : false}
             onDragStart={() => handleDragStart(rowIndex, header)}
+            // onDragStart={() => {
+            //   console.log('onDragStart on', rowIndex)
+            // }}
             onDragOver={handleDragOver}
             onDrop={() => handleDrop(rowIndex, header)}
+            // onDrop={() => {
+            //   console.log('onDrop on', rowIndex)
+            // }}
             style={getCellStyle(rowIndex, header)}
           >
             {tableOptions.editing && isEditing ? (
@@ -332,4 +347,10 @@ const GridRow = ({
   );
 };
 
-export default GridRow;
+
+export default memo(GridRow, (p,n)=>{
+  // console.log('PREVIOUS',p.id)
+  // console.log('NEXT', n.id)
+  // console.log(p.id !== n.id)
+  return p.id === n.id
+});

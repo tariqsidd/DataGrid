@@ -13,7 +13,6 @@ const ExportAndSubmitButton = ({
   callExportCSV = false,
   onSubmit = () => {},
 }) => {
-  console.log("Export CSV Button");
   const csvLinkRef = useRef();
   const [errorCells, setErrorCells] = useState(errorIdentifier(data));
 

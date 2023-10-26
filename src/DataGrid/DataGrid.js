@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, createRef } from "react";
+import React, {useEffect, useState, useRef, createRef, useCallback, memo} from "react";
 import { Table, TableBody } from "@material-ui/core";
 import GridHeader from "./GridHeader";
 import GridFooter from "./GridFooter";
@@ -9,6 +9,31 @@ import ContextMenu from "./ContextMenu";
 import { commonStyles } from "./styles";
 import ExportAndSubmitButton from "./ExportAndSubmitButton";
 import ErrorAlert from "./ErrorAlert";
+import {unsubscribe} from "./Reactive/subscriber";
+import isEqual from 'lodash.isequal'
+
+const TBody = memo(({tableOptions, tableHeaders, data, openContextMenu}) => {
+  console.log('TableBody RERENDER')
+
+  return(
+    <TableBody style={{ height: data.length * 40 }}>
+      {data.map((row, rowIndex) => {
+        return(
+          <GridRow
+            key={row.id}
+            id={row.id}
+            tableOptions={DataGridOptions}
+            tableHeaders={tableHeaders}
+            // rowIndex={rowIndex}
+            row={row}
+            data={data}
+            openContextMenu={openContextMenu}
+          />
+        )
+      })}
+    </TableBody>
+  )
+},isEqual);
 
 const DataGrid = ({
   incomingData,
@@ -28,35 +53,7 @@ const DataGrid = ({
     left: 0,
     rowIndex: -1,
   });
-  const containerRef = useRef(null);
-  const visibleRangeRef = useRef([0, 0]);
 
-  useEffect(() => {
-    function updateVisibleItems() {
-      if (containerRef.current) {
-        const scrollTop = containerRef.current.scrollTop;
-        const startIndex = Math.max(
-          0,
-          Math.floor(scrollTop / itemHeight) - buffer
-        );
-        const endIndex = Math.min(
-          data.length,
-          startIndex +
-            Math.ceil(containerRef.current.clientHeight / itemHeight) +
-            2 * buffer
-        );
-        visibleRangeRef.current = [startIndex, endIndex];
-        // setVisibleRange([startIndex, endIndex]);
-      }
-    }
-
-    updateVisibleItems();
-    window.addEventListener("scroll", updateVisibleItems);
-
-    return () => {
-      window.removeEventListener("scroll", updateVisibleItems);
-    };
-  }, [itemHeight, buffer, data.length]);
 
   useEffect(() => {
     let updatedTableOptions = {
@@ -70,23 +67,30 @@ const DataGrid = ({
       ...updatedTableOptions,
       contextMenu: contextMenu,
     });
+    return () => {
+      // Run on unmount
+      unsubscribe("highlightedCell");
+      unsubscribe("errorFocusCell");
+      unsubscribe("dropCell");
+      unsubscribe("errorFocusedCellRef");
+    };
   }, [incomingTableOptions]);
 
-  const openContextMenu = (event, rowIndex) => {
+  const openContextMenu = useCallback((event, rowIndex, id) => {
     event.preventDefault();
     setContextMenuPosition({
+      id,
       top: event.clientY,
       left: event.clientX,
       rowIndex: rowIndex,
     });
     setContextMenuVisible(true);
-  };
+  },[]);
 
   const closeContextMenu = () => {
     setContextMenuVisible(false);
   };
 
-  const classes = commonStyles();
   return (
     <div className="table-container">
       <ExportAndSubmitButton
@@ -99,36 +103,14 @@ const DataGrid = ({
       {tableOptions.showErrorAlert && tableOptions.showErrors && (
         <ErrorAlert data={data} tableOptions={tableOptions} />
       )}
-      <Table
-        stickyHeader
-        ref={containerRef}
-        style={{ overflowY: "auto", height: "100%" }}
-      >
+      <Table stickyHeader>
         <GridHeader tableOptions={tableOptions} tableHeaders={tableHeaders} />
-        <TableBody style={{ height: data.length * itemHeight }}>
-          {data
-            .slice(visibleRangeRef.current[0], visibleRangeRef.current[1])
-            .map((row, rowIndex) => (
-              <GridRow
-                tableOptions={tableOptions}
-                tableHeaders={tableHeaders}
-                rowIndex={rowIndex}
-                row={row}
-                data={data.slice(
-                  visibleRangeRef.current[0],
-                  visibleRangeRef.current[1]
-                )}
-                openContextMenu={openContextMenu}
-              />
-            ))}
-          {tableOptions.addRow && (
-            <GridFooter
-              addRow={() => setData(addNewRow(tableHeaders, data))}
-              tableHeaders={tableHeaders}
-              tableOptions={tableOptions}
-            />
-          )}
-        </TableBody>
+        <TBody
+          tableOptions={tableOptions}
+          tableHeaders={tableHeaders}
+          data={data}
+          openContextMenu={openContextMenu}
+        />
       </Table>
       <ContextMenu
         tableOptions={tableOptions}

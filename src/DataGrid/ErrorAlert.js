@@ -12,7 +12,6 @@ import { commonStyles } from "./styles";
 import { errorIdentifier } from "./utils";
 
 const ErrorAlert = ({ tableOptions = {}, data = [] }) => {
-  console.log("Error Alert Rendered");
   const [currentErrorIndex, setCurrentErrorIndex] = useState(0);
   const [errorCells, setErrorCells] = useState([]);
 

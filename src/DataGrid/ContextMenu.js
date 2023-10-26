@@ -19,11 +19,15 @@ const ContextMenu = ({
     closeContextMenu();
   };
 
-  const deleteRow = (rowIndex) => {
+  const deleteRow = (id) => {
     const newData = [...data];
+    let rowIndex = newData.findIndex((i)=> i.id === id)
     newData.splice(rowIndex, 1);
     setData(newData);
     closeContextMenu();
+  //  new logic
+  //   newData[rowIndex].isDeleted = true;
+  //   closeContextMenu();
   };
 
   return (
@@ -45,7 +49,8 @@ const ContextMenu = ({
         {tableOptions.deleteRow && (
           <MenuItem
             onClick={() => {
-              deleteRow(contextMenuPosition.rowIndex);
+              console.log('contextMenuPosition',contextMenuPosition)
+              deleteRow(contextMenuPosition.id);
             }}
           >
             Delete Row

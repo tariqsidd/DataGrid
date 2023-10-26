@@ -97,7 +97,7 @@ export const Data = [
     city: "Los Karachi",
     phoneNo: 2313453453,
     country: "PK",
-    // errorObj: { city: "city not allowed" },
+    errorObj: { city: "city not allowed" },
   },
   {
     name: "John",
@@ -311,7 +311,7 @@ export const dataSample = [
   },
 ];
 
-function generateData(rows = 5000) {
+function generateData(rows = 10) {
   const baseData = {
     name: "Jamil",
     surname: "Smith",
@@ -321,14 +321,15 @@ function generateData(rows = 5000) {
     country: "PK",
   };
 
-  const dataList = Data;
-  //const dataList = [];
+  // const dataList = Data;
+  const dataList = [];
 
   for (let i = 0; i < rows; i++) {
     const newData = { ...baseData };
     newData.name = `${baseData.name}${i}`;
     newData.surname = `${baseData.surname}${i}`;
     newData.phoneNo += Math.floor(Math.random() * 10000); // Add a small random increment for variation
+    newData.id =  Math.random().toString(36).substring(2, 6+2)
     dataList.push(newData);
   }
 
