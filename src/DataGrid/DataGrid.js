@@ -15,6 +15,7 @@ const DataGrid = ({
   tableHeaders,
   incomingTableOptions,
   callExportCSV,
+  onChangeInData,
   onSubmit,
   onProceedAnyway,
   onSkip,
@@ -89,6 +90,7 @@ const DataGrid = ({
         onDataChange={(data) => {
           console.log("Updated Data in DataGrid", data);
           setData([...data]);
+          onChangeInData(data);
         }}
       />
       {tableOptions.showErrorAlert && tableOptions.showErrors && (
@@ -104,6 +106,7 @@ const DataGrid = ({
           onDataChange={(data) => {
             console.log("Updated Data in DataGrid", data);
             setData([...data]);
+            onChangeInData(data);
           }}
         />
       </Table>

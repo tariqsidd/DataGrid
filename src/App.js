@@ -36,6 +36,9 @@ const App = () => {
           tableHeaders={tableHeader}
           incomingTableOptions={tableOptions}
           callExportCSV={exportCSV}
+          onChangeInData={(data) => {
+            console.log("Updated Data Outside", data);
+          }}
           onSubmit={() => {
             console.log("On submit pressed");
           }}
