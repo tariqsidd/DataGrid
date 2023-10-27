@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect, memo } from "react";
-import { TableCell, TableRow, Checkbox } from "@material-ui/core";
+import { TableCell, TableRow, Checkbox, Tooltip } from "@material-ui/core";
 import { commonStyles } from "./styles";
 import { cellContent, cellHasError, getCellType } from "./utils";
 import {
@@ -298,20 +298,23 @@ const GridRow = ({
       // }
     >
       <TableCell className={classes.smallCell} align="center">
-        <Checkbox
-          checked={selected}
-          onChange={(event) => {
-            const array = getSubscribedData("selectedRows");
-            const index = array.indexOf(rowData.id);
-            if (index === -1) {
-              array.push(rowData.id);
-            } else {
-              array.splice(index, 1);
-            }
-            setSubscribedData("selectedRows", array);
-            setSelected(!selected);
-          }}
-        />
+        <Tooltip title={"Select to Delete Row"} arrow>
+          <Checkbox
+            color="default"
+            checked={selected}
+            onChange={(event) => {
+              const array = getSubscribedData("selectedRows");
+              const index = array.indexOf(rowData.id);
+              if (index === -1) {
+                array.push(rowData.id);
+              } else {
+                array.splice(index, 1);
+              }
+              setSubscribedData("selectedRows", array);
+              setSelected(!selected);
+            }}
+          />
+        </Tooltip>
         {/* {rowIndex} */}
       </TableCell>
       {tableHeaders.map((header) => {
@@ -325,7 +328,6 @@ const GridRow = ({
 
         return (
           <TableCell
-            //id={`cell-${rowIndex}-${header.headerFieldName}`}
             id={`cell-${rowData.id}-${header.headerFieldName}`}
             key={header.headerName}
             align="center"

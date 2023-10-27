@@ -311,7 +311,7 @@ export const dataSample = [
   },
 ];
 
-function generateData(rows = 5000) {
+function generateData(rows = 20) {
   const baseData = {
     name: "Jamil",
     surname: "Smith",
