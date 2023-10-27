@@ -34,7 +34,7 @@ const GridBody = memo(
                 // handleDataChange(updatedRow, rowIndex);
                 handleDataChange(updatedRow);
               }}
-              openContextMenu={openContextMenu}
+              // openContextMenu={openContextMenu}
             />
           );
         })}

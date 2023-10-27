@@ -111,21 +111,21 @@ const DataGrid = ({
           tableOptions={tableOptions}
           tableHeaders={tableHeaders}
           data={data}
-          openContextMenu={openContextMenu}
+          // openContextMenu={openContextMenu}
           onDataChange={(data) => {
             console.log("Updated Data in DataGrid", data);
             setData([...data]);
           }}
         />
       </Table>
-      <ContextMenu
+      {/* <ContextMenu
         tableOptions={tableOptions}
         setData={setData}
         data={data}
         contextMenuVisible={contextMenuVisible}
         contextMenuPosition={contextMenuPosition}
         closeContextMenu={closeContextMenu}
-      />
+      /> */}
     </div>
   );
 };

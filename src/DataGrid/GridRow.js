@@ -291,11 +291,11 @@ const GridRow = ({
     <TableRow
       key={rowData.id}
       style={{ height: tableOptions.columnHeight }}
-      onContextMenu={(event) =>
-        tableOptions.contextMenu
-          ? openContextMenu(event, rowIndex, rowData.id)
-          : null
-      }
+      // onContextMenu={(event) =>
+      //   tableOptions.contextMenu
+      //     ? openContextMenu(event, rowIndex, rowData.id)
+      //     : null
+      // }
     >
       <TableCell className={classes.smallCell} align="center">
         <Checkbox
