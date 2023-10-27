@@ -58,15 +58,7 @@ export const getCellType = (
   }
 };
 
-export const getCellError = (rowIndex, fieldName, data) => {
-  const rowErrorsObj = data[rowIndex].errorObj;
-  if (rowErrorsObj && rowErrorsObj[fieldName]) {
-    return rowErrorsObj[fieldName];
-  }
-  return null;
-};
-
-export const _getCellError = (row, fieldName) => {
+export const getCellError = (row, fieldName) => {
   const rowErrorsObj = row.errorObj;
   if (rowErrorsObj && rowErrorsObj[fieldName]) {
     return rowErrorsObj[fieldName];
@@ -75,7 +67,7 @@ export const _getCellError = (row, fieldName) => {
 };
 
 export const cellHasError = (row, fieldName) => {
-  return !!_getCellError(row, fieldName);
+  return !!getCellError(row, fieldName);
 };
 
 export const errorIdentifier = (data) =>
