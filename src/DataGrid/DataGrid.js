@@ -21,7 +21,7 @@ const DataGrid = ({
   onSkip,
 }) => {
   console.log("RE-Render");
-  const [data, setData] = useState(incomingData);
+  const [data, setData] = useState([]);
   const [tableOptions, setTableOptions] = useState(DataGridOptions);
   const [contextMenuVisible, setContextMenuVisible] = useState(false);
   const [contextMenuPosition, setContextMenuPosition] = useState({
@@ -29,6 +29,10 @@ const DataGrid = ({
     left: 0,
     rowIndex: -1,
   });
+
+  useEffect(() => {
+    setData(incomingData);
+  }, [incomingData]);
 
   useEffect(() => {
     let updatedTableOptions = {
