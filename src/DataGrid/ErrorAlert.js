@@ -20,12 +20,12 @@ const ErrorAlert = ({ tableOptions = {}, data = [] }) => {
           current: {
             rowIndex: errors[errors.length - 1].rowIndex,
             fieldName: errors[errors.length - 1].cellName,
-            rowId: errors[errors.length - 1].id,
+            rowId: errors[errors.length - 1].indexId,
           },
           next: {
             rowIndex: errors[0].rowIndex,
             fieldName: errors[0].cellName,
-            rowId: errors[0].id,
+            rowId: errors[0].indexId,
           },
         });
       }
@@ -46,12 +46,12 @@ const ErrorAlert = ({ tableOptions = {}, data = [] }) => {
           current: {
             rowIndex: errors[errors.length - 1].rowIndex,
             fieldName: errors[errors.length - 1].cellName,
-            rowId: errors[errors.length - 1].id,
+            rowId: errors[errors.length - 1].indexId,
           },
           next: {
             rowIndex: errors[0].rowIndex,
             fieldName: errors[0].cellName,
-            rowId: errors[0].id,
+            rowId: errors[0].indexId,
           },
         });
       }
@@ -67,12 +67,12 @@ const ErrorAlert = ({ tableOptions = {}, data = [] }) => {
         current: {
           rowIndex: errorCells[currentErrorIndex].rowIndex,
           fieldName: errorCells[currentErrorIndex].cellName,
-          rowId: errorCells[currentErrorIndex].id,
+          rowId: errorCells[currentErrorIndex].indexId,
         },
         next: {
           rowIndex: errorCells[nextErrorIndex].rowIndex,
           fieldName: errorCells[nextErrorIndex].cellName,
-          rowId: errorCells[nextErrorIndex].id,
+          rowId: errorCells[nextErrorIndex].indexId,
         },
       });
     }

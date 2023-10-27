@@ -63,11 +63,13 @@ const GridRow = ({
     const dropCell = value;
     if (draggingCell && dropCell) {
       const draggingCellIndex = data.current.findIndex(
-        (x) => x.id === draggingCell.id
+        (x) => x.indexId === draggingCell.indexId
       );
-      const dropCellIndex = data.current.findIndex((x) => x.id === dropCell.id);
+      const dropCellIndex = data.current.findIndex(
+        (x) => x.indexId === dropCell.indexId
+      );
       const currentRowIndex = data.current.findIndex(
-        (x) => x.id === rowData.id
+        (x) => x.indexId === rowData.indexId
       );
       if (
         currentRowIndex > draggingCellIndex &&
@@ -115,12 +117,14 @@ const GridRow = ({
   const getErrorFocusCell = (value) => {
     if (value && data.current) {
       const currentRowIndex = data.current.findIndex(
-        (x) => x.id === value.current.rowId
+        (x) => x.indexId === value.current.rowId
       );
       const nextRowIndex = data.current.findIndex(
-        (x) => x.id === value.next.rowId
+        (x) => x.indexId === value.next.rowId
       );
-      const selfRowIndex = data.current.findIndex((x) => x.id === rowData.id);
+      const selfRowIndex = data.current.findIndex(
+        (x) => x.indexId === rowData.indexId
+      );
       if (selfRowIndex === currentRowIndex || selfRowIndex === nextRowIndex) {
         handleErrorFocus(nextRowIndex, value.next.fieldName, value.next.rowId);
       }
@@ -175,7 +179,7 @@ const GridRow = ({
     }
     if (rowIndex != null && headerFieldName != null) {
       // Highlight the new cell
-      const cellId = `cell-${rowData.id}-${headerFieldName}`;
+      const cellId = `cell-${rowData.indexId}-${headerFieldName}`;
       const newCell = document.getElementById(cellId);
       applyHighlightedStyle(newCell);
       setSubscribedData("highlightedCell", cellId);
@@ -194,7 +198,7 @@ const GridRow = ({
 
   const handleDragStart = (rowIndex, header) => {
     setSubscribedData("draggingCell", {
-      id: rowData.id,
+      indexId: rowData.indexId,
       value: rowData[header.headerFieldName],
       fieldName: header.headerFieldName,
     });
@@ -206,7 +210,7 @@ const GridRow = ({
 
   const handleDrop = (targetRowIndex, header) => {
     setSubscribedData("dropCell", {
-      id: rowData.id,
+      indexId: rowData.indexId,
       header: header,
     });
   };
@@ -289,7 +293,7 @@ const GridRow = ({
   const classes = commonStyles();
   return (
     <TableRow
-      key={rowData.id}
+      key={rowData.indexId}
       style={{ height: tableOptions.columnHeight }}
       // onContextMenu={(event) =>
       //   tableOptions.contextMenu
@@ -304,9 +308,9 @@ const GridRow = ({
             checked={selected}
             onChange={(event) => {
               const array = getSubscribedData("selectedRows");
-              const index = array.indexOf(rowData.id);
+              const index = array.indexOf(rowData.indexId);
               if (index === -1) {
-                array.push(rowData.id);
+                array.push(rowData.indexId);
               } else {
                 array.splice(index, 1);
               }
@@ -328,7 +332,7 @@ const GridRow = ({
 
         return (
           <TableCell
-            id={`cell-${rowData.id}-${header.headerFieldName}`}
+            id={`cell-${rowData.indexId}-${header.headerFieldName}`}
             key={header.headerName}
             align="center"
             onClick={() => {
@@ -366,8 +370,8 @@ const GridRow = ({
 };
 
 export default memo(GridRow, (p, n) => {
-  // console.log('PREVIOUS',p.id)
-  // console.log('NEXT', n.id)
-  // console.log(p.id !== n.id)
-  return p.row.id === n.row.id;
+  // console.log('PREVIOUS',p.indexId)
+  // console.log('NEXT', n.indexId)
+  // console.log(p.indexId !== n.indexId)
+  return p.row.indexId === n.row.indexId;
 });

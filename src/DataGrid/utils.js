@@ -76,7 +76,7 @@ export const errorIdentifier = (data) =>
       ? Object.keys(row.error).map((cellName) => ({
           rowIndex,
           cellName,
-          id: row.id,
+          indexId: row.indexId,
         }))
       : []
   );

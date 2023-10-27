@@ -55,7 +55,7 @@ const GridButtons = ({
   const onDelete = (value) => {
     for (let i = 0; i < selectedRows.length; i++) {
       const rowIndex = exportData.findIndex(
-        (item) => item.id === selectedRows[i]
+        (item) => item.indexId === selectedRows[i]
       );
       exportData.splice(rowIndex, 1);
     }

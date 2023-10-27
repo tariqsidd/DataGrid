@@ -9,7 +9,7 @@ const GridBody = memo(
     console.log("TableBody RERENDER");
     console.log("Table Body in Data", data);
     const handleDataChange = (updatedRow) => {
-      const rowIndex = data.findIndex((x) => x.id === updatedRow.id);
+      const rowIndex = data.findIndex((x) => x.indexId === updatedRow.indexId);
       data[rowIndex] = updatedRow;
       setSubscribedData("gridData", data);
       console.log("Updated Data in Table Body", data);
@@ -21,7 +21,7 @@ const GridBody = memo(
         {data.map((row, rowIndex) => {
           return (
             <GridRow
-              key={row.id}
+              key={row.indexId}
               tableOptions={tableOptions}
               tableHeaders={tableHeaders}
               rowIndex={rowIndex}
