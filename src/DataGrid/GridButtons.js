@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from "react";
 import { CSVLink } from "react-csv";
 import { Button } from "@material-ui/core";
 import GetAppIcon from "@material-ui/icons/GetApp";
+import DeleteIcon from "@material-ui/icons/Delete";
 import { commonStyles } from "./styles";
 import { errorIdentifier } from "./utils";
 import { subscribeToData, setSubscribedData } from "./Reactive/subscriber";
@@ -44,14 +45,6 @@ const GridButtons = ({
   useEffect(() => {
     subscribeToData("selectedRows", getSelectedRows);
   }, []);
-
-  // const getErrorFocusCell = (value) => {
-  //   if (value) {
-  //     setError(true);
-  //   } else {
-  //     setError(false);
-  //   }
-  // };
 
   const getSelectedRows = (value) => {
     setSelectedRows([...value]);
@@ -114,17 +107,19 @@ const GridButtons = ({
           ref={csvLinkRef}
         />
       </div>
-      <div className={classes.exportCSVButton}>
-        <Button
-          variant="contained"
-          color="primary"
-          className={classes.button}
-          onClick={onDelete}
-          disabled={selectedRows.length === 0}
-        >
-          Delete
-        </Button>
-      </div>
+      {selectedRows.length > 0 && (
+        <div className={classes.exportCSVButton}>
+          <Button
+            variant="contained"
+            color="secondary"
+            className={classes.button}
+            onClick={onDelete}
+            startIcon={<DeleteIcon />}
+          >
+            Delete
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
