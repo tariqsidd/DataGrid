@@ -1,11 +1,4 @@
-import React, {
-  useEffect,
-  useState,
-  useRef,
-  createRef,
-  useCallback,
-  memo,
-} from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Table } from "@material-ui/core";
 import GridHeader from "./GridHeader";
 import GridFooter from "./GridFooter";
@@ -14,11 +7,7 @@ import { addNewRow } from "./utils";
 import ContextMenu from "./ContextMenu";
 import GridButtons from "./GridButtons";
 import ErrorAlert from "./ErrorAlert";
-import {
-  unsubscribe,
-  setSubscribedData,
-  subscribeToData,
-} from "./Reactive/subscriber";
+import { unsubscribe, setSubscribedData } from "./Reactive/subscriber";
 import GridBody from "./GridBody";
 
 const DataGrid = ({
@@ -27,13 +16,11 @@ const DataGrid = ({
   incomingTableOptions,
   callExportCSV,
   onSubmit,
+  onProceedAnyway,
+  onSkip,
 }) => {
   console.log("RE-Render");
   const [data, setData] = useState(incomingData);
-  // const data = useRef(incomingData);
-  // const setData = ( value) => {
-  //   data.current = value;
-  // }
   const [tableOptions, setTableOptions] = useState(DataGridOptions);
   const [contextMenuVisible, setContextMenuVisible] = useState(false);
   const [contextMenuPosition, setContextMenuPosition] = useState({
@@ -97,6 +84,8 @@ const DataGrid = ({
         tableHeaders={tableHeaders}
         callExportCSV={callExportCSV}
         onSubmit={onSubmit}
+        onProceedAnyway={onProceedAnyway}
+        onSkip={onSkip}
         onDataChange={(data) => {
           console.log("Updated Data in DataGrid", data);
           setData([...data]);

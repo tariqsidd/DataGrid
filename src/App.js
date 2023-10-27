@@ -11,8 +11,9 @@ const tableOptions = {
   editing: true,
   showErrors: true,
   showErrorAlert: true,
-  showExportButton: true,
-  showSubmitButton: true,
+  showExportButton: false,
+  showSubmitButton: false,
+  showSkipAndProceedButton: true,
 };
 
 const App = () => {
@@ -38,6 +39,8 @@ const App = () => {
           onSubmit={() => {
             console.log("On submit pressed");
           }}
+          onProceedAnyway={() => {}}
+          onSkip={() => {}}
         />
       </div>
     </>

@@ -22,7 +22,6 @@ const GridBody = memo(
           return (
             <GridRow
               key={row.id}
-              // id={row.id}
               tableOptions={tableOptions}
               tableHeaders={tableHeaders}
               rowIndex={rowIndex}
@@ -31,7 +30,6 @@ const GridBody = memo(
               onRowChange={(updatedRow, rowIndex) => {
                 console.log("Table Body Row: ", updatedRow);
                 console.log("Table Body Row Index: ", rowIndex);
-                // handleDataChange(updatedRow, rowIndex);
                 handleDataChange(updatedRow);
               }}
               // openContextMenu={openContextMenu}

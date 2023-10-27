@@ -7,7 +7,7 @@ import {
   setSubscribedData,
   getSubscribedData,
 } from "./Reactive/subscriber";
-import ErrorCellCopy from "./ErrorCell2";
+import ErrorCell from "./ErrorCell";
 import isEqual from "lodash.isequal";
 
 let Ajv = require("ajv");
@@ -347,7 +347,7 @@ const GridRow = ({
             ) : (
               <>
                 {tableOptions.showErrors && hasError ? (
-                  <ErrorCellCopy
+                  <ErrorCell
                     tableOptions={tableOptions}
                     row={rowData}
                     header={header}

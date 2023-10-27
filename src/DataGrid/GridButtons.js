@@ -13,6 +13,8 @@ const GridButtons = ({
   data = [],
   callExportCSV = false,
   onSubmit = () => {},
+  onProceedAnyway = () => {},
+  onSkip = () => {},
   onDataChange,
 }) => {
   console.log("Export CSV BUtton");
@@ -107,6 +109,28 @@ const GridButtons = ({
           ref={csvLinkRef}
         />
       </div>
+      {tableOptions.showSkipAndProceedButton && (
+        <div className={classes.exportCSVButton}>
+          <Button
+            variant="outlined"
+            color="primary"
+            className={classes.button}
+            onClick={onSkip}
+          >
+            Skip These Records
+          </Button>
+
+          <Button
+            variant="contained"
+            color="primary"
+            className={classes.button}
+            onClick={onProceedAnyway}
+          >
+            Proceed Anyway
+          </Button>
+        </div>
+      )}
+
       {selectedRows.length > 0 && (
         <div className={classes.exportCSVButton}>
           <Button
