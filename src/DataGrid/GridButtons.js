@@ -59,7 +59,6 @@ const GridButtons = ({
       );
       exportData.splice(rowIndex, 1);
     }
-    console.log(exportData);
     setExportData(exportData);
     setSelectedRows([]);
     setSubscribedData("selectedRows", []);

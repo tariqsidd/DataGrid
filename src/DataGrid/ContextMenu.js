@@ -46,7 +46,7 @@ const ContextMenu = ({
         {tableOptions.deleteRow && (
           <MenuItem
             onClick={() => {
-              console.log("contextMenuPosition", contextMenuPosition);
+              // console.log("contextMenuPosition", contextMenuPosition);
               deleteRow(contextMenuPosition.id);
             }}
           >
