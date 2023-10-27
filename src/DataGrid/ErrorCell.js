@@ -64,7 +64,7 @@ const ErrorCell = ({
   const classes = commonStyles();
 
   return (
-    <Tooltip title={getCellError(rowIndex, header.headerFieldName, data)} arrow>
+    <Tooltip title={getCellError(row, header.headerFieldName)} arrow>
       <div
         className={classes.errorCell}
         style={{ height: tableOptions.columnHeight }}
