@@ -93,7 +93,7 @@ const GridRow = ({
     if (draggingCell.fieldName === dropCellHeader.headerFieldName) {
       for (let i = draggingCellIndex; i <= dropCellIndex; i++) {
         rowData[dropCellHeader.headerFieldName] = draggingCell.value;
-        rowData["errorObj"] = validateRowData(
+        rowData["error"] = validateRowData(
           draggingCell.fieldName,
           rowData,
           dropCellHeader
@@ -212,8 +212,8 @@ const GridRow = ({
   };
 
   const validateRowData = useCallback((fieldName, rowData, headers) => {
-    const errors = rowData.errorObj
-      ? JSON.parse(JSON.stringify(rowData.errorObj))
+    const errors = rowData.error
+      ? JSON.parse(JSON.stringify(rowData.error))
       : {};
     if (errors.hasOwnProperty(fieldName)) {
       delete errors[fieldName];
@@ -257,7 +257,7 @@ const GridRow = ({
       rowData[editingCell.fieldName] = editingValue;
 
       // Validate the edited row data cell
-      rowData.errorObj = validateRowData(
+      rowData.error = validateRowData(
         editingCell.fieldName,
         rowData,
         editingCellHeader

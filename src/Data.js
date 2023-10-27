@@ -97,7 +97,7 @@ export const Data = [
     city: "Los Karachi",
     phoneNo: 2313453453,
     country: "PK",
-    errorObj: { city: "city not allowed" },
+    error: { city: "city not allowed" },
   },
   {
     name: "John",
@@ -106,7 +106,7 @@ export const Data = [
     city: "New York",
     phoneNo: 1234567890,
     country: "USA",
-    errorObj: { phoneNo: "wrong country code" },
+    error: { phoneNo: "wrong country code" },
   },
   {
     name: "Jane",
@@ -115,7 +115,7 @@ export const Data = [
     city: "Los Angeles",
     phoneNo: 9876543210,
     country: "USA",
-    errorObj: { surname: "surname required" },
+    error: { surname: "surname required" },
   },
   {
     name: "Jamil",
@@ -124,7 +124,7 @@ export const Data = [
     city: "Los Karachi",
     phoneNo: 2313453453,
     country: "PK",
-    errorObj: { city: "city not allowed" },
+    error: { city: "city not allowed" },
   },
   {
     name: "John",
@@ -133,7 +133,7 @@ export const Data = [
     city: "New York",
     phoneNo: 1234567890,
     country: "USA",
-    errorObj: { phoneNo: "wrong country code" },
+    error: { phoneNo: "wrong country code" },
   },
   {
     name: "Jane",
@@ -142,7 +142,7 @@ export const Data = [
     city: "Los Angeles",
     phoneNo: 9876543210,
     country: "USA",
-    errorObj: { surname: "surname required" },
+    error: { surname: "surname required" },
   },
   {
     name: "Jamil",
@@ -151,7 +151,7 @@ export const Data = [
     city: "Los Karachi",
     phoneNo: 2313453453,
     country: "PK",
-    errorObj: { city: "city not allowed" },
+    error: { city: "city not allowed" },
   },
   {
     name: "John",
@@ -160,7 +160,7 @@ export const Data = [
     city: "New York",
     phoneNo: 1234567890,
     country: "USA",
-    errorObj: { phoneNo: "wrong country code" },
+    error: { phoneNo: "wrong country code" },
   },
   {
     name: "Jane",
@@ -169,7 +169,7 @@ export const Data = [
     city: "Los Angeles",
     phoneNo: 9876543210,
     country: "USA",
-    errorObj: { surname: "surname required" },
+    error: { surname: "surname required" },
   },
   {
     name: "Jamil",
@@ -178,7 +178,7 @@ export const Data = [
     city: "Los Karachi",
     phoneNo: 2313453453,
     country: "PK",
-    errorObj: { city: "city not allowed" },
+    error: { city: "city not allowed" },
   },
   {
     name: "John",
@@ -187,7 +187,7 @@ export const Data = [
     city: "New York",
     phoneNo: 1234567890,
     country: "USA",
-    errorObj: { phoneNo: "wrong country code" },
+    error: { phoneNo: "wrong country code" },
   },
   {
     name: "Jane",
@@ -196,7 +196,7 @@ export const Data = [
     city: "Los Angeles",
     phoneNo: 9876543210,
     country: "USA",
-    errorObj: { surname: "surname required" },
+    error: { surname: "surname required" },
   },
   {
     name: "Jamil",
@@ -205,7 +205,7 @@ export const Data = [
     city: "Los Karachi",
     phoneNo: 2313453453,
     country: "PK",
-    errorObj: { city: "city not allowed" },
+    error: { city: "city not allowed" },
   },
   {
     name: "John",
@@ -214,7 +214,7 @@ export const Data = [
     city: "New York",
     phoneNo: 1234567890,
     country: "USA",
-    errorObj: { phoneNo: "wrong country code" },
+    error: { phoneNo: "wrong country code" },
   },
   {
     name: "Jane",
@@ -223,7 +223,7 @@ export const Data = [
     city: "Los Angeles",
     phoneNo: 9876543210,
     country: "USA",
-    errorObj: { surname: "surname required" },
+    error: { surname: "surname required" },
   },
   {
     name: "Jamil",
@@ -232,7 +232,7 @@ export const Data = [
     city: "Los Karachi",
     phoneNo: 2313453453,
     country: "PK",
-    errorObj: { city: "city not allowed" },
+    error: { city: "city not allowed" },
   },
   {
     name: "John",
@@ -241,7 +241,7 @@ export const Data = [
     city: "New York",
     phoneNo: 1234567890,
     country: "USA",
-    errorObj: { phoneNo: "wrong country code" },
+    error: { phoneNo: "wrong country code" },
   },
   {
     name: "Jane",
@@ -250,34 +250,7 @@ export const Data = [
     city: "Los Angeles",
     phoneNo: 9876543210,
     country: "USA",
-    errorObj: { surname: "surname required" },
-  },
-  {
-    name: "Jamil",
-    surname: "Smith",
-    date: "17/10/2023",
-    city: "Los Karachi",
-    phoneNo: 2313453453,
-    country: "PK",
-    errorObj: { city: "city not allowed" },
-  },
-  {
-    name: "John",
-    surname: "Doe",
-    date: "18/10/2023",
-    city: "New York",
-    phoneNo: 1234567890,
-    country: "USA",
-    errorObj: { phoneNo: "wrong country code" },
-  },
-  {
-    name: "Jane",
-    surname: "",
-    date: "19/10/2023",
-    city: "Los Angeles",
-    phoneNo: 9876543210,
-    country: "USA",
-    errorObj: { surname: "surname required" },
+    error: { surname: "surname required" },
   },
 ];
 
@@ -289,7 +262,6 @@ export const dataSample = [
     city: "Los Karachi",
     phoneNo: 2313453453,
     country: "PK",
-    // errorObj: { city: "city not allowed" },
   },
   {
     name: "John",
@@ -298,7 +270,6 @@ export const dataSample = [
     city: "New York",
     phoneNo: 1234567890,
     country: "USA",
-    // errorObj: { phoneNo: "wrong country code" },
   },
   {
     name: "Jane",
@@ -307,7 +278,6 @@ export const dataSample = [
     city: "Los Angeles",
     phoneNo: 9876543210,
     country: "USA",
-    //errorObj: { surname: "surname required" },
   },
 ];
 
@@ -332,7 +302,7 @@ function generateData(rows = 20) {
     newData.id = Math.random()
       .toString(36)
       .substring(2, 6 + 2);
-    //newData.errorObj = { name: "Invalid" };
+    //newData.error = { name: "Invalid" };
     dataList.push(newData);
   }
 

@@ -59,7 +59,7 @@ export const getCellType = (
 };
 
 export const getCellError = (row, fieldName) => {
-  const rowErrorsObj = row.errorObj;
+  const rowErrorsObj = row.error;
   if (rowErrorsObj && rowErrorsObj[fieldName]) {
     return rowErrorsObj[fieldName];
   }
@@ -72,8 +72,8 @@ export const cellHasError = (row, fieldName) => {
 
 export const errorIdentifier = (data) =>
   data.flatMap((row, rowIndex) =>
-    row.errorObj
-      ? Object.keys(row.errorObj).map((cellName) => ({
+    row.error
+      ? Object.keys(row.error).map((cellName) => ({
           rowIndex,
           cellName,
           id: row.id,
@@ -100,7 +100,7 @@ export const addNewRow = (tableHeaders, data) => {
   tableHeaders.forEach((header) => {
     newRow[header.headerFieldName] = getDefaultForType(header.headerFieldType);
   });
-  newRow["errorObj"] = {};
+  newRow["error"] = {};
   const newData = [...data];
   newData.push(newRow);
   return newData;
