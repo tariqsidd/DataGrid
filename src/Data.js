@@ -10,7 +10,7 @@ export const tableHeader = [
     headerName: "Name",
     headerFieldName: "name",
     headerFieldType: "string",
-    headerCellType: "textField",
+    headerCellType: "text",
     headerSchema: {
       type: "object",
       properties: {
@@ -24,7 +24,7 @@ export const tableHeader = [
     headerName: "Surname",
     headerFieldName: "surname",
     headerFieldType: "string",
-    headerCellType: "textField",
+    headerCellType: "text",
     headerSchema: {
       type: "object",
       properties: {

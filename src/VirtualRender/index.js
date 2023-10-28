@@ -1,122 +1,81 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { Box } from '@material-ui/core';
+import TableHeader from "./TableHeader";
+import TableRow from "./TableRow";
+import {unsubscribe} from "../DataGrid/Reactive/subscriber";
+import {indexMap} from './utils'
 
-const TableCell = React.memo(({ children, width }) => {
-  return(
-    <Box
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        width: width,
-        textAlign: 'left',
-        padding: '16px',
-        borderBottom: '1px solid rgba(224, 224, 224, 1)',
-        fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-        fontSize: '0.875rem',
-        lineHeight: 1.5,
-        letterSpacing: '0.01071em',
-      }}
-    >
-      {children}
-    </Box>
-  )
-});
-
-const TableRow = ({ item, itemheight, columns }) => {
-  return(
-    <Box
-      style={{
-        display: 'flex',
-        flexDirection: 'row',
-        position: 'absolute',
-        top: item.top,
-        height: itemheight,
-        width: '100%',
-        backgroundColor: '#fff',
-        '&:nth-of-type(odd)': {
-          backgroundColor: 'rgba(0, 0, 0, 0.04)',
-        },
-        '&:hover': {
-          backgroundColor: 'rgba(0, 0, 0, 0.07)',
-        }
-      }}
-      onClick={()=>{console.log('onClick')}}
-      onDoubleClick={()=>{console.log('onDoubleClick')}}
-      draggable={true}
-      onDragStart={()=>{console.log('onDragStart', item)}}
-      onDragOver ={(event)=>{
-        event.preventDefault();
-      }}
-      onDrop={(e)=>{
-        console.log('onDrop', item)}
-      }
-    >
-      {columns.map((column, index) => (
-        <TableCell key={index} width={`${100 / columns.length}%`}>{item[column.headerFieldName]}</TableCell>
-      ))}
-    </Box>
-  )
-};
-
-const TableHeader = ({ columns }) => {
-  return(
-    <Box
-      style={{
-        display: 'flex',
-        flexDirection: 'row',
-        position: 'sticky',
-        top: 0,
-        backgroundColor: '#f5f5f5',
-        zIndex: 1,
-        borderBottom: '2px solid rgba(224, 224, 224, 1)',
-        fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-        fontWeight: 500,
-        fontSize: '0.875rem',
-        lineHeight: 1.5,
-        letterSpacing: '0.01071em',
-        color: 'rgba(0, 0, 0, 0.87)'
-      }}
-    >
-      {columns.map((header, index) => (
-        <TableCell key={index} width={`${100 / columns.length}%`}>{header.headerName}</TableCell>
-      ))}
-    </Box>
-  )
+export const DataGridOptions = {
+  addRow: true,
+  deleteRow: true,
+  duplicateRow: true,
+  columnHeight: 40,
+  editing: true,
+  showErrors: true,
+  showErrorAlert: true,
+  showExportButton: true,
+  showSubmitButton: false,
 };
 
 
-const Table = ({ itemheight, incomingData, tableHeaders, buffer=5, numberOfRows=6 }) => {
-  const viewportHeight = numberOfRows * itemheight;
-  const [numVisibleItems, setNumVisibleItems] = useState(Math.trunc(viewportHeight / itemheight));
+const VirtualTable = ({ itemHeight, incomingData, tableHeaders, buffer=5, numberOfRows=6 }) => {
+  const viewportHeight = numberOfRows * itemHeight;
+  const [data, setData] = useState([]);
+  const [numVisibleItems, setNumVisibleItems] = useState(Math.trunc(viewportHeight / itemHeight));
   const [viewState, setViewState] = useState({
     start: 0,
     end: numVisibleItems
   });
+  console.log('VirtualTable')
 
-  // console.log('numVisibleItems', numVisibleItems)
+  useEffect(()=>{
+    setData(incomingData)
+    return ()=>{
+      unsubscribe("willRowMutate");
+    }
+  },[]);
 
   const viewPortRef = useRef(null);
   const scrollPositionRef = useRef(0);
-  const containerStyle = { height: incomingData.length * itemheight };
+  const containerStyle = { height: data.length * itemHeight };
 
   const scrollPos = useCallback(() => {
-    const currentIndx = Math.trunc(viewPortRef.current.scrollTop / itemheight);
+    const currentIndx = Math.trunc(viewPortRef.current.scrollTop / itemHeight);
     const adjustedIndex = Math.max(0, currentIndx - buffer);
-    const endIndex = Math.min(incomingData.length - 1, adjustedIndex + numVisibleItems + buffer);
+    const endIndex = Math.min(data.length - 1, adjustedIndex + numVisibleItems + buffer);
 
     if (adjustedIndex !== viewState.start || endIndex !== viewState.end) {
       setViewState({ start: adjustedIndex, end: endIndex });
     }
-  }, [itemheight, numVisibleItems, viewState.start, viewState.end, incomingData.length]);
+  }, [itemHeight, numVisibleItems, viewState.start, viewState.end, data.length]);
 
   const renderRows = useCallback(() => {
     let result = [];
-    for (let i = viewState.start; i <= viewState.end; i++) {
-      let item = { ...incomingData[i], top: i * itemheight };
-      result.push(<TableRow key={i} item={item} itemheight={itemheight} columns={tableHeaders} />);
+    if(data.length) {
+      for (let i = viewState.start; i <= viewState.end; i++) {
+        let item = {...data[i], top: i * itemHeight};
+        indexMap.set(item.id, i);
+        result.push(
+          <TableRow
+            key={item.id}
+            item={item}
+            columns={tableHeaders}
+            itemHeight={itemHeight}
+            onRowChange={(updatedRow) => {
+              console.log('onRowChange')
+              const index = data.findIndex((i) => i.id === updatedRow.id);
+              if (index !== -1) {
+                let _data = data;
+                _data[index] = updatedRow;
+                setData(_data)
+              }
+            }}
+          />
+        );
+      }
+      return result;
     }
-    return result;
-  }, [viewState.start, viewState.end, itemheight, incomingData, tableHeaders]);
+  }, [viewState.start, viewState.end, itemHeight, data, tableHeaders]);
 
   useEffect(() => {
     if (scrollPositionRef.current) {
@@ -128,8 +87,8 @@ const Table = ({ itemheight, incomingData, tableHeaders, buffer=5, numberOfRows=
   }, []);
 
   useEffect(() => {
-    setNumVisibleItems(Math.trunc(viewportHeight / itemheight));
-  }, [itemheight, viewportHeight]);
+    setNumVisibleItems(Math.trunc(viewportHeight / itemHeight));
+  }, [itemHeight, viewportHeight]);
 
   return (
     <Box
@@ -158,4 +117,4 @@ const Table = ({ itemheight, incomingData, tableHeaders, buffer=5, numberOfRows=
   );
 };
 
-export default Table;
+export default VirtualTable;
