@@ -22,7 +22,12 @@ const TableHeader = ({ columns }) => {
       }}
     >
       {columns.map((header, index) => (
-        <TableCell key={index} width={`${100 / columns.length}%`}>{header.headerName}</TableCell>
+        <TableCell
+          key={index}
+          header
+          width={`${100 / columns.length}%`}>
+          {header.headerName}
+        </TableCell>
       ))}
     </Box>
   )

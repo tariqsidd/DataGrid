@@ -26,7 +26,6 @@ const VirtualTable = ({ itemHeight, incomingData, tableHeaders, buffer=5, number
     start: 0,
     end: numVisibleItems
   });
-  console.log('VirtualTable')
 
   useEffect(()=>{
     setData(incomingData)
@@ -57,12 +56,11 @@ const VirtualTable = ({ itemHeight, incomingData, tableHeaders, buffer=5, number
         indexMap.set(item.id, i);
         result.push(
           <TableRow
-            key={item.id}
+            key={`${item.id}-Row`}
             item={item}
             columns={tableHeaders}
             itemHeight={itemHeight}
             onRowChange={(updatedRow) => {
-              console.log('onRowChange')
               const index = data.findIndex((i) => i.id === updatedRow.id);
               if (index !== -1) {
                 let _data = data;

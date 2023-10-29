@@ -6,7 +6,6 @@ import {findIndexById} from "./utils";
 
 const TableRow = ({ item, itemHeight, columns, onRowChange }) => {
   const [rowData, setRowData] = useState(item);
-// console.log('TableRow')
 
   useEffect(()=>{
     setRowData(item);
@@ -15,7 +14,7 @@ const TableRow = ({ item, itemHeight, columns, onRowChange }) => {
 
   const mutateRow = useCallback((updatedCell, key, row)=>{
     row[key] = updatedCell;
-    setRowData(row);
+    setRowData({...row});
   },[rowData]);
 
   const willRowMutate = ({endCellValues, startCellValues})=>{
@@ -25,9 +24,8 @@ const TableRow = ({ item, itemHeight, columns, onRowChange }) => {
     let from = findIndexById(start_row_id);
     let to = findIndexById(end_row_id);
     if (current >= from && current <= to){
-      let row =  {...rowData};
-      mutateRow(valueForOverWrite, key, row)
-      onRowChange(row)
+      mutateRow(valueForOverWrite, key, rowData);
+      onRowChange(rowData)
     }
   };
 
@@ -41,23 +39,17 @@ const TableRow = ({ item, itemHeight, columns, onRowChange }) => {
         height: itemHeight,
         width: '100%',
         backgroundColor: '#fff',
-        '&:nth-of-type(odd)': {
-          backgroundColor: 'rgba(0, 0, 0, 0.04)',
-        },
-        '&:hover': {
-          backgroundColor: 'rgba(0, 0, 0, 0.07)',
-        }
       }}
     >
       {columns.map((column, index) => (
         <TableCell
-          key={`${item.id}-cell`}
+          key={`${index}-cell`}
           column={column}
           rowId={item.id}
           width={`${100 / columns.length}%`}
           onChangeCell={(updatedCell)=>{
             let row =  {...rowData};
-            mutateRow(updatedCell, column.headerFieldName, row)
+            mutateRow(updatedCell, column.headerFieldName, row);
             onRowChange(row)
           }}
         >

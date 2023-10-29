@@ -1,4 +1,4 @@
-import React, {useState, useRef, useCallback} from "react";
+import React, {useState, useRef, useCallback, useEffect} from "react";
 import {Box} from "@material-ui/core";
 import {DataGridOptions} from "./index";
 import GenericTextField from "./GenericTextField";
@@ -11,9 +11,13 @@ import {
 } from "./utils";
 import {setSubscribedData} from "../DataGrid/Reactive/subscriber";
 
-const TableCell = React.memo(({ children, width, column, onChangeCell, rowId }) => {
+const TableCell = React.memo(({ children, width, column, onChangeCell, rowId, header }) => {
   const [editMode, setEditMode] = useState(false);
-  const cellValue = useRef(children);
+  const cellValue = useRef(null);
+
+  useEffect(()=>{
+    cellValue.current = children
+  },[children])
 
   let extraProps = {
     ...(column?.headerOptions && {options: column.headerOptions})
@@ -25,8 +29,10 @@ const TableCell = React.memo(({ children, width, column, onChangeCell, rowId }) 
         <GenericTextField
           type={column.headerCellType}
           label={column.headerName}
+          schema={column.headerSchema}
           value={cellValue.current}
           onChange={(updatedCell)=>{
+            cellValue.current = updatedCell;
             onChangeCell(updatedCell);
             setEditMode(false)
           }}
@@ -63,10 +69,10 @@ const TableCell = React.memo(({ children, width, column, onChangeCell, rowId }) 
 
   return(
     <Box
-      draggable={true}
+      draggable={!header}
       onDragOver ={onDragOver}
       onDrop={()=>{onDrop(children, column.headerFieldName, rowId)}}
-      style={tableCellStyles.cellStyle(width)}
+      style={tableCellStyles.cellStyle(width, header)}
       onDragStart={()=>{onDragStart(children, column.headerFieldName, rowId)}}
       onDoubleClick={()=>onDoubleClick(cellValue.current)}
       onDragEnd={clearOrdinates}>
@@ -76,14 +82,15 @@ const TableCell = React.memo(({ children, width, column, onChangeCell, rowId }) 
 });
 
 export const tableCellStyles = {
-  cellStyle: (width)=>{
+  cellStyle: (width, header)=>{
     return({
       display: 'inline-flex',
       alignItems: 'center',
+      justifyContent:'center',
       width: width,
       textAlign: 'left',
       padding: '16px',
-      borderBottom: '1px solid rgba(224, 224, 224, 1)',
+      ...(!header && {border: '1px solid rgba(224, 224, 224, 1)'}),
       fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
       fontSize: '0.875rem',
       lineHeight: 1.5,
