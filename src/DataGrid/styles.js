@@ -84,10 +84,10 @@ export const commonStyles = makeStyles((theme) => ({
     margin: "4px",
   },
   errorAlert: {
-    paddingRight: "4px",
-    paddingLeft: "4px",
-    paddingTop: "16px",
-    paddingBottom: "16px",
+    // paddingRight: "4px",
+    // paddingLeft: "4px",
+    // paddingTop: "16px",
+    // paddingBottom: "16px",
   },
   errorAlert2: {
     paddingRight: "6px",
@@ -96,9 +96,9 @@ export const commonStyles = makeStyles((theme) => ({
     paddingBottom: "8px",
     backgroundColor: "#ffe6e6",
     display: "flex",
-    borderRadius: "4px",
-    boxShadow:
-      "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)",
+    // borderRadius: "4px",
+    // boxShadow:
+    //   "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)",
     justifyContent: "space-between",
   },
   errorTitle: {

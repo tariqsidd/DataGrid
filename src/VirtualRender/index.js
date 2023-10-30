@@ -2,7 +2,7 @@ import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { Box } from '@material-ui/core';
 import TableHeader from "./TableHeader";
 import TableRow from "./TableRow";
-import {unsubscribe} from "../DataGrid/Reactive/subscriber";
+import {subscribeToData, unsubscribe} from "../DataGrid/Reactive/subscriber";
 import {indexMap} from './utils'
 
 export const DataGridOptions = {
@@ -22,21 +22,27 @@ const VirtualTable = ({ itemHeight, incomingData, tableHeaders, buffer=5, number
   const viewportHeight = numberOfRows * itemHeight;
   const [data, setData] = useState([]);
   const [numVisibleItems, setNumVisibleItems] = useState(Math.trunc(viewportHeight / itemHeight));
-  const [viewState, setViewState] = useState({
-    start: 0,
-    end: numVisibleItems
-  });
-
-  useEffect(()=>{
-    setData(incomingData)
-    return ()=>{
-      unsubscribe("willRowMutate");
-    }
-  },[]);
-
+  const [viewState, setViewState] = useState({start: 0, end: numVisibleItems});
+  const cellErrors = useRef([]);
   const viewPortRef = useRef(null);
   const scrollPositionRef = useRef(0);
   const containerStyle = { height: data.length * itemHeight };
+
+  useEffect(()=>{
+    setData(incomingData)
+    subscribeToData('listenCellErrors', listenCellErrors);
+    return ()=>{
+      unsubscribe("willRowMutate");
+      unsubscribe("listenCellErrors");
+    }
+  },[]);
+
+  const listenCellErrors = (cellRef)=> {
+    cellErrors.current.push(cellRef)
+    console.log('cellErrors.current',cellErrors.current)
+  };
+
+
 
   const scrollPos = useCallback(() => {
     const currentIndx = Math.trunc(viewPortRef.current.scrollTop / itemHeight);

@@ -3,7 +3,9 @@ import { tableHeader, Data, dataArray, dataSample } from "./Data";
 import { Button } from "@material-ui/core";
 import DataGrid from "./DataGrid/DataGrid";
 import VirtualTable from "./VirtualRender";
+import Ajv from 'ajv';
 
+const ajv = new Ajv();
 const tableOptions = {
   addRow: true,
   deleteRow: true,
@@ -18,7 +20,7 @@ const tableOptions = {
 
 const cities = ['New York', 'Los Angeles', 'Chicago'];
 const userData = [];
-for (let i = 0; i < 100; i++) {
+for (let i = 0; i < 500000; i++) {
   userData.push({
     name: `Name ${i}`,
     surname: `Surname ${i}`,
@@ -33,6 +35,7 @@ for (let i = 0; i < 100; i++) {
 // Define the headers for the table
 
 const App = () => {
+
   return (
     <VirtualTable
       buffer={5}

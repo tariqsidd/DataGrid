@@ -43,7 +43,7 @@ const TableRow = ({ item, itemHeight, columns, onRowChange }) => {
     >
       {columns.map((column, index) => (
         <TableCell
-          key={`${index}-cell`}
+          key={`${item.id}-${column.headerFieldName}-${index}`}
           column={column}
           rowId={item.id}
           width={`${100 / columns.length}%`}

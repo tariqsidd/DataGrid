@@ -9,15 +9,21 @@ import {
   setEndCellOrdinate,
   setStartCellOrdinate
 } from "./utils";
-import {setSubscribedData} from "../DataGrid/Reactive/subscriber";
+import {setSubscribedData, subscribeToData} from "../DataGrid/Reactive/subscriber";
 
 const TableCell = React.memo(({ children, width, column, onChangeCell, rowId, header }) => {
+  const [validCell, setValidCell] = useState(true);
   const [editMode, setEditMode] = useState(false);
   const cellValue = useRef(null);
+  const cellRef = useRef(null);
 
   useEffect(()=>{
     cellValue.current = children
-  },[children])
+  },[children]);
+
+  useEffect(()=>{
+    !validCell && setSubscribedData('listenCellErrors',cellRef)
+  },[validCell]);
 
   let extraProps = {
     ...(column?.headerOptions && {options: column.headerOptions})
@@ -30,11 +36,13 @@ const TableCell = React.memo(({ children, width, column, onChangeCell, rowId, he
           type={column.headerCellType}
           label={column.headerName}
           schema={column.headerSchema}
+          validationKey={column.headerFieldName}
           value={cellValue.current}
-          onChange={(updatedCell)=>{
+          onChange={(updatedCell, isValid)=>{
             cellValue.current = updatedCell;
             onChangeCell(updatedCell);
-            setEditMode(false)
+            setEditMode(false);
+            setValidCell(isValid)
           }}
           {...extraProps}
         />
@@ -69,10 +77,11 @@ const TableCell = React.memo(({ children, width, column, onChangeCell, rowId, he
 
   return(
     <Box
+      ref={cellRef}
       draggable={!header}
       onDragOver ={onDragOver}
       onDrop={()=>{onDrop(children, column.headerFieldName, rowId)}}
-      style={tableCellStyles.cellStyle(width, header)}
+      style={tableCellStyles.cellStyle(width, header, validCell)}
       onDragStart={()=>{onDragStart(children, column.headerFieldName, rowId)}}
       onDoubleClick={()=>onDoubleClick(cellValue.current)}
       onDragEnd={clearOrdinates}>
@@ -82,7 +91,7 @@ const TableCell = React.memo(({ children, width, column, onChangeCell, rowId, he
 });
 
 export const tableCellStyles = {
-  cellStyle: (width, header)=>{
+  cellStyle: (width, header, validCell)=>{
     return({
       display: 'inline-flex',
       alignItems: 'center',
@@ -95,6 +104,7 @@ export const tableCellStyles = {
       fontSize: '0.875rem',
       lineHeight: 1.5,
       letterSpacing: '0.01071em',
+      ...(!validCell && {backgroundColor: "#ffe6e6"}),
     })
   }
 };
