@@ -102,7 +102,8 @@ const GridRow = ({
         );
       }
       handleHighlight(dropCellIndex, dropCellHeader.headerFieldName);
-      onRowChange(rowData, rowIndex);
+      //onRowChange(rowData, rowIndex);
+      onRowChange(data.current, rowData, rowIndex);
     }
   };
 
@@ -234,6 +235,7 @@ const GridRow = ({
       valueToValidate = { [fieldKey]: value };
     }
     if (schema) {
+      // console.log(schema);
       const validate = ajv.compile(schema);
       if (!validate(valueToValidate)) {
         errors[fieldKey] = validate.errors[0].message;
@@ -272,7 +274,8 @@ const GridRow = ({
     }
     console.log("Row changed in Grid Row", rowData);
     setRowData(rowData);
-    onRowChange(rowData, rowIndex);
+    //onRowChange(rowData, rowIndex);
+    onRowChange(data.current, rowData, rowIndex);
   };
 
   const getCellStyle = (header) => {

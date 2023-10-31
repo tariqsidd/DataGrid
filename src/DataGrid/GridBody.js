@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import React, { memo, useEffect, useState } from "react";
 import { TableBody } from "@material-ui/core";
 import GridRow from "./GridRow";
 import { setSubscribedData } from "./Reactive/subscriber";
@@ -8,7 +8,8 @@ const GridBody = memo(
   ({ tableOptions, tableHeaders, data, openContextMenu, onDataChange }) => {
     console.log("TableBody RERENDER");
     console.log("Table Body in Data", data);
-    const handleDataChange = (updatedRow) => {
+    const handleDataChange = (data, updatedRow) => {
+      console.log("Data in handle Data change", data);
       const rowIndex = data.findIndex((x) => x.indexId === updatedRow.indexId);
       data[rowIndex] = updatedRow;
       setSubscribedData("gridData", data);
@@ -27,10 +28,11 @@ const GridBody = memo(
               rowIndex={rowIndex}
               row={row}
               data={data}
-              onRowChange={(updatedRow, rowIndex) => {
+              onRowChange={(data, updatedRow, rowIndex) => {
                 console.log("Table Body Row: ", updatedRow);
                 console.log("Table Body Row Index: ", rowIndex);
-                handleDataChange(updatedRow);
+                console.log("Table Data before Handle Data", data);
+                handleDataChange(data, updatedRow);
               }}
               // openContextMenu={openContextMenu}
             />

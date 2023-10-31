@@ -21,7 +21,7 @@ const GridButtons = ({
   const csvLinkRef = useRef();
   const [error, setError] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
-  const [exportData, setExportData] = useState(data);
+  const [exportData, setExportData] = useState([]);
 
   const prepareCSVData = () => {
     const csvData = [];
@@ -36,6 +36,7 @@ const GridButtons = ({
 
   useEffect(() => {
     console.log("Button Data", data);
+    setExportData(data);
     const errors = errorIdentifier(data);
     if (errors.length > 0) {
       setError(true);

@@ -8,6 +8,7 @@ export const commonStyles = makeStyles((theme) => ({
     overflow: "hidden",
     padding: "0px",
     fontSize: "0.75em",
+    backgroundColor: "white",
   },
   highlightedSmallCell: {
     width: "30px",
