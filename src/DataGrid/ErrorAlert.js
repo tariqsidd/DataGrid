@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useRef, useState, memo} from "react";
 import { IconButton, Typography } from "@material-ui/core";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
@@ -10,19 +10,24 @@ import {
 } from "./Reactive/subscriber";
 import { commonStyles } from "./styles";
 import { errorIdentifier } from "./utils";
+import {indexMap} from "../VirtualRender/utils";
+// 290380
 
-const ErrorAlert = ({ tableOptions = {}, data = [] }) => {
-  console.log("Error Alert Rendered");
+const ErrorAlert = ({ tableOptions = {}, data = [], scrollToRow }) => {
   const [currentErrorIndex, setCurrentErrorIndex] = useState(0);
   const [errorCells, setErrorCells] = useState([]);
 
   useEffect(() => {
-    subscribeToData("gridData", getGridData);
-    return () => {
-      // Run on unmount
-      unsubscribe("gridData");
-    };
+    subscribeToData('listenCellErrors', listenCellErrors);
   }, []);
+
+  const listenCellErrors = (cellRef)=> {
+    // scrollToRow(290380)
+    setErrorCells(prevItems => [...prevItems, cellRef])
+  };
+
+  console.log('errorCells',errorCells)
+
 
   useEffect(() => {
     const errors = tableOptions.showErrors ? errorIdentifier(data) : [];
@@ -144,4 +149,4 @@ const ErrorAlert = ({ tableOptions = {}, data = [] }) => {
   );
 };
 
-export default ErrorAlert;
+export default memo(ErrorAlert);

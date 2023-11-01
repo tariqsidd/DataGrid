@@ -38,3 +38,20 @@ export const convertToHasMap = (data)=>{
 export const findIndexById = (id)=> {
   return indexMap.has(id) ? indexMap.get(id) : -1;
 };
+
+export const convertToHashMap = (data, chunkSize = 500) => {
+
+  // Function to add items to the map in chunks
+  const addToMapInChunks = (startIndex) => {
+    for (let i = startIndex; i < Math.min(startIndex + chunkSize, data.length); i++) {
+      const item = data[i];
+      indexMap.set(item.id, i);
+    }
+  };
+
+  // Loop to process the entire dataset in chunks
+  for (let i = 0; i < data.length; i += chunkSize) {
+    addToMapInChunks(i);
+  }
+
+};

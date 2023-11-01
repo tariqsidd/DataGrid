@@ -2,8 +2,7 @@ import {Box} from "@material-ui/core";
 import React from "react";
 import TableCell from "./TableCell";
 import ErrorAlert from "../DataGrid/ErrorAlert";
-
-const TableHeader = ({ columns }) => {
+const TableHeader = ({ columns, scrollToRow }) => {
   return(
     <Box style={{
       display: 'flex',
@@ -12,7 +11,7 @@ const TableHeader = ({ columns }) => {
       top: 0,
       zIndex: 1,
     }}>
-      <ErrorAlert/>
+      <ErrorAlert scrollToRow={scrollToRow}/>
     <Box
       style={{
         display: 'flex',

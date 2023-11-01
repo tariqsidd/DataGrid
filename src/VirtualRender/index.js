@@ -3,7 +3,7 @@ import { Box } from '@material-ui/core';
 import TableHeader from "./TableHeader";
 import TableRow from "./TableRow";
 import {subscribeToData, unsubscribe} from "../DataGrid/Reactive/subscriber";
-import {indexMap} from './utils'
+import {convertToHashMap, indexMap} from './utils'
 
 export const DataGridOptions = {
   addRow: true,
@@ -23,24 +23,25 @@ const VirtualTable = ({ itemHeight, incomingData, tableHeaders, buffer=5, number
   const [data, setData] = useState([]);
   const [numVisibleItems, setNumVisibleItems] = useState(Math.trunc(viewportHeight / itemHeight));
   const [viewState, setViewState] = useState({start: 0, end: numVisibleItems});
-  const cellErrors = useRef([]);
+  // const cellErrors = useRef([]);
   const viewPortRef = useRef(null);
   const scrollPositionRef = useRef(0);
   const containerStyle = { height: data.length * itemHeight };
 
   useEffect(()=>{
     setData(incomingData)
-    subscribeToData('listenCellErrors', listenCellErrors);
+    convertToHashMap(incomingData);
+    // subscribeToData('listenCellErrors', listenCellErrors);
     return ()=>{
       unsubscribe("willRowMutate");
       unsubscribe("listenCellErrors");
     }
   },[]);
 
-  const listenCellErrors = (cellRef)=> {
-    cellErrors.current.push(cellRef)
-    console.log('cellErrors.current',cellErrors.current)
-  };
+  // const listenCellErrors = (cellRef)=> {
+  //   cellErrors.current.push(cellRef)
+  //   console.log('listenCellErrors',cellErrors.current)
+  // };
 
 
 
@@ -54,12 +55,22 @@ const VirtualTable = ({ itemHeight, incomingData, tableHeaders, buffer=5, number
     }
   }, [itemHeight, numVisibleItems, viewState.start, viewState.end, data.length]);
 
+  const scrollToRow = (rowIndex) => {
+    const scrollPosition = (rowIndex * itemHeight) - itemHeight;
+    if (viewPortRef.current) {
+      viewPortRef.current.scrollTop = scrollPosition;
+    }
+  };
+
+// Example usage: scrollToRow(10) // Scrolls to the 11th row (assuming 0-based indexing)
+
+
   const renderRows = useCallback(() => {
     let result = [];
     if(data.length) {
       for (let i = viewState.start; i <= viewState.end; i++) {
         let item = {...data[i], top: i * itemHeight};
-        indexMap.set(item.id, i);
+        // indexMap.set(item.id, i);
         result.push(
           <TableRow
             key={`${item.id}-Row`}
@@ -107,7 +118,7 @@ const VirtualTable = ({ itemHeight, incomingData, tableHeaders, buffer=5, number
       }}
       onScroll={scrollPos}
     >
-      <TableHeader columns={tableHeaders} />
+      <TableHeader columns={tableHeaders} scrollToRow={scrollToRow}/>
       <Box
         style={{
           position: 'absolute',
