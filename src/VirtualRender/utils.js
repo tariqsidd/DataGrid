@@ -2,39 +2,43 @@ export const indexMap = new Map();
 let DragStartCellOrdinate = null;
 let DragEndCellOrdinate = null;
 
-export const setStartCellOrdinate = (cellValue, key, rowId)=>{
+export const setStartCellOrdinate = (cellValue, key, rowId) => {
   DragStartCellOrdinate = {
-    cellValue, key, rowId
+    cellValue,
+    key,
+    rowId,
   };
 };
 
-export const setEndCellOrdinate = (cellValue, key, rowId)=>{
+export const setEndCellOrdinate = (cellValue, key, rowId) => {
   DragEndCellOrdinate = {
-    cellValue, key, rowId
+    cellValue,
+    key,
+    rowId,
   };
 };
 
-export const getStartCellOrdinate = () =>{
+export const getStartCellOrdinate = () => {
   return DragStartCellOrdinate;
 };
 
-export const getEndCellOrdinate = ()=>{
+export const getEndCellOrdinate = () => {
   return DragEndCellOrdinate;
 };
 
-export const clearOrdinates = ()=>{
+export const clearOrdinates = () => {
   DragStartCellOrdinate = null;
-  DragEndCellOrdinate = null
+  DragEndCellOrdinate = null;
 };
 
-export const convertToHasMap = (data)=>{
+export const convertToHasMap = (data) => {
   const indexMap = new Map();
   data.forEach((item, index) => {
-    indexMap.set(item.id, index);
+    indexMap.set(item.indexId, index);
   });
-  return indexMap
+  return indexMap;
 };
 
-export const findIndexById = (id)=> {
-  return indexMap.has(id) ? indexMap.get(id) : -1;
+export const findIndexById = (indexId) => {
+  return indexMap.has(indexId) ? indexMap.get(indexId) : -1;
 };
