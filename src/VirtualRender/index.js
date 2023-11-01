@@ -2,7 +2,11 @@ import React, { useState, useRef, useCallback, useEffect } from "react";
 import { Box } from "@material-ui/core";
 import TableHeader from "./TableHeader";
 import TableRow from "./TableRow";
-import { subscribeToData, unsubscribe } from "../DataGrid/Reactive/subscriber";
+import {
+  setSubscribedData,
+  subscribeToData,
+  unsubscribe,
+} from "../DataGrid/Reactive/subscriber";
 import { indexMap } from "./utils";
 
 export const DataGridOptions = {
@@ -41,9 +45,11 @@ const VirtualTable = ({
   useEffect(() => {
     setData(incomingData);
     subscribeToData("listenCellErrors", listenCellErrors);
+    setSubscribedData("rowsToDelete", []);
     return () => {
       unsubscribe("willRowMutate");
       unsubscribe("listenCellErrors");
+      unsubscribe("rowsToDelete");
     };
   }, []);
 
