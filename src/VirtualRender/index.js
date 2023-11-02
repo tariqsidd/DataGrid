@@ -1,9 +1,13 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { Box } from '@material-ui/core';
+import React, { useState, useRef, useCallback, useEffect } from "react";
+import { Box } from "@material-ui/core";
 import TableHeader from "./TableHeader";
 import TableRow from "./TableRow";
-import {subscribeToData, unsubscribe} from "../DataGrid/Reactive/subscriber";
-import {convertToHashMap, indexMap} from './utils'
+import {
+  setSubscribedData,
+  subscribeToData,
+  unsubscribe,
+} from "../DataGrid/Reactive/subscriber";
+import {convertToHashMap} from "./utils";
 
 export const DataGridOptions = {
   addRow: true,
@@ -17,8 +21,13 @@ export const DataGridOptions = {
   showSubmitButton: false,
 };
 
-
-const VirtualTable = ({ itemHeight, incomingData, tableHeaders, buffer=5, numberOfRows=6 }) => {
+const VirtualTable = ({
+  itemHeight,
+  incomingData,
+  tableHeaders,
+  buffer = 5,
+  numberOfRows = 6,
+}) => {
   const viewportHeight = numberOfRows * itemHeight;
   const [data, setData] = useState([]);
   const [numVisibleItems, setNumVisibleItems] = useState(Math.trunc(viewportHeight / itemHeight));
@@ -28,15 +37,17 @@ const VirtualTable = ({ itemHeight, incomingData, tableHeaders, buffer=5, number
   const scrollPositionRef = useRef(0);
   const containerStyle = { height: data.length * itemHeight };
 
-  useEffect(()=>{
-    setData(incomingData)
+  useEffect(() => {
+    setData(incomingData);
     convertToHashMap(incomingData);
-    // subscribeToData('listenCellErrors', listenCellErrors);
-    return ()=>{
+    // subscribeToData("listenCellErrors", listenCellErrors);
+    setSubscribedData("rowsToDelete", []);
+    return () => {
       unsubscribe("willRowMutate");
       unsubscribe("listenCellErrors");
-    }
-  },[]);
+      unsubscribe("rowsToDelete");
+    };
+  }, []);
 
   // const listenCellErrors = (cellRef)=> {
   //   cellErrors.current.push(cellRef)
@@ -48,12 +59,21 @@ const VirtualTable = ({ itemHeight, incomingData, tableHeaders, buffer=5, number
   const scrollPos = useCallback(() => {
     const currentIndx = Math.trunc(viewPortRef.current.scrollTop / itemHeight);
     const adjustedIndex = Math.max(0, currentIndx - buffer);
-    const endIndex = Math.min(data.length - 1, adjustedIndex + numVisibleItems + buffer);
+    const endIndex = Math.min(
+      data.length - 1,
+      adjustedIndex + numVisibleItems + buffer
+    );
 
     if (adjustedIndex !== viewState.start || endIndex !== viewState.end) {
       setViewState({ start: adjustedIndex, end: endIndex });
     }
-  }, [itemHeight, numVisibleItems, viewState.start, viewState.end, data.length]);
+  }, [
+    itemHeight,
+    numVisibleItems,
+    viewState.start,
+    viewState.end,
+    data.length,
+  ]);
 
   const scrollToRow = (rowIndex) => {
     const scrollPosition = (rowIndex * itemHeight) - itemHeight;
@@ -67,22 +87,24 @@ const VirtualTable = ({ itemHeight, incomingData, tableHeaders, buffer=5, number
 
   const renderRows = useCallback(() => {
     let result = [];
-    if(data.length) {
+    if (data.length) {
       for (let i = viewState.start; i <= viewState.end; i++) {
-        let item = {...data[i], top: i * itemHeight};
-        // indexMap.set(item.id, i);
+        let item = { ...data[i], top: i * itemHeight };
+        // indexMap.set(item.indexId, i);
         result.push(
           <TableRow
-            key={`${item.id}-Row`}
+            key={`${item.indexId}-Row`}
             item={item}
             columns={tableHeaders}
             itemHeight={itemHeight}
             onRowChange={(updatedRow) => {
-              const index = data.findIndex((i) => i.id === updatedRow.id);
+              const index = data.findIndex(
+                (i) => i.indexId === updatedRow.indexId
+              );
               if (index !== -1) {
                 let _data = data;
                 _data[index] = updatedRow;
-                setData(_data)
+                setData(_data);
               }
             }}
           />
@@ -109,21 +131,21 @@ const VirtualTable = ({ itemHeight, incomingData, tableHeaders, buffer=5, number
     <Box
       ref={viewPortRef}
       style={{
-        position: 'relative',
-        width: '100%',
-        height: '100vh',
-        border: '1px solid rgba(224, 224, 224, 1)',
-        overflowY: 'scroll',
-        fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif'
+        position: "relative",
+        width: "100%",
+        height: "100vh",
+        border: "1px solid rgba(224, 224, 224, 1)",
+        overflowY: "scroll",
+        fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
       }}
       onScroll={scrollPos}
     >
       <TableHeader columns={tableHeaders} scrollToRow={scrollToRow}/>
       <Box
         style={{
-          position: 'absolute',
-          width: '100%',
-          ...containerStyle
+          position: "absolute",
+          width: "100%",
+          ...containerStyle,
         }}
       >
         {renderRows()}

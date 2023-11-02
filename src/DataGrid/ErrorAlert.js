@@ -5,15 +5,12 @@ import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
 import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
 import {
   subscribeToData,
-  unsubscribe,
   setSubscribedData,
 } from "./Reactive/subscriber";
 import { commonStyles } from "./styles";
-import { errorIdentifier } from "./utils";
-import {indexMap} from "../VirtualRender/utils";
-// 290380
+import {findIndexById} from "../VirtualRender/utils";
 
-const ErrorAlert = ({ tableOptions = {}, data = [], scrollToRow }) => {
+const ErrorAlert = ({ scrollToRow }) => {
   const [currentErrorIndex, setCurrentErrorIndex] = useState(0);
   const [errorCells, setErrorCells] = useState([]);
 
@@ -21,96 +18,46 @@ const ErrorAlert = ({ tableOptions = {}, data = [], scrollToRow }) => {
     subscribeToData('listenCellErrors', listenCellErrors);
   }, []);
 
-  const listenCellErrors = (cellRef)=> {
+  useEffect(()=>{
+    scrollToRow(errorCells[currentErrorIndex])
+  },[currentErrorIndex]);
+
+
+  const listenCellErrors = ({error, key, rowId})=> {
+    const compareNumbers = (a, b) => a - b;
+    let index = findIndexById(rowId);
+    if (error !== null && error[key] !== null) {
+      // Add index if it is not already in errorCells
+      setErrorCells(prevArray => prevArray.includes(index) ? prevArray.sort(compareNumbers) : [...prevArray, index].sort(compareNumbers));
+    } else {
+      // Remove index from the errorCells
+      setErrorCells(prevArray => prevArray.filter(item => item !== index).sort(compareNumbers));
+    }
+
     // scrollToRow(290380)
-    setErrorCells(prevItems => [...prevItems, cellRef])
   };
 
-  console.log('errorCells',errorCells)
-
-
-  useEffect(() => {
-    const errors = tableOptions.showErrors ? errorIdentifier(data) : [];
-    if (errors.length > 0) {
-      if (errors[0]) {
-        setSubscribedData("errorFocusCell", {
-          current: {
-            rowIndex: errors[errors.length - 1].rowIndex,
-            fieldName: errors[errors.length - 1].cellName,
-          },
-          next: {
-            rowIndex: errors[0].rowIndex,
-            fieldName: errors[0].cellName,
-          },
-        });
-      }
-    } else {
-      setSubscribedData("errorFocusCell", null);
-    }
-    setErrorCells(errors);
-  }, []);
-
-  const getGridData = (value) => {
-    const errors = tableOptions.showErrors ? errorIdentifier(value) : [];
-    if (errors.length > 0) {
-      if (errors[0]) {
-        setSubscribedData("errorFocusCell", {
-          current: {
-            rowIndex: errors[errors.length - 1].rowIndex,
-            fieldName: errors[errors.length - 1].cellName,
-          },
-          next: {
-            rowIndex: errors[0].rowIndex,
-            fieldName: errors[0].cellName,
-          },
-        });
-      }
-    } else {
-      setSubscribedData("errorFocusCell", null);
-    }
-    setErrorCells(errors);
-  };
-
-  const focusOnErrorCell = (currentErrorIndex, nextErrorIndex) => {
-    if (errorCells[currentErrorIndex] && errorCells[nextErrorIndex]) {
-      setSubscribedData("errorFocusCell", {
-        current: {
-          rowIndex: errorCells[currentErrorIndex].rowIndex,
-          fieldName: errorCells[currentErrorIndex].cellName,
-        },
-        next: {
-          rowIndex: errorCells[nextErrorIndex].rowIndex,
-          fieldName: errorCells[nextErrorIndex].cellName,
-        },
-      });
-    }
-  };
 
   const handleNextError = (event) => {
     event.stopPropagation();
-
     if (currentErrorIndex < errorCells.length - 1) {
       setCurrentErrorIndex((prev) => prev + 1);
-      focusOnErrorCell(currentErrorIndex, currentErrorIndex + 1);
     } else {
       setCurrentErrorIndex(0);
-      focusOnErrorCell(currentErrorIndex, 0);
     }
   };
 
   const handlePrevError = (event) => {
     event.stopPropagation();
-
     if (currentErrorIndex > 0) {
       setCurrentErrorIndex((prev) => prev - 1);
-      focusOnErrorCell(currentErrorIndex, currentErrorIndex - 1);
     } else {
       setCurrentErrorIndex(errorCells.length - 1);
-      focusOnErrorCell(currentErrorIndex, errorCells.length - 1);
     }
   };
 
   const classes = commonStyles();
+
   return (
     <>
       {errorCells.length > 0 && (

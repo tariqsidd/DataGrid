@@ -72,11 +72,12 @@ export const cellHasError = (rowIndex, fieldName, data) => {
 
 export const errorIdentifier = (data) =>
   data.flatMap((row, rowIndex) =>
-    row.errorObj
-      ? Object.keys(row.errorObj).map((cellName) => ({
-          rowIndex,
-          cellName,
-        }))
+    row.error
+      ? Object.keys(row.error).map((cellName) => ({
+        rowIndex,
+        cellName,
+        indexId: row.indexId,
+      }))
       : []
   );
 
