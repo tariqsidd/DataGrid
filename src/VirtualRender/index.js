@@ -18,16 +18,20 @@ export const DataGridOptions = {
   showErrors: true,
   showErrorAlert: true,
   showExportButton: true,
-  showSubmitButton: false,
+  showSubmitButton: true,
+  showProceedButton: true,
 };
 
 const VirtualTable = ({
   itemHeight,
   incomingData,
+  incomingTableOptions,
   tableHeaders,
   buffer = 5,
   numberOfRows = 6,
 }) => {
+  console.log("Virtual Table render");
+  const [tableOptions, setTableOptions] = useState(DataGridOptions);
   const viewportHeight = numberOfRows * itemHeight;
   const [data, setData] = useState([]);
   const [numVisibleItems, setNumVisibleItems] = useState(
@@ -46,12 +50,24 @@ const VirtualTable = ({
     setData(incomingData);
     subscribeToData("listenCellErrors", listenCellErrors);
     setSubscribedData("rowsToDelete", []);
+    setSubscribedData("gridData", incomingData);
     return () => {
       unsubscribe("willRowMutate");
       unsubscribe("listenCellErrors");
       unsubscribe("rowsToDelete");
     };
   }, []);
+
+  useEffect(() => {
+    let updatedTableOptions = {
+      ...tableOptions,
+      ...incomingTableOptions,
+    };
+
+    setTableOptions({
+      ...updatedTableOptions,
+    });
+  }, [incomingTableOptions]);
 
   const listenCellErrors = (cellRef) => {
     cellErrors.current.push(cellRef);
@@ -78,6 +94,7 @@ const VirtualTable = ({
   ]);
 
   const renderRows = useCallback(() => {
+    console.log("render Rows called");
     let result = [];
     if (data.length) {
       for (let i = viewState.start; i <= viewState.end; i++) {
@@ -96,7 +113,9 @@ const VirtualTable = ({
               if (index !== -1) {
                 let _data = data;
                 _data[index] = updatedRow;
-                setData(_data);
+                console.log(_data);
+                setData([..._data]);
+                setSubscribedData("gridData", _data);
               }
             }}
           />
@@ -132,7 +151,16 @@ const VirtualTable = ({
       }}
       onScroll={scrollPos}
     >
-      <TableHeader columns={tableHeaders} />
+      <TableHeader
+        data={data}
+        columns={tableHeaders}
+        tableOptions={tableOptions}
+        onDataChange={(data) => {
+          console.log(data);
+          //setData(data);
+          setData([...data]);
+        }}
+      />
       <Box
         style={{
           position: "absolute",

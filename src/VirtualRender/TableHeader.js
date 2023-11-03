@@ -2,8 +2,9 @@ import { Box } from "@material-ui/core";
 import React from "react";
 import TableCell from "./TableCell";
 import ErrorAlert from "../DataGrid/ErrorAlert";
+import GridButtons from "./GridButton";
 
-const TableHeader = ({ columns }) => {
+const TableHeader = ({ data, columns, tableOptions, onDataChange }) => {
   return (
     <Box
       style={{
@@ -14,6 +15,22 @@ const TableHeader = ({ columns }) => {
         zIndex: 1,
       }}
     >
+      <GridButtons
+        data={data}
+        tableOptions={tableOptions}
+        tableHeaders={columns}
+        onDataChange={(data) => {
+          onDataChange(data);
+        }}
+        // callExportCSV={callExportCSV}
+        // onSubmit={onSubmit}
+        // onProceedAnyway={onProceedAnyway}
+        // onSkip={onSkip}
+        // onDataChange={(data) => {
+        //   // setData([...data]);
+        //   // onChangeInData(data);
+        // }}
+      />
       <ErrorAlert />
       <Box
         style={{

@@ -9,6 +9,7 @@ import {
 import { findIndexById } from "./utils";
 
 const TableRow = ({ item, itemHeight, columns, onRowChange }) => {
+  console.log("Table Row rendered");
   const [rowData, setRowData] = useState(item);
   const [selected, setSelected] = useState(
     item.selected ? item.selected : false
@@ -98,6 +99,10 @@ const TableRow = ({ item, itemHeight, columns, onRowChange }) => {
   );
 };
 
-export default memo(TableRow, (previousProps, nextProps) => {
-  return previousProps.id === nextProps.id;
-});
+export default memo(
+  TableRow
+  //   (previousProps, nextProps) => {
+  //   console.log(previousProps.item.indexId);
+  //   return previousProps.item.indexId === nextProps.item.indexId;
+  // }
+);
