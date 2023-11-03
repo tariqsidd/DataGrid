@@ -1,111 +1,63 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useRef, useState, memo} from "react";
 import { IconButton, Typography } from "@material-ui/core";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
 import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
 import {
   subscribeToData,
-  unsubscribe,
   setSubscribedData,
 } from "./Reactive/subscriber";
 import { commonStyles } from "./styles";
-import { errorIdentifier } from "./utils";
+import {findIndexById} from "../VirtualRender/utils";
 
-const ErrorAlert = ({ tableOptions = {}, data = [] }) => {
-  console.log("Error Alert Rendered");
+const ErrorAlert = ({ scrollToRow }) => {
   const [currentErrorIndex, setCurrentErrorIndex] = useState(0);
   const [errorCells, setErrorCells] = useState([]);
 
   useEffect(() => {
-    subscribeToData("gridData", getGridData);
-    return () => {
-      // Run on unmount
-      unsubscribe("gridData");
-    };
+    subscribeToData('listenCellErrors', listenCellErrors);
   }, []);
 
-  useEffect(() => {
-    const errors = tableOptions.showErrors ? errorIdentifier(data) : [];
-    if (errors.length > 0) {
-      if (errors[0]) {
-        setSubscribedData("errorFocusCell", {
-          current: {
-            rowIndex: errors[errors.length - 1].rowIndex,
-            fieldName: errors[errors.length - 1].cellName,
-          },
-          next: {
-            rowIndex: errors[0].rowIndex,
-            fieldName: errors[0].cellName,
-          },
-        });
-      }
-    } else {
-      setSubscribedData("errorFocusCell", null);
-    }
-    setErrorCells(errors);
-  }, []);
+  useEffect(()=>{
+    scrollToRow(errorCells[currentErrorIndex])
+  },[currentErrorIndex]);
 
-  const getGridData = (value) => {
-    const errors = tableOptions.showErrors ? errorIdentifier(value) : [];
-    if (errors.length > 0) {
-      if (errors[0]) {
-        setSubscribedData("errorFocusCell", {
-          current: {
-            rowIndex: errors[errors.length - 1].rowIndex,
-            fieldName: errors[errors.length - 1].cellName,
-          },
-          next: {
-            rowIndex: errors[0].rowIndex,
-            fieldName: errors[0].cellName,
-          },
-        });
-      }
+
+  const listenCellErrors = ({error, key, rowId})=> {
+    const compareNumbers = (a, b) => a - b;
+    let index = findIndexById(rowId);
+    if (error !== null && error[key] !== null) {
+      // Add index if it is not already in errorCells
+      setErrorCells(prevArray => prevArray.includes(index) ? prevArray.sort(compareNumbers) : [...prevArray, index].sort(compareNumbers));
     } else {
-      setSubscribedData("errorFocusCell", null);
+      // Remove index from the errorCells
+      setErrorCells(prevArray => prevArray.filter(item => item !== index).sort(compareNumbers));
     }
-    setErrorCells(errors);
+
+    // scrollToRow(290380)
   };
 
-  const focusOnErrorCell = (currentErrorIndex, nextErrorIndex) => {
-    if (errorCells[currentErrorIndex] && errorCells[nextErrorIndex]) {
-      setSubscribedData("errorFocusCell", {
-        current: {
-          rowIndex: errorCells[currentErrorIndex].rowIndex,
-          fieldName: errorCells[currentErrorIndex].cellName,
-        },
-        next: {
-          rowIndex: errorCells[nextErrorIndex].rowIndex,
-          fieldName: errorCells[nextErrorIndex].cellName,
-        },
-      });
-    }
-  };
 
   const handleNextError = (event) => {
     event.stopPropagation();
-
     if (currentErrorIndex < errorCells.length - 1) {
       setCurrentErrorIndex((prev) => prev + 1);
-      focusOnErrorCell(currentErrorIndex, currentErrorIndex + 1);
     } else {
       setCurrentErrorIndex(0);
-      focusOnErrorCell(currentErrorIndex, 0);
     }
   };
 
   const handlePrevError = (event) => {
     event.stopPropagation();
-
     if (currentErrorIndex > 0) {
       setCurrentErrorIndex((prev) => prev - 1);
-      focusOnErrorCell(currentErrorIndex, currentErrorIndex - 1);
     } else {
       setCurrentErrorIndex(errorCells.length - 1);
-      focusOnErrorCell(currentErrorIndex, errorCells.length - 1);
     }
   };
 
   const classes = commonStyles();
+
   return (
     <>
       {errorCells.length > 0 && (
@@ -144,4 +96,4 @@ const ErrorAlert = ({ tableOptions = {}, data = [] }) => {
   );
 };
 
-export default ErrorAlert;
+export default memo(ErrorAlert);

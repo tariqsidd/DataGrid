@@ -7,6 +7,7 @@ import {
   getSubscribedData,
 } from "../DataGrid/Reactive/subscriber";
 import { findIndexById } from "./utils";
+import { tableCellStyles } from "./TableHeader";
 
 const TableRow = ({ item, itemHeight, columns, onRowChange }) => {
   console.log("Table Row rendered");
@@ -57,7 +58,7 @@ const TableRow = ({ item, itemHeight, columns, onRowChange }) => {
         backgroundColor: "#fff",
       }}
     >
-      <TableCell key={item.indexId} header width={`${15 / columns.length}%`}>
+      <Box key={item.indexId} style={tableCellStyles.cellStyle(columns, 15)}>
         <Tooltip title={"Select to Delete Row"} arrow>
           <Checkbox
             color="default"
@@ -78,7 +79,7 @@ const TableRow = ({ item, itemHeight, columns, onRowChange }) => {
             }}
           />
         </Tooltip>
-      </TableCell>
+      </Box>
 
       {columns.map((column, index) => (
         <TableCell
@@ -86,8 +87,9 @@ const TableRow = ({ item, itemHeight, columns, onRowChange }) => {
           column={column}
           rowId={item.indexId}
           width={`${100 / columns.length}%`}
-          onChangeCell={(updatedCell) => {
-            let row = { ...rowData };
+          isError={rowData?.error || { [column.headerFieldName]: null }}
+          onChangeCell={(updatedCell, error) => {
+            let row = { ...rowData, error };
             mutateRow(updatedCell, column.headerFieldName, row);
             onRowChange(row);
           }}

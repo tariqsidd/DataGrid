@@ -11,7 +11,9 @@ import Ajv from "ajv";
 const ajv = new Ajv();
 const dateFns = require("date-fns");
 const GenericTextField = ({
+  errorObj,
   type,
+  isError,
   label,
   value,
   onChange,
@@ -20,8 +22,10 @@ const GenericTextField = ({
   validationKey,
 }) => {
   const inputRef = useRef(value);
+  const datePickerRef = useRef(value);
   const [selectedValue, setSelectedValue] = useState(null);
-  const [isValid, setIsValid] = useState(true);
+  const [error, setError] = useState(errorObj);
+  const [isValid, setIsValid] = useState(isError);
   const classes = commonStyles();
 
   useEffect(() => {
@@ -44,9 +48,10 @@ const GenericTextField = ({
       }
     }
     const validate = ajv.compile(schema);
-    // const valid = validate({ [validationKey]: val });
     const valid = validate(valueToValidate);
+    console.log('valid',validate.errors !== null ? validate.errors[0].message:null);
     setIsValid(valid);
+    setError({[validationKey]:validate.errors !== null ? validate.errors[0].message:null})
   };
 
   const setValue = (newValue) => {
@@ -70,9 +75,8 @@ const GenericTextField = ({
           console.log(typeof e.target.value);
           setValue(e.target.value);
           setSelectedValue(e.target.value);
-          // con
           handleValidation(inputRef.current.value);
-          onChange(inputRef.current.value, isValid);
+          onChange(inputRef.current.value, isValid, error);
         }}
       >
         {options.map((option) => (
@@ -92,26 +96,27 @@ const GenericTextField = ({
           margin="dense"
           error={!isValid}
           helperText={null}
-          ref={inputRef}
+          inputRef={datePickerRef}
           variant="inline"
           format="dd/MM/yyyy"
           inputVariant="outlined"
-          value={dateFns.parse(selectedValue, "dd/MM/yyyy", new Date())}
+          // value={dateFns.parse(selectedValue, "dd/MM/yyyy", new Date())}
           onChange={(date) => {
-            const dateValid = dateFns.isValid(date);
-            if (dateValid) {
-              const formattedDate = dateFns.format(date, "dd/MM/yyyy");
-              setValue(formattedDate);
-              setSelectedValue(formattedDate);
-              handleValidation(inputRef.current.value);
-
-              //setEditingValue(formattedDate);
-            } else {
-              setValue("");
-              setSelectedValue("");
-              handleValidation(inputRef.current.value);
-              // setEditingValue("");
-            }
+            console.log('date',date)
+            // const dateValid = dateFns.isValid(date);
+            // if (dateValid) {
+            //   const formattedDate = dateFns.format(date, "dd/MM/yyyy");
+            //   setValue(formattedDate);
+            //   setSelectedValue(formattedDate);
+            //   handleValidation(inputRef.current);
+            //
+            //   //setEditingValue(formattedDate);
+            // } else {
+            //   setValue("");
+            //   setSelectedValue("");
+            //   handleValidation(inputRef.current);
+            //   // setEditingValue("");
+            // }
           }}
           onClose={() => {
             // onChange(inputRef.current.value, isValid);
@@ -151,7 +156,7 @@ const GenericTextField = ({
         handleValidation(e.target.value);
       }}
       onBlur={() => {
-        onChange(inputRef.current.value, isValid);
+        onChange(inputRef.current.value, isValid, error);
       }}
       margin="dense"
       variant="outlined"

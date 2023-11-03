@@ -351,3 +351,12 @@ let indexMap = convertToHasMap(dataArray)
 function findIndexById(id) {
   return indexMap.has(id) ? indexMap.get(id) : -1;
 }
+
+let toggleControlsData = [
+  {label:'A', value: true},
+  {label:'B', value: false},
+  {label:'C', value: false},
+  {label:'D', value: false},
+];
+
+

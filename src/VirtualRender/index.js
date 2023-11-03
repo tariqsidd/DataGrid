@@ -7,7 +7,7 @@ import {
   subscribeToData,
   unsubscribe,
 } from "../DataGrid/Reactive/subscriber";
-import { indexMap } from "./utils";
+import { convertToHashMap } from "./utils";
 
 export const DataGridOptions = {
   addRow: true,
@@ -41,14 +41,15 @@ const VirtualTable = ({
     start: 0,
     end: numVisibleItems,
   });
-  const cellErrors = useRef([]);
+  // const cellErrors = useRef([]);
   const viewPortRef = useRef(null);
   const scrollPositionRef = useRef(0);
   const containerStyle = { height: data.length * itemHeight };
 
   useEffect(() => {
     setData(incomingData);
-    subscribeToData("listenCellErrors", listenCellErrors);
+    convertToHashMap(incomingData);
+    // subscribeToData("listenCellErrors", listenCellErrors);
     setSubscribedData("rowsToDelete", []);
     setSubscribedData("gridData", incomingData);
     return () => {
@@ -69,10 +70,10 @@ const VirtualTable = ({
     });
   }, [incomingTableOptions]);
 
-  const listenCellErrors = (cellRef) => {
-    cellErrors.current.push(cellRef);
-    console.log("cellErrors.current", cellErrors.current);
-  };
+  // const listenCellErrors = (cellRef) => {
+  //   cellErrors.current.push(cellRef);
+  //   console.log("cellErrors.current", cellErrors.current);
+  // };
 
   const scrollPos = useCallback(() => {
     const currentIndx = Math.trunc(viewPortRef.current.scrollTop / itemHeight);
@@ -93,13 +94,22 @@ const VirtualTable = ({
     data.length,
   ]);
 
+  const scrollToRow = (rowIndex) => {
+    const scrollPosition = rowIndex * itemHeight - itemHeight;
+    if (viewPortRef.current) {
+      viewPortRef.current.scrollTop = scrollPosition;
+    }
+  };
+
+  // Example usage: scrollToRow(10) // Scrolls to the 11th row (assuming 0-based indexing)
+
   const renderRows = useCallback(() => {
     console.log("render Rows called");
     let result = [];
     if (data.length) {
       for (let i = viewState.start; i <= viewState.end; i++) {
         let item = { ...data[i], top: i * itemHeight };
-        indexMap.set(item.indexId, i);
+        // indexMap.set(item.indexId, i);
         result.push(
           <TableRow
             key={`${item.indexId}-Row`}
@@ -152,6 +162,7 @@ const VirtualTable = ({
       onScroll={scrollPos}
     >
       <TableHeader
+        scrollToRow={scrollToRow}
         data={data}
         columns={tableHeaders}
         tableOptions={tableOptions}

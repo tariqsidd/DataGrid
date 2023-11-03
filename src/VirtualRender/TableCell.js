@@ -1,6 +1,6 @@
-import React, { useState, useRef, useCallback, useEffect } from "react";
-import { Box } from "@material-ui/core";
-import { DataGridOptions } from "./index";
+import React, {useState, useRef, useCallback, useEffect} from "react";
+import {Box} from "@material-ui/core";
+import {DataGridOptions} from "./index";
 import GenericTextField from "./GenericTextField";
 import {
   clearOrdinates,
@@ -15,22 +15,24 @@ import {
 } from "../DataGrid/Reactive/subscriber";
 
 const TableCell = React.memo(
-  ({ children, width, column, onChangeCell, rowId, header }) => {
+  ({children, width, column, onChangeCell, rowId, isError}) => {
     const [validCell, setValidCell] = useState(true);
     const [editMode, setEditMode] = useState(false);
     const cellValue = useRef(null);
     const cellRef = useRef(null);
+    useEffect(() => {
+      let keys = Object.keys(isError)
+      if (keys[0] === column.headerFieldName && isError[column.headerFieldName] !== null) {
+        isError[column.headerFieldName].length && setValidCell(false)
+      }
+    }, [isError]);
 
     useEffect(() => {
       cellValue.current = children;
     }, [children]);
 
-    useEffect(() => {
-      !validCell && setSubscribedData("listenCellErrors", cellRef);
-    }, [validCell]);
-
     let extraProps = {
-      ...(column?.headerOptions && { options: column.headerOptions }),
+      ...(column?.headerOptions && {options: column.headerOptions}),
     };
 
     const renderInputField = () => {
@@ -38,15 +40,18 @@ const TableCell = React.memo(
         return (
           <GenericTextField
             type={column.headerCellType}
+            isError={validCell}
+            errorObj={isError}
             label={column.headerName}
             schema={column.headerSchema}
             validationKey={column.headerFieldName}
             value={cellValue.current}
-            onChange={(updatedCell, isValid) => {
+            onChange={(updatedCell, isValid, error) => {
               cellValue.current = updatedCell;
-              onChangeCell(updatedCell);
+              onChangeCell(updatedCell, error);
               setEditMode(false);
               setValidCell(isValid);
+              setSubscribedData("listenCellErrors", {rowId, error, key: column.headerFieldName})
             }}
             {...extraProps}
           />
@@ -56,7 +61,7 @@ const TableCell = React.memo(
     };
 
     const onDoubleClick = () => {
-      if (DataGridOptions.editing && !header) {
+      if (DataGridOptions.editing) {
         setEditMode(true);
       }
     };
@@ -73,7 +78,7 @@ const TableCell = React.memo(
       setEndCellOrdinate(cellValue, key, rowId);
       const startCellValues = getStartCellOrdinate();
       const endCellValues = getEndCellOrdinate();
-      const CellOrdinates = { startCellValues, endCellValues };
+      const CellOrdinates = {startCellValues, endCellValues};
       if (startCellValues.key === endCellValues.key) {
         setSubscribedData("willRowMutate", CellOrdinates);
       }
@@ -82,12 +87,12 @@ const TableCell = React.memo(
     return (
       <Box
         ref={cellRef}
-        draggable={!header}
+        draggable={true}
         onDragOver={onDragOver}
         onDrop={() => {
           onDrop(children, column.headerFieldName, rowId);
         }}
-        style={tableCellStyles.cellStyle(width, header, validCell)}
+        style={tableCellStyles.cellStyle(width, validCell)}
         onDragStart={() => {
           onDragStart(children, column.headerFieldName, rowId);
         }}
@@ -101,7 +106,7 @@ const TableCell = React.memo(
 );
 
 export const tableCellStyles = {
-  cellStyle: (width, header, validCell) => {
+  cellStyle: (width, validCell) => {
     return {
       display: "inline-flex",
       alignItems: "center",
@@ -109,12 +114,12 @@ export const tableCellStyles = {
       width: width,
       textAlign: "left",
       padding: "16px",
-      ...(!header && { border: "1px solid rgba(224, 224, 224, 1)" }),
+      border: `1px solid rgba(224, 224, 224, 1)`,
       fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
       fontSize: "0.875rem",
       lineHeight: 1.5,
       letterSpacing: "0.01071em",
-      ...(!validCell && { backgroundColor: "#ffe6e6" }),
+      ...(!validCell && {backgroundColor: "#ffe6e6"}),
     };
   },
 };
