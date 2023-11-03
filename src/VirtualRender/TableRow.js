@@ -101,10 +101,6 @@ const TableRow = ({ item, itemHeight, columns, onRowChange }) => {
   );
 };
 
-export default memo(
-  TableRow
-  //   (previousProps, nextProps) => {
-  //   console.log(previousProps.item.indexId);
-  //   return previousProps.item.indexId === nextProps.item.indexId;
-  // }
-);
+export default memo(TableRow, (previousProps, nextProps) => {
+  return previousProps.item.indexId === nextProps.item.indexId;
+});
