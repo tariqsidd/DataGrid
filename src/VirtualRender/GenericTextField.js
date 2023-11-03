@@ -29,10 +29,21 @@ const GenericTextField = ({
   const classes = commonStyles();
 
   useEffect(() => {
-    if (type === "select" || type === "date") {
-      setSelectedValue(value);
-    } else {
-      setValue(value);
+    switch (type) {
+      case 'text':
+        setValue(value);
+        break;
+      case 'number':
+        setValue(value);
+        break;
+      case 'select':
+        setSelectedValue(value);
+        break;
+      case 'date':
+        setDate(value);
+        break;
+      default:
+        setValue(value);
     }
   }, []);
 
@@ -57,6 +68,12 @@ const GenericTextField = ({
   const setValue = (newValue) => {
     if (inputRef.current) {
       inputRef.current.value = newValue;
+    }
+  };
+
+  const setDate = (date) => {
+    if (datePickerRef.current) {
+      datePickerRef.current = date;
     }
   };
 
@@ -100,45 +117,21 @@ const GenericTextField = ({
           variant="inline"
           format="dd/MM/yyyy"
           inputVariant="outlined"
-          // value={dateFns.parse(selectedValue, "dd/MM/yyyy", new Date())}
+          value={dateFns.parse(datePickerRef.current, "dd/MM/yyyy", new Date())}
           onChange={(date) => {
-            console.log('date',date)
-            // const dateValid = dateFns.isValid(date);
-            // if (dateValid) {
-            //   const formattedDate = dateFns.format(date, "dd/MM/yyyy");
-            //   setValue(formattedDate);
-            //   setSelectedValue(formattedDate);
-            //   handleValidation(inputRef.current);
-            //
-            //   //setEditingValue(formattedDate);
-            // } else {
-            //   setValue("");
-            //   setSelectedValue("");
-            //   handleValidation(inputRef.current);
-            //   // setEditingValue("");
-            // }
+            const dateValid = dateFns.isValid(date);
+            if (dateValid) {
+              const formattedDate = dateFns.format(date, "dd/MM/yyyy");
+              setDate(formattedDate);
+              onChange(formattedDate, true, error);
+            } else {
+              setDate("");
+              onChange('', true, error);
+            }
           }}
           onClose={() => {
             // onChange(inputRef.current.value, isValid);
           }}
-          // minDate={
-          //   header.headerDateProperties && header.headerDateProperties.min
-          //     ? dateFns.parse(
-          //         header.headerDateProperties.min,
-          //         "dd/MM/yyyy",
-          //         new Date()
-          //       )
-          //     : undefined
-          // }
-          // maxDate={
-          //   header.headerDateProperties && header.headerDateProperties.max
-          //     ? dateFns.parse(
-          //         header.headerDateProperties.max,
-          //         "dd/MM/yyyy",
-          //         new Date()
-          //       )
-          //     : undefined
-          // }
           inputProps={{ readOnly: true }}
         />
       </MuiPickersUtilsProvider>
