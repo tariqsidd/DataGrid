@@ -44,10 +44,13 @@ export const findIndexById = (indexId) => {
 };
 
 export const convertToHashMap = (data, chunkSize = 500) => {
-
   // Function to add items to the map in chunks
   const addToMapInChunks = (startIndex) => {
-    for (let i = startIndex; i < Math.min(startIndex + chunkSize, data.length); i++) {
+    for (
+      let i = startIndex;
+      i < Math.min(startIndex + chunkSize, data.length);
+      i++
+    ) {
       const item = data[i];
       indexMap.set(item.indexId, i);
     }
@@ -57,5 +60,15 @@ export const convertToHashMap = (data, chunkSize = 500) => {
   for (let i = 0; i < data.length; i += chunkSize) {
     addToMapInChunks(i);
   }
+};
 
+export const bulkDeleteFromDataAndHashMap = (data, idsToDelete) => {
+  // Filter out the items from the data array
+  data = data.filter((item) => !idsToDelete.includes(item.indexId));
+  // Clear the existing hashmap
+  indexMap.clear();
+  // Rebuild the hashmap with the updated data
+  convertToHashMap(data);
+
+  return data;
 };

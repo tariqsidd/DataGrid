@@ -112,6 +112,7 @@ const VirtualTable = ({
         // indexMap.set(item.indexId, i);
         result.push(
           <TableRow
+            index={i}
             key={`${item.indexId}-Row`}
             item={item}
             columns={tableHeaders}
@@ -123,8 +124,8 @@ const VirtualTable = ({
               if (index !== -1) {
                 let _data = data;
                 _data[index] = updatedRow;
-                console.log(_data);
-                setData([..._data]);
+                setData(_data);
+                // setData([..._data]);
                 setSubscribedData("gridData", _data);
               }
             }}

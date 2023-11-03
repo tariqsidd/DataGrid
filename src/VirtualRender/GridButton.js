@@ -10,12 +10,12 @@ import {
   setSubscribedData,
   getSubscribedData,
 } from "../DataGrid/Reactive/subscriber";
-import { findIndexById } from "./utils";
+import { bulkDeleteFromDataAndHashMap } from "./utils";
 
 const GridButtons = ({
   tableOptions = {},
   tableHeaders = [],
-  data = [],
+  // data = [],
   callExportCSV = false,
   onSubmit = () => {},
   onProceedAnyway = () => {},
@@ -52,6 +52,7 @@ const GridButtons = ({
 
   useEffect(() => {
     subscribeToData("rowsToDelete", getRowsToDelete);
+    subscribeToData("gridData", getGridData);
   }, []);
 
   const getRowsToDelete = (value) => {
@@ -59,22 +60,27 @@ const GridButtons = ({
     setRowsToDelete([...value]);
   };
 
+  const getGridData = (data) => {
+    setExportData([...data]);
+  };
+
   const onDelete = (value) => {
-    let _data = getSubscribedData("gridData", data);
+    let _data = getSubscribedData("gridData");
     console.log("Data before Deletion", _data);
-    for (let i = 0; i < rowsToDelete.length; i++) {
-      const rowIndex = _data.findIndex(
-        (item) => item.indexId === rowsToDelete[i]
-      );
-      //   const rowIndex = findIndexById(rowsToDelete[i]);
-      console.log(rowIndex);
-      _data.splice(rowIndex, 1);
-    }
+    // for (let i = 0; i < rowsToDelete.length; i++) {
+    //   const rowIndex = _data.findIndex(
+    //     (item) => item.indexId === rowsToDelete[i]
+    //   );
+    //   //   const rowIndex = findIndexById(rowsToDelete[i]);
+    //   console.log(rowIndex);
+    //   _data.splice(rowIndex, 1);
+    // }
     // setExportData(_data);
-    console.log(_data);
+    let modifiedData = bulkDeleteFromDataAndHashMap(_data, rowsToDelete);
+    console.log("Data after Deletion", modifiedData);
     setRowsToDelete([]);
     setSubscribedData("rowsToDelete", []);
-    onDataChange(_data);
+    onDataChange(modifiedData);
   };
 
   useEffect(() => {
@@ -85,7 +91,7 @@ const GridButtons = ({
 
   const classes = commonStyles();
   return (
-    <div>
+    <div style={{ backgroundColor: "white" }}>
       <div className={classes.exportCSVButton}>
         {tableOptions.showExportButton && (
           <Button

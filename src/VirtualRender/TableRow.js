@@ -9,7 +9,7 @@ import {
 import { findIndexById } from "./utils";
 import { tableCellStyles } from "./TableHeader";
 
-const TableRow = ({ item, itemHeight, columns, onRowChange }) => {
+const TableRow = ({ item, itemHeight, columns, onRowChange, index }) => {
   console.log("Table Row rendered");
   const [rowData, setRowData] = useState(item);
   const [selected, setSelected] = useState(
@@ -102,5 +102,6 @@ const TableRow = ({ item, itemHeight, columns, onRowChange }) => {
 };
 
 export default memo(TableRow, (previousProps, nextProps) => {
-  return previousProps.item.indexId === nextProps.item.indexId;
+  // return previousProps.item.indexId === nextProps.item.indexId;
+  return previousProps.index === nextProps.index;
 });
