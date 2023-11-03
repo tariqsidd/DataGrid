@@ -107,12 +107,12 @@ const VirtualTable = ({
     console.log("render Rows called");
     let result = [];
     if (data.length) {
+      console.log(viewState.end);
       for (let i = viewState.start; i <= viewState.end; i++) {
         let item = { ...data[i], top: i * itemHeight };
         // indexMap.set(item.indexId, i);
         result.push(
           <TableRow
-            index={i}
             key={`${item.indexId}-Row`}
             item={item}
             columns={tableHeaders}
@@ -169,7 +169,8 @@ const VirtualTable = ({
         tableOptions={tableOptions}
         onDataChange={(data) => {
           console.log(data);
-          //setData(data);
+          setSubscribedData("gridData", data);
+          console.log("Causing re render");
           setData([...data]);
         }}
       />

@@ -103,5 +103,4 @@ const TableRow = ({ item, itemHeight, columns, onRowChange, index }) => {
 
 export default memo(TableRow, (previousProps, nextProps) => {
   // return previousProps.item.indexId === nextProps.item.indexId;
-  return previousProps.index === nextProps.index;
 });
