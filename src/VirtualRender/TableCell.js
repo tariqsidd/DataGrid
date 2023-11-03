@@ -1,5 +1,5 @@
 import React, {useState, useRef, useCallback, useEffect} from "react";
-import {Box} from "@material-ui/core";
+import {Box, Tooltip} from "@material-ui/core";
 import {DataGridOptions} from "./index";
 import GenericTextField from "./GenericTextField";
 import {
@@ -16,6 +16,7 @@ import {
 
 const TableCell = React.memo(
   ({children, width, column, onChangeCell, rowId, isError}) => {
+    console.log('isError',isError)
     const [validCell, setValidCell] = useState(true);
     const [editMode, setEditMode] = useState(false);
     const cellValue = useRef(null);
@@ -84,23 +85,51 @@ const TableCell = React.memo(
       }
     };
 
+    const BoxWithToolTip = ()=>{
+      if(!validCell){
+        return(
+          <Tooltip title={isError[column.headerFieldName]} placement="bottom" style={{ color: 'red' }}>
+            <Box
+              ref={cellRef}
+              draggable={true}
+              onDragOver={onDragOver}
+              onDrop={() => {
+                onDrop(children, column.headerFieldName, rowId);
+              }}
+              style={tableCellStyles.cellStyle(width, validCell)}
+              onDragStart={() => {
+                onDragStart(children, column.headerFieldName, rowId);
+              }}
+              onDoubleClick={() => onDoubleClick(cellValue.current)}
+              onDragEnd={clearOrdinates}>
+              {renderInputField()}
+            </Box>
+          </Tooltip>
+        )
+      }
+      else {
+        return(
+          <Box
+            ref={cellRef}
+            draggable={true}
+            onDragOver={onDragOver}
+            onDrop={() => {
+              onDrop(children, column.headerFieldName, rowId);
+            }}
+            style={tableCellStyles.cellStyle(width, validCell)}
+            onDragStart={() => {
+              onDragStart(children, column.headerFieldName, rowId);
+            }}
+            onDoubleClick={() => onDoubleClick(cellValue.current)}
+            onDragEnd={clearOrdinates}>
+            {renderInputField()}
+          </Box>
+        )
+      }
+    }
+
     return (
-      <Box
-        ref={cellRef}
-        draggable={true}
-        onDragOver={onDragOver}
-        onDrop={() => {
-          onDrop(children, column.headerFieldName, rowId);
-        }}
-        style={tableCellStyles.cellStyle(width, validCell)}
-        onDragStart={() => {
-          onDragStart(children, column.headerFieldName, rowId);
-        }}
-        onDoubleClick={() => onDoubleClick(cellValue.current)}
-        onDragEnd={clearOrdinates}
-      >
-        {renderInputField()}
-      </Box>
+      <BoxWithToolTip/>
     );
   }
 );
