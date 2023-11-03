@@ -107,11 +107,10 @@ const VirtualTable = ({
     console.log("render Rows called");
     let result = [];
     if (data.length) {
-      console.log(viewState.end);
+      console.log(viewState);
       for (let i = viewState.start; i <= viewState.end; i++) {
         let item = { ...data[i], top: i * itemHeight };
-        // indexMap.set(item.indexId, i);
-        result.push(
+        'indexId' in item && result.push(
           <TableRow
             key={`${item.indexId}-Row`}
             item={item}
