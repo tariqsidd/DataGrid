@@ -1,10 +1,20 @@
 export const indexMap = new Map();
 let DragStartCellOrdinate = null;
 let DragEndCellOrdinate = null;
+let columnOrder = [];
 
-export const setStartCellOrdinate = (cellValue, key, rowId) => {
+export const setColumnOrder = (tableHeaders) => {
+  columnOrder = tableHeaders.map((item) => item.headerFieldName);
+};
+
+export const getColumnOrder = () => {
+  return columnOrder;
+};
+
+export const setStartCellOrdinate = (cellValue, column, key, rowId) => {
   DragStartCellOrdinate = {
     cellValue,
+    column,
     key,
     rowId,
   };
@@ -27,6 +37,7 @@ export const getEndCellOrdinate = () => {
 };
 
 export const clearOrdinates = () => {
+  console.log("Clear ordinates called");
   DragStartCellOrdinate = null;
   DragEndCellOrdinate = null;
 };
@@ -44,10 +55,13 @@ export const findIndexById = (indexId) => {
 };
 
 export const convertToHashMap = (data, chunkSize = 500) => {
-
   // Function to add items to the map in chunks
   const addToMapInChunks = (startIndex) => {
-    for (let i = startIndex; i < Math.min(startIndex + chunkSize, data.length); i++) {
+    for (
+      let i = startIndex;
+      i < Math.min(startIndex + chunkSize, data.length);
+      i++
+    ) {
       const item = data[i];
       indexMap.set(item.indexId, i);
     }
@@ -57,5 +71,4 @@ export const convertToHashMap = (data, chunkSize = 500) => {
   for (let i = 0; i < data.length; i += chunkSize) {
     addToMapInChunks(i);
   }
-
 };

@@ -20,7 +20,24 @@ const tableOptions = {
 
 const cities = ["New York", "Los Angeles", "Chicago"];
 const userData = [];
-for (let i = 0; i < 50; i++) {
+
+userData.push({
+  name: `Name`,
+  surname: `Surname `,
+  date: new Date(2023, 9, (2 % 31) + 1).toLocaleDateString(),
+  city: "Lordv",
+  phoneNo: 1000000,
+  country: `Country`,
+  // error: {
+  //   name: "Error in name",
+  //   surname: "Error in surname",
+  // },
+  indexId: Math.random()
+    .toString(36)
+    .substring(2, 6 + 2),
+});
+
+for (let i = 0; i < 50000; i++) {
   userData.push({
     name: `Name ${i}`,
     surname: `Surname ${i}`,
@@ -28,6 +45,10 @@ for (let i = 0; i < 50; i++) {
     city: cities[i % cities.length],
     phoneNo: 1000000 + i,
     country: `Country ${i % 10}`,
+    // error: {
+    //   name: "Error in name",
+    //   surname: "Error in surname",
+    // },
     indexId: Math.random()
       .toString(36)
       .substring(2, 6 + 2),

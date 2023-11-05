@@ -7,7 +7,7 @@ import {
   subscribeToData,
   unsubscribe,
 } from "../DataGrid/Reactive/subscriber";
-import {convertToHashMap} from "./utils";
+import { convertToHashMap, setColumnOrder } from "./utils";
 
 export const DataGridOptions = {
   addRow: true,
@@ -30,8 +30,13 @@ const VirtualTable = ({
 }) => {
   const viewportHeight = numberOfRows * itemHeight;
   const [data, setData] = useState([]);
-  const [numVisibleItems, setNumVisibleItems] = useState(Math.trunc(viewportHeight / itemHeight));
-  const [viewState, setViewState] = useState({start: 0, end: numVisibleItems});
+  const [numVisibleItems, setNumVisibleItems] = useState(
+    Math.trunc(viewportHeight / itemHeight)
+  );
+  const [viewState, setViewState] = useState({
+    start: 0,
+    end: numVisibleItems,
+  });
   // const cellErrors = useRef([]);
   const viewPortRef = useRef(null);
   const scrollPositionRef = useRef(0);
@@ -40,12 +45,15 @@ const VirtualTable = ({
   useEffect(() => {
     setData(incomingData);
     convertToHashMap(incomingData);
+    setColumnOrder(tableHeaders);
     // subscribeToData("listenCellErrors", listenCellErrors);
     setSubscribedData("rowsToDelete", []);
+    setSubscribedData("gridData", incomingData);
     return () => {
       unsubscribe("willRowMutate");
       unsubscribe("listenCellErrors");
       unsubscribe("rowsToDelete");
+      unsubscribe("gridData");
     };
   }, []);
 
@@ -53,8 +61,6 @@ const VirtualTable = ({
   //   cellErrors.current.push(cellRef)
   //   console.log('listenCellErrors',cellErrors.current)
   // };
-
-
 
   const scrollPos = useCallback(() => {
     const currentIndx = Math.trunc(viewPortRef.current.scrollTop / itemHeight);
@@ -76,14 +82,13 @@ const VirtualTable = ({
   ]);
 
   const scrollToRow = (rowIndex) => {
-    const scrollPosition = (rowIndex * itemHeight) - itemHeight;
+    const scrollPosition = rowIndex * itemHeight - itemHeight;
     if (viewPortRef.current) {
       viewPortRef.current.scrollTop = scrollPosition;
     }
   };
 
-// Example usage: scrollToRow(10) // Scrolls to the 11th row (assuming 0-based indexing)
-
+  // Example usage: scrollToRow(10) // Scrolls to the 11th row (assuming 0-based indexing)
 
   const renderRows = useCallback(() => {
     let result = [];
@@ -105,6 +110,7 @@ const VirtualTable = ({
                 let _data = data;
                 _data[index] = updatedRow;
                 setData(_data);
+                setSubscribedData("gridData", _data);
               }
             }}
           />
@@ -140,7 +146,11 @@ const VirtualTable = ({
       }}
       onScroll={scrollPos}
     >
-      <TableHeader columns={tableHeaders} scrollToRow={scrollToRow}/>
+      <TableHeader
+        columns={tableHeaders}
+        scrollToRow={scrollToRow}
+        data={data}
+      />
       <Box
         style={{
           position: "absolute",
