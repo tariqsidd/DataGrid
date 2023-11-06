@@ -115,7 +115,7 @@ const TableRow = ({ item, itemHeight, columns, onRowChange, index }) => {
     >
       <Box
         key={item.indexId}
-        style={fixedTableCellStyles.cellStyle(columns, 15)}
+        style={fixedTableCellStyles.cellStyle(columns, 40)}
       >
         <Tooltip title={"Select to Delete Row"} arrow>
           <Checkbox

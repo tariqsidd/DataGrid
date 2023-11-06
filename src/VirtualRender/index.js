@@ -2,6 +2,7 @@ import React, { useState, useRef, useCallback, useEffect } from "react";
 import { Box, Paper, Button } from "@material-ui/core";
 import TableHeader from "./TableHeader";
 import TableRow from "./TableRow";
+import TableHeaderRow from "./TableHeaderRow";
 import {
   setSubscribedData,
   subscribeToData,
@@ -149,31 +150,94 @@ const VirtualTable = ({
   };
 
   return (
+    // <Box
+    //   ref={viewPortRef}
+    //   style={{
+    //     position: "relative",
+    //     width: "100%",
+    //     height: "100vh",
+    //     border: "1px solid rgba(224, 224, 224, 1)",
+    //     overflowY: "scroll",
+    //     fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+    //   }}
+    //   onScroll={scrollPos}
+    // >
+    //   <TableHeader
+    //     columns={tableHeaders}
+    //     scrollToRow={scrollToRow}
+    //     data={data}
+    //   />
+    //   <Box
+    //     style={{
+    //       position: "absolute",
+    //       width: "100%",
+    //       ...containerStyle,
+    //     }}
+    //   >
+    //     {renderRows()}
+    //   </Box>
+    // </Box>
     <Box
-      ref={viewPortRef}
+      // component={Paper}
       style={{
-        position: "relative",
-        width: "100%",
-        height: "100vh",
-        border: "1px solid rgba(224, 224, 224, 1)",
-        overflowY: "scroll",
-        fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+        height: "calc(100vh - 64px)",
+        // overflow: "hidden"
       }}
-      onScroll={scrollPos}
     >
+      <Button
+        onClick={() => {
+          let modifiedData = bulkDeleteFromDataAndHashMap(
+            data,
+            rowsToDelete.current
+          );
+          setData(modifiedData);
+        }}
+      >
+        Delete
+      </Button>
       <TableHeader
         columns={tableHeaders}
         scrollToRow={scrollToRow}
         data={data}
       />
       <Box
+        ref={viewPortRef}
         style={{
-          position: "absolute",
+          position: "relative",
           width: "100%",
-          ...containerStyle,
+          height: `calc(100vh - ${itemHeight * 3 + 6}px)`,
+          border: "1px solid rgba(224, 224, 224, 1)",
+          overflowY: "scroll",
+          overflowX: "scroll",
+          fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
         }}
+        // sx={{
+        //   "&::-webkit-scrollbar": {
+        //     width: 10,
+        //   },
+        //   "&::-webkit-scrollbar-track": {},
+        //   "&::-webkit-scrollbar-thumb": {
+        //     // backgroundColor: "red",
+        //     backgroundColor: "#ccc",
+        //     // borderRadius: 6
+        //   },
+        // }}
+        onScroll={scrollPos}
       >
-        {renderRows()}
+        <TableHeaderRow
+          columns={tableHeaders}
+          scrollToRow={scrollToRow}
+          data={data}
+        />
+        <Box
+          style={{
+            position: "absolute",
+            width: "100%",
+            ...containerStyle,
+          }}
+        >
+          {renderRows()}
+        </Box>
       </Box>
     </Box>
   );
