@@ -34,12 +34,6 @@ const TableCell = React.memo(
       subscribeToData("errorFocusedCellRef", getErrorFocusedCellRef);
     }, []);
 
-    // useEffect(() => {
-    //   const value = getSubscribedData("errorFocusCell");
-    //   console.log("Called froom here");
-    //   getErrorFocusCell(value);
-    // }, []);
-
     useEffect(() => {
       const keys = Object.keys(isError);
       if (
@@ -68,18 +62,12 @@ const TableCell = React.memo(
         const currentRowIndex = findIndexById(value.current.rowId);
         const nextRowIndex = findIndexById(value.next.rowId);
         const selfRowIndex = findIndexById(rowId);
-        // if (selfRowIndex === currentRowIndex || selfRowIndex === nextRowIndex) {
-        //   handleErrorFocus(
-        //     nextRowIndex,
-        //     value.next.fieldName,
-        //     value.next.rowId
-        //   );
-        // }
         if (
           (selfRowIndex === currentRowIndex || selfRowIndex === nextRowIndex) &&
           (column.headerFieldName === value.current.fieldName ||
             column.headerFieldName === value.next.fieldName)
         ) {
+          // console.log("Handle Error Focus Called");
           handleErrorFocus(
             nextRowIndex,
             value.next.fieldName,
@@ -91,6 +79,7 @@ const TableCell = React.memo(
 
     const applyErrorFocusStyle = (cell) => {
       if (cell) {
+        cell.style.padding = "15.5px";
         cell.style.border = "2px solid #f44336";
       }
     };
@@ -109,9 +98,10 @@ const TableCell = React.memo(
       if (rowIndex != null && headerFieldName != null) {
         // Error Focus the new cell
         const cellId = `cell-${rowId}-${headerFieldName}`;
-        const newCell = document.getElementById(cellId);
-        console.log(newCell);
-        applyErrorFocusStyle(newCell);
+        setTimeout(() => {
+          const newCell = document.getElementById(cellId);
+          applyErrorFocusStyle(newCell);
+        }, 100);
         setSubscribedData("errorFocusedCellRef", cellId);
       }
     };
@@ -231,6 +221,7 @@ export const tableCellStyles = {
       alignItems: "center",
       justifyContent: "center",
       width: width,
+      // minWidth: "100px",
       textAlign: "left",
       padding: "16px",
       border: `1px solid rgba(224, 224, 224, 1)`,

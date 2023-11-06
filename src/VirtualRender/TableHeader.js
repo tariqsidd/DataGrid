@@ -46,6 +46,7 @@ export const tableCellStyles = {
       alignItems: "center",
       justifyContent: "center",
       width: `${p / columns.length}%`,
+      // minWidth: "100px",
       textAlign: "left",
       padding: "16px",
       fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',

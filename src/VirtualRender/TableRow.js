@@ -94,7 +94,6 @@ const TableRow = ({ item, itemHeight, columns, onRowChange }) => {
         errors[fieldKey] = validate.errors[0].message;
       }
     }
-    console.log(errors);
 
     //Sorting Error
     return Object.fromEntries(

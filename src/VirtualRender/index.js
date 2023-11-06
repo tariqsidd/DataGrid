@@ -48,7 +48,7 @@ const VirtualTable = ({
     setColumnOrder(tableHeaders);
     // subscribeToData("listenCellErrors", listenCellErrors);
     setSubscribedData("rowsToDelete", []);
-    setSubscribedData("gridData", incomingData);
+    // setSubscribedData("gridData", incomingData);
     return () => {
       unsubscribe("willRowMutate");
       unsubscribe("listenCellErrors");
@@ -82,7 +82,7 @@ const VirtualTable = ({
   ]);
 
   const scrollToRow = (rowIndex) => {
-    const scrollPosition = rowIndex * itemHeight - itemHeight;
+    const scrollPosition = rowIndex * itemHeight - 6 * itemHeight;
     if (viewPortRef.current) {
       viewPortRef.current.scrollTop = scrollPosition;
     }

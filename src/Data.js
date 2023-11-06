@@ -87,6 +87,66 @@ export const tableHeader = [
     headerFieldType: "string",
     headerCellType: "textField",
   },
+  // {
+  //   headerName: "Country1",
+  //   headerFieldName: "country1",
+  //   headerFieldType: "string",
+  //   headerCellType: "textField",
+  // },
+  // {
+  //   headerName: "Country2",
+  //   headerFieldName: "country2",
+  //   headerFieldType: "string",
+  //   headerCellType: "textField",
+  // },
+  // {
+  //   headerName: "Country3",
+  //   headerFieldName: "country3",
+  //   headerFieldType: "string",
+  //   headerCellType: "textField",
+  // },
+  // {
+  //   headerName: "Country4",
+  //   headerFieldName: "country4",
+  //   headerFieldType: "string",
+  //   headerCellType: "textField",
+  // },
+  // {
+  //   headerName: "Country5",
+  //   headerFieldName: "country5",
+  //   headerFieldType: "string",
+  //   headerCellType: "textField",
+  // },
+  // {
+  //   headerName: "Country6",
+  //   headerFieldName: "country6",
+  //   headerFieldType: "string",
+  //   headerCellType: "textField",
+  // },
+  // {
+  //   headerName: "Country7",
+  //   headerFieldName: "country7",
+  //   headerFieldType: "string",
+  //   headerCellType: "textField",
+  // },
+  // {
+  //   headerName: "Country8",
+  //   headerFieldName: "country8",
+  //   headerFieldType: "string",
+  //   headerCellType: "textField",
+  // },
+  // {
+  //   headerName: "Country9",
+  //   headerFieldName: "country9",
+  //   headerFieldType: "string",
+  //   headerCellType: "textField",
+  // },
+  // {
+  //   headerName: "Country10",
+  //   headerFieldName: "country10",
+  //   headerFieldType: "string",
+  //   headerCellType: "textField",
+  // },
 ];
 
 export const Data = [
