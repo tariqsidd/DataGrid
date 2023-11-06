@@ -122,14 +122,7 @@ const TableRow = ({ item, itemHeight, columns, onRowChange, index }) => {
             color="default"
             checked={selected}
             onChange={() => {
-              const deleteRowsId = getSubscribedData("rowsToDelete");
-              const index = deleteRowsId.indexOf(item.indexId);
-              if (index === -1) {
-                deleteRowsId.push(item.indexId);
-              } else {
-                deleteRowsId.splice(index, 1);
-              }
-              setSubscribedData("rowsToDelete", deleteRowsId);
+              setSubscribedData("rowsToDelete", rowData.indexId);
               mutateRow(!selected, "selected", rowData);
               setSelected(!selected);
             }}

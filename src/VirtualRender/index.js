@@ -56,7 +56,6 @@ const VirtualTable = ({
     convertToHashMap(incomingData);
     setColumnOrder(tableHeaders);
     subscribeToData("rowsToDelete", getRowsToDelete);
-    setSubscribedData("rowsToDelete", []);
     return () => {
       unsubscribe("willRowMutate");
       unsubscribe("rowsToDelete");
@@ -103,6 +102,20 @@ const VirtualTable = ({
     }
   };
 
+  const onRowChange = useCallback((updatedRow) => {
+    setData((prevData) => {
+      const index = findIndexById(updatedRow.indexId, prevData);
+      if (index !== -1) {
+        return [
+          ...prevData.slice(0, index),
+          updatedRow,
+          ...prevData.slice(index + 1),
+        ];
+      }
+      return prevData;
+    });
+  }, []);
+
   const renderRows = useCallback(() => {
     let result = [];
     if (data.length) {
@@ -115,15 +128,7 @@ const VirtualTable = ({
               item={item}
               columns={tableHeaders}
               itemHeight={itemHeight}
-              onRowChange={(updatedRow) => {
-                const index = findIndexById(updatedRow.indexId);
-                if (index !== -1) {
-                  let _data = data;
-                  _data[index] = updatedRow;
-                  setData(_data);
-                  setSubscribedData("gridData", _data);
-                }
-              }}
+              onRowChange={onRowChange}
             />
           );
       }
@@ -144,36 +149,62 @@ const VirtualTable = ({
     setNumVisibleItems(Math.trunc(viewportHeight / itemHeight));
   }, [itemHeight, viewportHeight]);
 
-  const getRowsToDelete = (value) => {
-    rowsToDelete.current = value;
+  const getRowsToDelete = (id) => {
+    const index = rowsToDelete.current.indexOf(id);
+    if (index === -1) {
+      rowsToDelete.current.push(id);
+    } else {
+      rowsToDelete.current.splice(index, 1);
+    }
+    console.log('rowsToDelete.current',rowsToDelete.current)
   };
 
   return (
-    <Box
-      ref={viewPortRef}
-      style={{
-        position: "relative",
-        width: "100%",
-        height: "100vh",
-        border: "1px solid rgba(224, 224, 224, 1)",
-        overflowY: "scroll",
-        fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-      }}
-      onScroll={scrollPos}
-    >
+    <Box component={Paper} style={{height: 'calc(100vh - 64px)', overflow:'hidden'}}>
+      <Button onClick={()=>{
+        let modifiedData = bulkDeleteFromDataAndHashMap(data, rowsToDelete.current);
+        setData(modifiedData);
+        rowsToDelete.current = []
+      }}>
+        Delete
+      </Button>
       <TableHeader
         columns={tableHeaders}
         scrollToRow={scrollToRow}
         data={data}
       />
       <Box
+        ref={viewPortRef}
         style={{
-          position: "absolute",
+          position: "relative",
           width: "100%",
-          ...containerStyle,
+          height: `calc(100vh - ${itemHeight*3+6}px)`,
+          border: "1px solid rgba(224, 224, 224, 1)",
+          overflowY: "scroll",
+          fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
         }}
-      >
-        {renderRows()}
+        sx={{
+          "&::-webkit-scrollbar": {
+            width: 5
+          },
+          "&::-webkit-scrollbar-track": {
+          },
+          "&::-webkit-scrollbar-thumb": {
+            // backgroundColor: "red",
+            backgroundColor: "#ccc",
+            // borderRadius: 6
+          }
+        }}
+        onScroll={scrollPos}>
+        <Box
+          style={{
+            position: "absolute",
+            width: "100%",
+            ...containerStyle,
+          }}
+        >
+          {renderRows()}
+        </Box>
       </Box>
     </Box>
   );
