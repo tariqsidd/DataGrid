@@ -1,10 +1,20 @@
 export const indexMap = new Map();
 let DragStartCellOrdinate = null;
 let DragEndCellOrdinate = null;
+let columnOrder = [];
 
-export const setStartCellOrdinate = (cellValue, key, rowId) => {
+export const setColumnOrder = (tableHeaders) => {
+  columnOrder = tableHeaders.map((item) => item.headerFieldName);
+};
+
+export const getColumnOrder = () => {
+  return columnOrder;
+};
+
+export const setStartCellOrdinate = (cellValue, column, key, rowId) => {
   DragStartCellOrdinate = {
     cellValue,
+    column,
     key,
     rowId,
   };
@@ -27,6 +37,7 @@ export const getEndCellOrdinate = () => {
 };
 
 export const clearOrdinates = () => {
+  console.log("Clear ordinates called");
   DragStartCellOrdinate = null;
   DragEndCellOrdinate = null;
 };

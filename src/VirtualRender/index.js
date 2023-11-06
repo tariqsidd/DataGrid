@@ -7,7 +7,7 @@ import {
   subscribeToData,
   unsubscribe,
 } from "../DataGrid/Reactive/subscriber";
-import {bulkDeleteFromDataAndHashMap, convertToHashMap, findIndexById} from "./utils";
+import {bulkDeleteFromDataAndHashMap, convertToHashMap, setColumnOrder, findIndexById } from "./utils";
 
 export const DataGridOptions = {
   addRow: true,
@@ -49,14 +49,16 @@ const VirtualTable = ({
   useEffect(() => {
     setData(incomingData);
     convertToHashMap(incomingData);
+    setColumnOrder(tableHeaders);
     // subscribeToData("listenCellErrors", listenCellErrors);
     subscribeToData("rowsToDelete", getRowsToDelete);
     setSubscribedData("rowsToDelete", []);
-    setSubscribedData("gridData", incomingData);
+    // setSubscribedData("gridData", incomingData);
     return () => {
       unsubscribe("willRowMutate");
       unsubscribe("listenCellErrors");
       unsubscribe("rowsToDelete");
+      unsubscribe("gridData");
     };
   }, []);
 
@@ -102,6 +104,7 @@ const VirtualTable = ({
     }
   };
 
+
   const renderRows = useCallback(() => {
     let result = [];
     if (data.length) {
@@ -118,10 +121,8 @@ const VirtualTable = ({
               if (index !== -1) {
                 let _data = data;
                 _data[index] = updatedRow;
-                console.log('_data changed',_data)
                 setData(_data);
-                // setData([..._data]);
-                // setSubscribedData("gridData", _data);
+                setSubscribedData("gridData", _data);
               }
             }}
           />
@@ -149,55 +150,31 @@ const VirtualTable = ({
   };
 
   return (
-    <Box component={Paper} style={{height: 'calc(100vh - 64px)', overflow:'hidden'}}>
-      <Button onClick={()=>{
-        let modifiedData = bulkDeleteFromDataAndHashMap(data, rowsToDelete.current);
-        setData(modifiedData)
-      }}>
-        Delete
-      </Button>
+    <Box
+      ref={viewPortRef}
+      style={{
+        position: "relative",
+        width: "100%",
+        height: "100vh",
+        border: "1px solid rgba(224, 224, 224, 1)",
+        overflowY: "scroll",
+        fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+      }}
+      onScroll={scrollPos}
+    >
       <TableHeader
+        columns={tableHeaders}
         scrollToRow={scrollToRow}
         data={data}
-        columns={tableHeaders}
-        tableOptions={tableOptions}
-        onDataChange={(data) => {
-          setSubscribedData("gridData", data);
-          setData([...data]);
-        }}
       />
       <Box
-        ref={viewPortRef}
         style={{
-          position: "relative",
+          position: "absolute",
           width: "100%",
-          height: `calc(100vh - ${itemHeight*3+6}px)`,
-          border: "1px solid rgba(224, 224, 224, 1)",
-          overflowY: "scroll",
-          fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+          ...containerStyle,
         }}
-        sx={{
-          "&::-webkit-scrollbar": {
-            width: 5
-          },
-          "&::-webkit-scrollbar-track": {
-          },
-          "&::-webkit-scrollbar-thumb": {
-            // backgroundColor: "red",
-            backgroundColor: "#ccc",
-            // borderRadius: 6
-          }
-        }}
-        onScroll={scrollPos}>
-        <Box
-          style={{
-            position: "absolute",
-            width: "100%",
-            ...containerStyle,
-          }}
-        >
-          {renderRows()}
-        </Box>
+      >
+        {renderRows()}
       </Box>
     </Box>
   );

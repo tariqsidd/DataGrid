@@ -1,42 +1,43 @@
-import React, {useEffect, useRef, useState, memo} from "react";
+import React, { useEffect, useRef, useState, memo } from "react";
 import { IconButton, Typography } from "@material-ui/core";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
 import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
-import {
-  subscribeToData,
-  setSubscribedData,
-} from "./Reactive/subscriber";
+import { subscribeToData, setSubscribedData } from "./Reactive/subscriber";
 import { commonStyles } from "./styles";
-import {findIndexById} from "../VirtualRender/utils";
+import { findIndexById } from "../VirtualRender/utils";
 
 const ErrorAlert = ({ scrollToRow }) => {
   const [currentErrorIndex, setCurrentErrorIndex] = useState(0);
   const [errorCells, setErrorCells] = useState([]);
 
   useEffect(() => {
-    subscribeToData('listenCellErrors', listenCellErrors);
+    subscribeToData("listenCellErrors", listenCellErrors);
   }, []);
 
-  useEffect(()=>{
-    scrollToRow(errorCells[currentErrorIndex])
-  },[currentErrorIndex]);
+  useEffect(() => {
+    scrollToRow(errorCells[currentErrorIndex]);
+  }, [currentErrorIndex]);
 
-
-  const listenCellErrors = ({error, key, rowId})=> {
+  const listenCellErrors = ({ error, key, rowId }) => {
     const compareNumbers = (a, b) => a - b;
     let index = findIndexById(rowId);
     if (error !== null && error[key] !== null) {
       // Add index if it is not already in errorCells
-      setErrorCells(prevArray => prevArray.includes(index) ? prevArray.sort(compareNumbers) : [...prevArray, index].sort(compareNumbers));
+      setErrorCells((prevArray) =>
+        prevArray.includes(index)
+          ? prevArray.sort(compareNumbers)
+          : [...prevArray, index].sort(compareNumbers)
+      );
     } else {
       // Remove index from the errorCells
-      setErrorCells(prevArray => prevArray.filter(item => item !== index).sort(compareNumbers));
+      setErrorCells((prevArray) =>
+        prevArray.filter((item) => item !== index).sort(compareNumbers)
+      );
     }
 
     // scrollToRow(290380)
   };
-
 
   const handleNextError = (event) => {
     event.stopPropagation();

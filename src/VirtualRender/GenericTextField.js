@@ -6,6 +6,7 @@ import {
 import DateFnsUtils from "@date-io/date-fns";
 import { TextField, MenuItem } from "@material-ui/core";
 import { commonStyles } from "../DataGrid/styles";
+import { getColumnOrder } from "./utils";
 import Ajv from "ajv";
 
 const ajv = new Ajv();
@@ -30,16 +31,16 @@ const GenericTextField = ({
 
   useEffect(() => {
     switch (type) {
-      case 'text':
+      case "text":
         setValue(value);
         break;
-      case 'number':
+      case "number":
         setValue(value);
         break;
-      case 'select':
+      case "select":
         setSelectedValue(value);
         break;
-      case 'date':
+      case "date":
         setDate(value);
         break;
       default:
@@ -48,21 +49,47 @@ const GenericTextField = ({
   }, []);
 
   const handleValidation = (val) => {
+    let errors = JSON.parse(JSON.stringify(errorObj));
+    if (errors.hasOwnProperty(validationKey)) {
+      delete errors[validationKey];
+    }
     let valueToValidate = {};
     if (type === "number") {
-      if (val !== undefined) {
+      if (val !== null) {
         valueToValidate = { [validationKey]: val };
       }
-    } else if (type === "text") {
-      if (val.length) {
+    } else if (type === "select") {
+      const validOptions = options.map((option) => option.value);
+      let valid = validOptions.includes(val);
+      if (!valid) {
+        let error = `"${val}" is not a valid selection. Please choose from the available options in the dropdown`;
+        errors[validationKey] = error;
+      }
+      if (val.length > 0) {
+        valueToValidate = { [validationKey]: val };
+      }
+    } else {
+      if (val.length > 0) {
         valueToValidate = { [validationKey]: val };
       }
     }
-    const validate = ajv.compile(schema);
-    const valid = validate(valueToValidate);
-    console.log('valid',validate.errors !== null ? validate.errors[0].message:null);
-    setIsValid(valid);
-    setError({[validationKey]:validate.errors !== null ? validate.errors[0].message:null})
+    let valid;
+    if (schema) {
+      const validate = ajv.compile(schema);
+      valid = validate(valueToValidate);
+      setIsValid(valid);
+      if (!valid) {
+        errors[validationKey] = validate.errors[0].message;
+      }
+    }
+    //Sorting Error
+    errors = Object.fromEntries(
+      getColumnOrder()
+        .filter((key) => errors.hasOwnProperty(key))
+        .map((key) => [key, errors[key]])
+    );
+    setError(errors);
+    return { errors, valid };
   };
 
   const setValue = (newValue) => {
@@ -89,11 +116,10 @@ const GenericTextField = ({
         value={selectedValue}
         className={classes.textField}
         onChange={(e) => {
-          console.log(typeof e.target.value);
           setValue(e.target.value);
           setSelectedValue(e.target.value);
-          handleValidation(inputRef.current.value);
-          onChange(inputRef.current.value, isValid, error);
+          let { errors, valid } = handleValidation(inputRef.current.value);
+          onChange(inputRef.current.value, valid, errors);
         }}
       >
         {options.map((option) => (
@@ -126,7 +152,7 @@ const GenericTextField = ({
               onChange(formattedDate, true, error);
             } else {
               setDate("");
-              onChange('', true, error);
+              onChange("", true, error);
             }
           }}
           onClose={() => {
@@ -145,8 +171,18 @@ const GenericTextField = ({
       error={!isValid}
       placeholder={label}
       onChange={(e) => {
-        setValue(e.target.value);
-        handleValidation(e.target.value);
+        if (type === "number") {
+          if (e.target.value.length > 0) {
+            setValue(parseInt(e.target.value, 10));
+            handleValidation(parseInt(e.target.value, 10));
+          } else {
+            setValue(null);
+            handleValidation(null);
+          }
+        } else {
+          setValue(e.target.value);
+          handleValidation(e.target.value);
+        }
       }}
       onBlur={() => {
         onChange(inputRef.current.value, isValid, error);

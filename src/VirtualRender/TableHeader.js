@@ -1,16 +1,8 @@
 import { Box } from "@material-ui/core";
 import React from "react";
-import TableCell from "./TableCell";
-import ErrorAlert from "../DataGrid/ErrorAlert";
-import GridButtons from "./GridButton";
-
-const TableHeader = ({
-  data,
-  columns,
-  tableOptions,
-  onDataChange,
-  scrollToRow,
-}) => {
+// import ErrorAlert from "../DataGrid/ErrorAlert";
+import ErrorAlert from "./ErrorAlert";
+const TableHeader = ({ columns, scrollToRow, data }) => {
   return (
     <Box
       style={{
@@ -21,7 +13,7 @@ const TableHeader = ({
         zIndex: 1,
       }}
     >
-      <ErrorAlert scrollToRow={scrollToRow} />
+      <ErrorAlert scrollToRow={scrollToRow} data={data} />
       <Box
         style={{
           display: "flex",
@@ -54,6 +46,7 @@ export const tableCellStyles = {
       alignItems: "center",
       justifyContent: "center",
       width: `${p / columns.length}%`,
+      // minWidth: "100px",
       textAlign: "left",
       padding: "16px",
       fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',

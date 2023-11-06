@@ -6,8 +6,11 @@ import {
   setSubscribedData,
   getSubscribedData,
 } from "../DataGrid/Reactive/subscriber";
-import { findIndexById } from "./utils";
+import { findIndexById, getColumnOrder } from "./utils";
 import { tableCellStyles } from "./TableHeader";
+import Ajv from "ajv";
+
+const ajv = new Ajv();
 
 const TableRow = ({ item, itemHeight, columns, onRowChange, index }) => {
   const [rowData, setRowData] = useState(item);
@@ -34,6 +37,7 @@ const TableRow = ({ item, itemHeight, columns, onRowChange, index }) => {
     let { rowId: end_row_id } = endCellValues;
     let {
       key,
+      column: header,
       cellValue: valueForOverWrite,
       rowId: start_row_id,
     } = startCellValues;
@@ -41,10 +45,63 @@ const TableRow = ({ item, itemHeight, columns, onRowChange, index }) => {
     let from = findIndexById(start_row_id);
     let to = findIndexById(end_row_id);
     if (current >= from && current <= to) {
+      rowData["error"] = validateRowData(
+        key,
+        rowData,
+        header,
+        valueForOverWrite
+      );
       mutateRow(valueForOverWrite, key, rowData);
       onRowChange(rowData);
     }
   };
+
+  const validateRowData = useCallback((fieldName, rowData, header, value) => {
+    const errors = rowData.error
+      ? JSON.parse(JSON.stringify(rowData.error))
+      : {};
+    if (errors.hasOwnProperty(fieldName)) {
+      delete errors[fieldName];
+    }
+    const schema = header.headerSchema;
+    const fieldKey = header.headerFieldName;
+    let valueToValidate = {};
+    if (header.headerCellType === "number") {
+      if (typeof value === "number") {
+        valueToValidate = { [fieldKey]: value };
+      } else if (value.length > 0) {
+        valueToValidate = { [fieldKey]: parseInt(value, 10) };
+      }
+    } else if (header.headerCellType === "select") {
+      const options = header.headerOptions.map((option) => option.value);
+      let valid = options.includes(value);
+      if (!valid) {
+        let error = `"${value}" is not a valid selection. Please choose from the available options in the dropdown`;
+        errors[fieldKey] = error;
+      }
+      if (value.length > 0) {
+        valueToValidate = { [fieldKey]: value };
+      }
+    } else {
+      if (value.length > 0) {
+        valueToValidate = { [fieldKey]: value };
+      }
+    }
+
+    if (schema) {
+      const validate = ajv.compile(schema);
+      if (!validate(valueToValidate)) {
+        errors[fieldKey] = validate.errors[0].message;
+      }
+    }
+
+    //Sorting Error
+    return Object.fromEntries(
+      getColumnOrder()
+        .filter((key) => errors.hasOwnProperty(key))
+        .map((key) => [key, errors[key]])
+    );
+  }, []);
 
   return (
     <Box
@@ -87,7 +144,7 @@ const TableRow = ({ item, itemHeight, columns, onRowChange, index }) => {
           column={column}
           rowId={item.indexId}
           width={`${100 / columns.length}%`}
-          isError={rowData?.error || { [column.headerFieldName]: null }}
+          isError={rowData?.error ? rowData.error : {}}
           onChangeCell={(updatedCell, error) => {
             mutateRow(updatedCell, column.headerFieldName, rowData, error);
             onRowChange(rowData);
