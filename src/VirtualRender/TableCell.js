@@ -122,11 +122,6 @@ const TableCell = React.memo(
               onChangeCell(updatedCell, error);
               setEditMode(false);
               setValidCell(isValid);
-              setSubscribedData("listenCellErrors", {
-                rowId,
-                error,
-                key: column.headerFieldName,
-              });
             }}
             {...extraProps}
           />

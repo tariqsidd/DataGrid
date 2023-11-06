@@ -1,5 +1,5 @@
-import React, {useState, useRef, useCallback, useEffect} from "react";
-import {Box, Paper, Button} from "@material-ui/core";
+import React, { useState, useRef, useCallback, useEffect } from "react";
+import { Box, Paper, Button } from "@material-ui/core";
 import TableHeader from "./TableHeader";
 import TableRow from "./TableRow";
 import {
@@ -7,7 +7,12 @@ import {
   subscribeToData,
   unsubscribe,
 } from "../DataGrid/Reactive/subscriber";
-import {bulkDeleteFromDataAndHashMap, convertToHashMap, setColumnOrder, findIndexById } from "./utils";
+import {
+  bulkDeleteFromDataAndHashMap,
+  convertToHashMap,
+  setColumnOrder,
+  findIndexById,
+} from "./utils";
 
 export const DataGridOptions = {
   addRow: true,
@@ -23,13 +28,13 @@ export const DataGridOptions = {
 };
 
 const VirtualTable = ({
-                        itemHeight,
-                        incomingData,
-                        incomingTableOptions,
-                        tableHeaders,
-                        buffer = 5,
-                        numberOfRows = 6,
-                      }) => {
+  itemHeight,
+  incomingData,
+  incomingTableOptions,
+  tableHeaders,
+  buffer = 5,
+  numberOfRows = 6,
+}) => {
   const [tableOptions, setTableOptions] = useState(DataGridOptions);
   const viewportHeight = numberOfRows * itemHeight;
   const [data, setData] = useState([]);
@@ -44,21 +49,20 @@ const VirtualTable = ({
   const viewPortRef = useRef(null);
   const rowsToDelete = useRef([]);
   const scrollPositionRef = useRef(0);
-  const containerStyle = {height: data.length * itemHeight};
+  const containerStyle = { height: data.length * itemHeight };
 
   useEffect(() => {
     setData(incomingData);
     convertToHashMap(incomingData);
     setColumnOrder(tableHeaders);
-    // subscribeToData("listenCellErrors", listenCellErrors);
     subscribeToData("rowsToDelete", getRowsToDelete);
     setSubscribedData("rowsToDelete", []);
-    // setSubscribedData("gridData", incomingData);
     return () => {
       unsubscribe("willRowMutate");
-      unsubscribe("listenCellErrors");
       unsubscribe("rowsToDelete");
       unsubscribe("gridData");
+      unsubscribe("errorFocusCell");
+      unsubscribe("errorFocusCellRef");
     };
   }, []);
 
@@ -73,11 +77,6 @@ const VirtualTable = ({
     });
   }, [incomingTableOptions]);
 
-  // const listenCellErrors = (cellRef) => {
-  //   cellErrors.current.push(cellRef);
-  //   console.log("cellErrors.current", cellErrors.current);
-  // };
-
   const scrollPos = useCallback(() => {
     const currentIndx = Math.trunc(viewPortRef.current.scrollTop / itemHeight);
     const adjustedIndex = Math.max(0, currentIndx - buffer);
@@ -87,7 +86,7 @@ const VirtualTable = ({
     );
 
     if (adjustedIndex !== viewState.start || endIndex !== viewState.end) {
-      setViewState({start: adjustedIndex, end: endIndex});
+      setViewState({ start: adjustedIndex, end: endIndex });
     }
   }, [
     itemHeight,
@@ -104,29 +103,29 @@ const VirtualTable = ({
     }
   };
 
-
   const renderRows = useCallback(() => {
     let result = [];
     if (data.length) {
       for (let i = viewState.start; i <= viewState.end; i++) {
-        let item = {...data[i], top: i * itemHeight};
-        'indexId' in item && result.push(
-          <TableRow
-            key={`${item.indexId}-Row`}
-            item={item}
-            columns={tableHeaders}
-            itemHeight={itemHeight}
-            onRowChange={(updatedRow) => {
-              const index = findIndexById(updatedRow.indexId);
-              if (index !== -1) {
-                let _data = data;
-                _data[index] = updatedRow;
-                setData(_data);
-                setSubscribedData("gridData", _data);
-              }
-            }}
-          />
-        );
+        let item = { ...data[i], top: i * itemHeight };
+        "indexId" in item &&
+          result.push(
+            <TableRow
+              key={`${item.indexId}-Row`}
+              item={item}
+              columns={tableHeaders}
+              itemHeight={itemHeight}
+              onRowChange={(updatedRow) => {
+                const index = findIndexById(updatedRow.indexId);
+                if (index !== -1) {
+                  let _data = data;
+                  _data[index] = updatedRow;
+                  setData(_data);
+                  setSubscribedData("gridData", _data);
+                }
+              }}
+            />
+          );
       }
       return result;
     }

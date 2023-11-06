@@ -12,32 +12,8 @@ const ErrorAlert = ({ scrollToRow }) => {
   const [errorCells, setErrorCells] = useState([]);
 
   useEffect(() => {
-    subscribeToData("listenCellErrors", listenCellErrors);
-  }, []);
-
-  useEffect(() => {
     scrollToRow(errorCells[currentErrorIndex]);
   }, [currentErrorIndex]);
-
-  const listenCellErrors = ({ error, key, rowId }) => {
-    const compareNumbers = (a, b) => a - b;
-    let index = findIndexById(rowId);
-    if (error !== null && error[key] !== null) {
-      // Add index if it is not already in errorCells
-      setErrorCells((prevArray) =>
-        prevArray.includes(index)
-          ? prevArray.sort(compareNumbers)
-          : [...prevArray, index].sort(compareNumbers)
-      );
-    } else {
-      // Remove index from the errorCells
-      setErrorCells((prevArray) =>
-        prevArray.filter((item) => item !== index).sort(compareNumbers)
-      );
-    }
-
-    // scrollToRow(290380)
-  };
 
   const handleNextError = (event) => {
     event.stopPropagation();
