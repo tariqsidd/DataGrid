@@ -134,12 +134,14 @@ const ErrorAlert = ({ scrollToRow, data = [] }) => {
             <div className={classes.errorTitle}>
               <CancelIcon
                 style={{
-                  paddingRight: "8px",
-                  paddingLeft: "8px",
+                  // paddingRight: "8px",
+                  // paddingLeft: "8px",
                   color: "#F04438",
                 }}
               />
-              <Typography>{`${errorCells.length} Error(s) found !`}</Typography>
+              <Typography
+                style={{ paddingLeft: "8px" }}
+              >{`${errorCells.length} Error(s) found !`}</Typography>
             </div>
           )}
           <div>
@@ -167,12 +169,14 @@ const ErrorAlert = ({ scrollToRow, data = [] }) => {
           <div className={classes.errorTitle}>
             <CheckCircleIcon
               style={{
-                paddingRight: "8px",
-                paddingLeft: "8px",
+                // paddingRight: "8px",
+                // paddingLeft: "8px",
                 color: "#12B76A",
               }}
             />
-            <Typography>{`No Error(s) found !`}</Typography>
+            <Typography
+              style={{ paddingLeft: "8px" }}
+            >{`No Error(s) found !`}</Typography>
           </div>
         </div>
       )}
