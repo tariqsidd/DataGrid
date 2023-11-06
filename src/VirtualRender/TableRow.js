@@ -1,5 +1,6 @@
 import React, { useEffect, useState, memo, useCallback } from "react";
 import { Box, Checkbox, Tooltip } from "@material-ui/core";
+import isEqual from 'lodash.isequal'
 import TableCell from "./TableCell";
 import {
   subscribeToData,
@@ -148,6 +149,5 @@ const TableRow = ({ item, itemHeight, columns, onRowChange, index }) => {
   );
 };
 
-export default memo(TableRow, (previousProps, nextProps) => {
-  return previousProps.item.top === nextProps.item.top;
-});
+export default memo(TableRow, isEqual);
+
