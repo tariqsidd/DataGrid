@@ -57,7 +57,6 @@ const VirtualTable = ({
     convertToHashMap(incomingData);
     setColumnOrder(tableHeaders);
     subscribeToData("rowsToDelete", getRowsToDelete);
-    setSubscribedData("rowsToDelete", []);
     return () => {
       unsubscribe("willRowMutate");
       unsubscribe("rowsToDelete");
@@ -104,6 +103,20 @@ const VirtualTable = ({
     }
   };
 
+  const onRowChange = useCallback((updatedRow) => {
+    setData((prevData) => {
+      const index = findIndexById(updatedRow.indexId, prevData);
+      if (index !== -1) {
+        return [
+          ...prevData.slice(0, index),
+          updatedRow,
+          ...prevData.slice(index + 1),
+        ];
+      }
+      return prevData;
+    });
+  }, []);
+
   const renderRows = useCallback(() => {
     let result = [];
     if (data.length) {
@@ -116,15 +129,7 @@ const VirtualTable = ({
               item={item}
               columns={tableHeaders}
               itemHeight={itemHeight}
-              onRowChange={(updatedRow) => {
-                const index = findIndexById(updatedRow.indexId);
-                if (index !== -1) {
-                  let _data = data;
-                  _data[index] = updatedRow;
-                  setData(_data);
-                  setSubscribedData("gridData", _data);
-                }
-              }}
+              onRowChange={onRowChange}
             />
           );
       }
@@ -145,8 +150,14 @@ const VirtualTable = ({
     setNumVisibleItems(Math.trunc(viewportHeight / itemHeight));
   }, [itemHeight, viewportHeight]);
 
-  const getRowsToDelete = (value) => {
-    rowsToDelete.current = value;
+  const getRowsToDelete = (id) => {
+    const index = rowsToDelete.current.indexOf(id);
+    if (index === -1) {
+      rowsToDelete.current.push(id);
+    } else {
+      rowsToDelete.current.splice(index, 1);
+    }
+    console.log("rowsToDelete.current", rowsToDelete.current);
   };
 
   return (
@@ -191,6 +202,7 @@ const VirtualTable = ({
             rowsToDelete.current
           );
           setData(modifiedData);
+          rowsToDelete.current = [];
         }}
       >
         Delete
