@@ -221,7 +221,7 @@ export const tableCellStyles = {
       alignItems: "center",
       justifyContent: "center",
       width: width,
-      // minWidth: "100px",
+      minWidth: "150px",
       textAlign: "left",
       padding: "16px",
       borderLeft: `1px solid rgba(224, 224, 224, 1)`,

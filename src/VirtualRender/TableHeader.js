@@ -28,7 +28,7 @@ const TableHeader = ({ columns, scrollToRow, data }) => {
           color: "rgba(0, 0, 0, 0.87)",
         }}
       >
-        <Box style={tableCellStyles.cellStyle(columns, 15)}>{`#`}</Box>
+        <Box style={fixedTableCellStyles.cellStyle(columns, 15)}>{`#`}</Box>
         {columns.map((header) => (
           <Box style={tableCellStyles.cellStyle(columns)}>
             {header.headerName}
@@ -46,7 +46,24 @@ export const tableCellStyles = {
       alignItems: "center",
       justifyContent: "center",
       width: `${p / columns.length}%`,
-      // minWidth: "100px",
+      minWidth: "150px",
+      textAlign: "left",
+      padding: "16px",
+      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+      fontSize: "0.875rem",
+      lineHeight: 1.5,
+      letterSpacing: "0.01071em",
+    };
+  },
+};
+
+export const fixedTableCellStyles = {
+  cellStyle: (columns, p = 100) => {
+    return {
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
+      width: `${p / columns.length}%`,
       textAlign: "left",
       padding: "16px",
       fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',

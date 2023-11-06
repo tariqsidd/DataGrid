@@ -7,13 +7,14 @@ import {
   getSubscribedData,
 } from "../DataGrid/Reactive/subscriber";
 import { findIndexById, getColumnOrder } from "./utils";
-import { tableCellStyles } from "./TableHeader";
+import { fixedTableCellStyles, tableCellStyles } from "./TableHeader";
 import Ajv from "ajv";
+import { error } from "ajv/dist/vocabularies/applicator/dependencies";
 
 const ajv = new Ajv();
 
 const TableRow = ({ item, itemHeight, columns, onRowChange, index }) => {
-  const [rowData, setRowData] = useState(item);
+  const [rowData, setRowData] = useState({});
   const [selected, setSelected] = useState(
     item.selected ? item.selected : false
   );
@@ -22,13 +23,16 @@ const TableRow = ({ item, itemHeight, columns, onRowChange, index }) => {
     setRowData(item);
     setSelected(item.selected ? item.selected : false);
     subscribeToData("willRowMutate", willRowMutate);
-  }, []);
+  }, [rowData]);
 
   const mutateRow = useCallback(
     (updatedCell, key, row, error) => {
       row[key] = updatedCell;
-      row['error'] = error;
+      if (error) {
+        row["error"] = error;
+      }
       setRowData({ ...row });
+      onRowChange(row);
     },
     [rowData]
   );
@@ -45,14 +49,8 @@ const TableRow = ({ item, itemHeight, columns, onRowChange, index }) => {
     let from = findIndexById(start_row_id);
     let to = findIndexById(end_row_id);
     if (current >= from && current <= to) {
-      rowData["error"] = validateRowData(
-        key,
-        rowData,
-        header,
-        valueForOverWrite
-      );
-      mutateRow(valueForOverWrite, key, rowData);
-      onRowChange(rowData);
+      let error = validateRowData(key, rowData, header, valueForOverWrite);
+      mutateRow(valueForOverWrite, key, rowData, error);
     }
   };
 
@@ -115,7 +113,10 @@ const TableRow = ({ item, itemHeight, columns, onRowChange, index }) => {
         backgroundColor: "#fff",
       }}
     >
-      <Box key={item.indexId} style={tableCellStyles.cellStyle(columns, 15)}>
+      <Box
+        key={item.indexId}
+        style={fixedTableCellStyles.cellStyle(columns, 15)}
+      >
         <Tooltip title={"Select to Delete Row"} arrow>
           <Checkbox
             color="default"
@@ -129,10 +130,8 @@ const TableRow = ({ item, itemHeight, columns, onRowChange, index }) => {
                 deleteRowsId.splice(index, 1);
               }
               setSubscribedData("rowsToDelete", deleteRowsId);
-              let row = { ...rowData };
-              mutateRow(!selected, "selected", row);
+              mutateRow(!selected, "selected", rowData);
               setSelected(!selected);
-              onRowChange(row);
             }}
           />
         </Tooltip>
@@ -147,7 +146,6 @@ const TableRow = ({ item, itemHeight, columns, onRowChange, index }) => {
           isError={rowData?.error ? rowData.error : {}}
           onChangeCell={(updatedCell, error) => {
             mutateRow(updatedCell, column.headerFieldName, rowData, error);
-            onRowChange(rowData);
           }}
         >
           {rowData[column.headerFieldName]}
@@ -158,6 +156,5 @@ const TableRow = ({ item, itemHeight, columns, onRowChange, index }) => {
 };
 
 export default memo(TableRow, (previousProps, nextProps) => {
-  return previousProps.item.top === nextProps.item.top
+  return previousProps.item.top === nextProps.item.top;
 });
-
