@@ -220,7 +220,7 @@ const VirtualTable = ({
           height: `calc(100vh - ${itemHeight * 3 + 6}px)`,
           border: "1px solid rgba(224, 224, 224, 1)",
           overflowY: "scroll",
-          overflowX: "scroll",
+          // overflowX: "scroll",
           fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
         }}
         // sx={{
