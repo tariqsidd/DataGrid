@@ -63,6 +63,7 @@ export const convertToHashMap = (data, chunkSize = 500) => {
 };
 
 export const bulkDeleteFromDataAndHashMap = (data, idsToDelete) => {
+  console.log('idsToDelete',idsToDelete)
   // Filter out the items from the data array
   data = data.filter((item) => !idsToDelete.includes(item.indexId));
   // Clear the existing hashmap

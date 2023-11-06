@@ -21,22 +21,6 @@ const TableHeader = ({
         zIndex: 1,
       }}
     >
-      <GridButtons
-        data={data}
-        tableOptions={tableOptions}
-        tableHeaders={columns}
-        onDataChange={(data) => {
-          onDataChange(data);
-        }}
-        // callExportCSV={callExportCSV}
-        // onSubmit={onSubmit}
-        // onProceedAnyway={onProceedAnyway}
-        // onSkip={onSkip}
-        // onDataChange={(data) => {
-        //   // setData([...data]);
-        //   // onChangeInData(data);
-        // }}
-      />
       <ErrorAlert scrollToRow={scrollToRow} />
       <Box
         style={{

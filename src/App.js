@@ -20,7 +20,7 @@ const tableOptions = {
 
 const cities = ["New York", "Los Angeles", "Chicago"];
 const userData = [];
-for (let i = 0; i < 50; i++) {
+for (let i = 0; i < 2; i++) {
   userData.push({
     name: `Name ${i}`,
     surname: `Surname ${i}`,
