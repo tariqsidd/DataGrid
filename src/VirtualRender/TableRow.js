@@ -10,7 +10,6 @@ import { findIndexById } from "./utils";
 import { tableCellStyles } from "./TableHeader";
 
 const TableRow = ({ item, itemHeight, columns, onRowChange, index }) => {
-  console.log("Table Row rendered");
   const [rowData, setRowData] = useState(item);
   const [selected, setSelected] = useState(
     item.selected ? item.selected : false
@@ -23,8 +22,9 @@ const TableRow = ({ item, itemHeight, columns, onRowChange, index }) => {
   }, []);
 
   const mutateRow = useCallback(
-    (updatedCell, key, row) => {
+    (updatedCell, key, row, error) => {
       row[key] = updatedCell;
+      row['error'] = error;
       setRowData({ ...row });
     },
     [rowData]
@@ -89,9 +89,8 @@ const TableRow = ({ item, itemHeight, columns, onRowChange, index }) => {
           width={`${100 / columns.length}%`}
           isError={rowData?.error || { [column.headerFieldName]: null }}
           onChangeCell={(updatedCell, error) => {
-            let row = { ...rowData, error };
-            mutateRow(updatedCell, column.headerFieldName, row);
-            onRowChange(row);
+            mutateRow(updatedCell, column.headerFieldName, rowData, error);
+            onRowChange(rowData);
           }}
         >
           {rowData[column.headerFieldName]}
@@ -102,5 +101,6 @@ const TableRow = ({ item, itemHeight, columns, onRowChange, index }) => {
 };
 
 export default memo(TableRow, (previousProps, nextProps) => {
-  // return previousProps.item.indexId === nextProps.item.indexId;
+  return previousProps.item.top === nextProps.item.top
 });
+
