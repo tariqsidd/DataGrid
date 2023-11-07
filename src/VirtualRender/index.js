@@ -146,7 +146,6 @@ const VirtualTable = ({
     } else {
       rowsToDelete.current.splice(index, 1);
     }
-    console.log("rowsToDelete.current", rowsToDelete.current);
   };
 
   useEffect(() => {
@@ -200,22 +199,24 @@ const VirtualTable = ({
         )}
       </Box>
       <Box className={classes.buttonContainer}>
-        <Button
-          variant="contained"
-          style={{ color: "white", backgroundColor: "#F04438" }}
-          className={classes.button}
-          startIcon={<DeleteIcon />}
-          onClick={() => {
-            let modifiedData = bulkDeleteFromDataAndHashMap(
-              data,
-              rowsToDelete.current
-            );
-            setData(modifiedData);
-            rowsToDelete.current = [];
-          }}
-        >
-          Delete
-        </Button>
+        {rowsToDelete.current.length > 0 && (
+          <Button
+            variant="contained"
+            style={{ color: "white", backgroundColor: "#F04438" }}
+            className={classes.button}
+            startIcon={<DeleteIcon />}
+            onClick={() => {
+              let modifiedData = bulkDeleteFromDataAndHashMap(
+                data,
+                rowsToDelete.current
+              );
+              setData(modifiedData);
+              rowsToDelete.current = [];
+            }}
+          >
+            Delete
+          </Button>
+        )}
       </Box>
       <ErrorAlert scrollToRow={scrollToRow} data={data} />
       <Box
