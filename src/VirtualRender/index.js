@@ -296,7 +296,7 @@ const scrollBoxStyles = {
       border: "1px solid rgba(224, 224, 224, 1)",
       overflowY: "auto",
       fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-      maxHeight: `${itemHeight * length + itemHeight}px`,
+      maxHeight: `${itemHeight * length + itemHeight + 6}px`,
     };
   },
 };
