@@ -28,6 +28,7 @@ const VirtualTable = ({
   onProceedAnyway = () => {},
   onSkip = () => {},
   callExportCSV = false,
+  onDataChange,
 }) => {
   const [tableOptions, setTableOptions] = useState({});
   const viewportHeight = numberOfRows * itemHeight;
@@ -180,6 +181,10 @@ const VirtualTable = ({
     }
   }, [callExportCSV]);
 
+  useEffect(() => {
+    onDataChange(data);
+  }, [data]);
+
   const classes = commonStyles();
   return (
     <Box style={scrollBoxStyles.parentContainer}>
@@ -261,7 +266,7 @@ const VirtualTable = ({
       )}
       <Box
         ref={viewPortRef}
-        style={scrollBoxStyles.scrollContainer(itemHeight)}
+        style={scrollBoxStyles.scrollContainer(itemHeight, data.length)}
         onScroll={scrollPos}
       >
         <TableHeader columns={tableHeaders} />
@@ -283,7 +288,7 @@ const scrollBoxStyles = {
   parentContainer: {
     height: "calc(100vh - 64px)",
   },
-  scrollContainer: (itemHeight) => {
+  scrollContainer: (itemHeight, length) => {
     return {
       position: "relative",
       width: "100%",
@@ -291,6 +296,7 @@ const scrollBoxStyles = {
       border: "1px solid rgba(224, 224, 224, 1)",
       overflowY: "scroll",
       fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+      maxHeight: `${itemHeight * length + itemHeight + 6}px`,
     };
   },
 };

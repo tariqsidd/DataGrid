@@ -27,7 +27,7 @@ userData.push({
     .substring(2, 6 + 2),
 });
 
-for (let i = 0; i < 50000; i++) {
+for (let i = 0; i < 5; i++) {
   userData.push({
     name: `Name ${i}`,
     surname: `Surname ${i}`,
@@ -71,6 +71,9 @@ const App = () => {
       tableHeaders={tableHeader}
       incomingTableOptions={options}
       callExportCSV={false}
+      onDataChange={(data) => {
+        console.log(data);
+      }}
     />
   );
 };
