@@ -71,7 +71,6 @@ const TableCell = React.memo(
           (column.headerFieldName === value.current.fieldName ||
             column.headerFieldName === value.next.fieldName)
         ) {
-          // console.log("Handle Error Focus Called");
           handleErrorFocus(
             nextRowIndex,
             value.next.fieldName,
@@ -83,7 +82,6 @@ const TableCell = React.memo(
 
     const applyErrorFocusStyle = (cell) => {
       if (cell) {
-        cell.style.padding = "15.5px";
         cell.style.border = "2px solid #f44336";
       }
     };
@@ -220,7 +218,7 @@ const TableCell = React.memo(
   }
 );
 
-export const tableCellStyles = {
+const tableCellStyles = {
   cellStyle: (width, validCell, showError) => {
     return {
       display: "inline-flex",

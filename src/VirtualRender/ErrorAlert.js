@@ -25,7 +25,7 @@ const ErrorAlert = ({ scrollToRow, data = [] }) => {
     const errors = errorIdentifier(data);
     if (errors.length > 0) {
       let focusCell = getSubscribedData("errorFocusCell");
-      if (focusCell === null) {
+      if (focusCell === undefined || focusCell === null) {
         setTimeout(() => {
           setSubscribedData("errorFocusCell", {
             current: {
@@ -93,15 +93,7 @@ const ErrorAlert = ({ scrollToRow, data = [] }) => {
 
   return (
     <>
-      <Box
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          position: "sticky",
-          top: 0,
-          zIndex: 1,
-        }}
-      >
+      <Box className={classes.stickyHeaderBox}>
         {errorCells.length > 0 && (
           <div className={classes.errorAlert}>
             {errorCells.length > 0 && (

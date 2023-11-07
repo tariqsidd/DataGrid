@@ -4,6 +4,7 @@ import isEqual from "lodash.isequal";
 import TableCell from "./TableCell";
 import { subscribeToData, setSubscribedData } from "./Reactive/subscriber";
 import { findIndexById, getColumnOrder } from "./utils";
+import { commonStyles } from "./styles";
 import Ajv from "ajv";
 
 const ajv = new Ajv();
@@ -96,18 +97,10 @@ const TableRow = ({ item, itemHeight, columns, onRowChange, tableOptions }) => {
     );
   }, []);
 
+  const classes = commonStyles();
+
   return (
-    <Box
-      style={{
-        display: "flex",
-        flexDirection: "row",
-        position: "absolute",
-        top: item.top,
-        height: itemHeight,
-        width: "100%",
-        backgroundColor: "#fff",
-      }}
-    >
+    <Box style={fixedRowStyles.rowStyle(item, itemHeight)}>
       <Box
         key={item.indexId}
         style={fixedTableCellStyles.cellStyle(columns, 40)}
@@ -148,7 +141,7 @@ const TableRow = ({ item, itemHeight, columns, onRowChange, tableOptions }) => {
   );
 };
 
-export const fixedTableCellStyles = {
+const fixedTableCellStyles = {
   cellStyle: (columns, p = 100) => {
     return {
       display: "inline-flex",
@@ -168,4 +161,17 @@ export const fixedTableCellStyles = {
   },
 };
 
+const fixedRowStyles = {
+  rowStyle: (item, itemHeight) => {
+    return {
+      display: "flex",
+      flexDirection: "row",
+      position: "absolute",
+      top: item.top,
+      height: itemHeight,
+      width: "100%",
+      backgroundColor: "#fff",
+    };
+  },
+};
 export default memo(TableRow, isEqual);

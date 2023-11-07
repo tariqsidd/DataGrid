@@ -182,12 +182,7 @@ const VirtualTable = ({
 
   const classes = commonStyles();
   return (
-    <Box
-      style={{
-        height: "calc(100vh - 64px)",
-        // overflow: "hidden"
-      }}
-    >
+    <Box style={scrollBoxStyles.parentContainer}>
       <Box className={classes.buttonContainer}>
         {tableOptions.showSkipButton && error && (
           <Button
@@ -225,8 +220,7 @@ const VirtualTable = ({
         {rowsToDelete.current.length > 0 && (
           <Button
             variant="contained"
-            style={{ color: "white", backgroundColor: "#F04438" }}
-            className={classes.button}
+            className={classes.deleteButton}
             startIcon={<DeleteIcon />}
             onClick={() => {
               let modifiedData = bulkDeleteFromDataAndHashMap(
@@ -267,26 +261,7 @@ const VirtualTable = ({
       )}
       <Box
         ref={viewPortRef}
-        style={{
-          position: "relative",
-          width: "100%",
-          height: `calc(100vh - ${itemHeight * 3 + 6}px)`,
-          border: "1px solid rgba(224, 224, 224, 1)",
-          overflowY: "scroll",
-          // overflowX: "scroll",
-          fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-        }}
-        // sx={{
-        //   "&::-webkit-scrollbar": {
-        //     width: 10,
-        //   },
-        //   "&::-webkit-scrollbar-track": {},
-        //   "&::-webkit-scrollbar-thumb": {
-        //     // backgroundColor: "red",
-        //     backgroundColor: "#ccc",
-        //     // borderRadius: 6
-        //   },
-        // }}
+        style={scrollBoxStyles.scrollContainer(itemHeight)}
         onScroll={scrollPos}
       >
         <TableHeader columns={tableHeaders} />
@@ -302,6 +277,22 @@ const VirtualTable = ({
       </Box>
     </Box>
   );
+};
+
+const scrollBoxStyles = {
+  parentContainer: {
+    height: "calc(100vh - 64px)",
+  },
+  scrollContainer: (itemHeight) => {
+    return {
+      position: "relative",
+      width: "100%",
+      height: `calc(100vh - ${itemHeight * 3 + 6}px)`,
+      border: "1px solid rgba(224, 224, 224, 1)",
+      overflowY: "scroll",
+      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+    };
+  },
 };
 
 export default VirtualTable;

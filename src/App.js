@@ -27,7 +27,7 @@ userData.push({
     .substring(2, 6 + 2),
 });
 
-for (let i = 0; i < 50; i++) {
+for (let i = 0; i < 50000; i++) {
   userData.push({
     name: `Name ${i}`,
     surname: `Surname ${i}`,
