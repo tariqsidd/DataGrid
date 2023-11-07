@@ -1,5 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import { Box, Button } from "@material-ui/core";
+import DeleteIcon from "@material-ui/icons/Delete";
 import TableHeader from "./TableHeader";
 import TableRow from "./TableRow";
 import ErrorAlert from "./ErrorAlert";
@@ -9,7 +10,9 @@ import {
   convertToHashMap,
   setColumnOrder,
   findIndexById,
+  errorIdentifier,
 } from "./utils";
+import { commonStyles } from "./styles";
 
 export const DataGridOptions = {
   addRow: true,
@@ -22,6 +25,7 @@ export const DataGridOptions = {
   showExportButton: true,
   showSubmitButton: true,
   showProceedButton: true,
+  showSkipButton: true,
 };
 
 const VirtualTable = ({
@@ -31,6 +35,9 @@ const VirtualTable = ({
   tableHeaders,
   buffer = 5,
   numberOfRows = 6,
+  onSubmit = () => {},
+  onProceedAnyway = () => {},
+  onSkip = () => {},
 }) => {
   const [tableOptions, setTableOptions] = useState(DataGridOptions);
   const viewportHeight = numberOfRows * itemHeight;
@@ -46,6 +53,7 @@ const VirtualTable = ({
   const rowsToDelete = useRef([]);
   const scrollPositionRef = useRef(0);
   const containerStyle = { height: data.length * itemHeight };
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     setData(incomingData);
@@ -155,6 +163,16 @@ const VirtualTable = ({
     console.log("rowsToDelete.current", rowsToDelete.current);
   };
 
+  useEffect(() => {
+    const errors = errorIdentifier(data);
+    if (errors.length > 0) {
+      setError(true);
+    } else {
+      setError(false);
+    }
+  }, [data]);
+
+  const classes = commonStyles();
   return (
     <Box
       style={{
@@ -162,18 +180,57 @@ const VirtualTable = ({
         // overflow: "hidden"
       }}
     >
-      <Button
-        onClick={() => {
-          let modifiedData = bulkDeleteFromDataAndHashMap(
-            data,
-            rowsToDelete.current
-          );
-          setData(modifiedData);
-          rowsToDelete.current = [];
-        }}
-      >
-        Delete
-      </Button>
+      <Box className={classes.buttonContainer}>
+        {tableOptions.showSkipButton && error && (
+          <Button
+            variant="outlined"
+            color="primary"
+            className={classes.button}
+            onClick={onSkip}
+          >
+            Skip These Records
+          </Button>
+        )}
+        {tableOptions.showSubmitButton && (
+          <Button
+            variant="contained"
+            color="primary"
+            className={classes.button}
+            onClick={onSubmit}
+            disabled={error}
+          >
+            Submit
+          </Button>
+        )}
+        {tableOptions.showProceedButton && (
+          <Button
+            variant="contained"
+            color="primary"
+            className={classes.button}
+            onClick={onProceedAnyway}
+          >
+            Proceed Anyway
+          </Button>
+        )}
+      </Box>
+      <Box className={classes.buttonContainer}>
+        <Button
+          variant="contained"
+          style={{ color: "white", backgroundColor: "#F04438" }}
+          className={classes.button}
+          startIcon={<DeleteIcon />}
+          onClick={() => {
+            let modifiedData = bulkDeleteFromDataAndHashMap(
+              data,
+              rowsToDelete.current
+            );
+            setData(modifiedData);
+            rowsToDelete.current = [];
+          }}
+        >
+          Delete
+        </Button>
+      </Box>
       <ErrorAlert scrollToRow={scrollToRow} data={data} />
       <Box
         ref={viewPortRef}
