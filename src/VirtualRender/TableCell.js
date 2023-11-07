@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import { Box, Tooltip } from "@material-ui/core";
-import { DataGridOptions } from "./index";
+import { DataGridOptions } from "./constants";
 import GenericTextField from "./GenericTextField";
 import {
   clearOrdinates,

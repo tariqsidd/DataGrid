@@ -1,61 +1,6 @@
 import { makeStyles } from "@material-ui/core/styles";
 
 export const commonStyles = makeStyles((theme) => ({
-  smallCell: {
-    border: "1px solid #8080801a",
-    width: "30px",
-    maxWidth: "30px",
-    overflow: "hidden",
-    padding: "4px",
-    fontSize: "0.75em",
-  },
-  highlightedSmallCell: {
-    width: "30px",
-    maxWidth: "30px",
-    padding: "4px",
-    fontSize: "0.75em",
-    border: "1px solid #8080801a",
-    backgroundColor: "#fafafa",
-  },
-  highlightedCell: {
-    minWidth: "150px",
-    width: "150px",
-    maxWidth: "150px",
-    padding: "0px",
-    fontSize: "0.75em",
-    border: "1px solid #8080801a",
-    backgroundColor: "#fafafa",
-  },
-  footerAddIcon: {
-    color: "#000000de",
-    height: "25px",
-  },
-  errorCell: {
-    backgroundColor: "#ffe6e6",
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  errorCellContentFocused: {
-    display: "flex",
-    width: "100%",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  errorCellContentUnFocused: {
-    display: "flex",
-    width: "100%",
-    alignItems: "center",
-    justifyContent: "space-around",
-  },
-  contextMenu: {
-    position: "fixed",
-    background: "white",
-    border: "1px solid #ccc",
-    boxShadow: "2px 2px 5px #888888",
-    zIndex: 1000,
-  },
   dateField: {
     width: "90%",
     "& .MuiIconButton-root": {
@@ -73,11 +18,6 @@ export const commonStyles = makeStyles((theme) => ({
   },
   textField: {
     width: "90%",
-  },
-  exportCSVButton: {
-    display: "flex",
-    justifyContent: "flex-end",
-    padding: "8px",
   },
   buttonContainer: {
     display: "flex",
@@ -114,9 +54,5 @@ export const commonStyles = makeStyles((theme) => ({
   errorTitle: {
     display: "flex",
     alignItems: "center",
-  },
-  cellValue: {
-    overflow: "hidden",
-    maxWidth: "80%",
   },
 }));

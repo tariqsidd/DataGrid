@@ -13,20 +13,7 @@ import {
   errorIdentifier,
 } from "./utils";
 import { commonStyles } from "./styles";
-
-export const DataGridOptions = {
-  addRow: true,
-  deleteRow: true,
-  duplicateRow: true,
-  columnHeight: 40,
-  editing: true,
-  showErrors: true,
-  showErrorAlert: true,
-  showExportButton: true,
-  showSubmitButton: true,
-  showProceedButton: true,
-  showSkipButton: true,
-};
+import { DataGridOptions } from "./constants";
 
 const VirtualTable = ({
   itemHeight,
