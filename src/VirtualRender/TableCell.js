@@ -131,7 +131,7 @@ const TableCell = React.memo(
           />
         );
       }
-      return children;
+      return <Box style={tableCellStyles.contentStyle}>{children}</Box>;
     };
 
     const onDoubleClick = () => {
@@ -141,8 +141,6 @@ const TableCell = React.memo(
     };
 
     const onDragOver = useCallback((e) => {
-      console.log("Drag Over");
-      e.stopPropagation();
       e.preventDefault();
     }, []);
 
@@ -239,7 +237,12 @@ export const tableCellStyles = {
       lineHeight: 1.5,
       letterSpacing: "0.01071em",
       ...(!validCell && showError && { backgroundColor: "#ffe6e6" }),
+      overflow: "hidden",
     };
+  },
+  contentStyle: {
+    overflowX: "hidden",
+    overflowY: "hidden",
   },
 };
 

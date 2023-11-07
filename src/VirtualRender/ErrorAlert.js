@@ -9,7 +9,7 @@ import { commonStyles } from "./styles";
 import { findIndexById, errorIdentifier } from "./utils";
 
 const ErrorAlert = ({ scrollToRow, data = [] }) => {
-  console.log("Error Alert Rendered");
+  // console.log("Error Alert Rendered");
 
   const [currentErrorIndex, setCurrentErrorIndex] = useState(0);
   const [errorCells, setErrorCells] = useState([]);
