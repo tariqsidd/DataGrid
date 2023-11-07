@@ -4,12 +4,11 @@ import isEqual from "lodash.isequal";
 import TableCell from "./TableCell";
 import { subscribeToData, setSubscribedData } from "./Reactive/subscriber";
 import { findIndexById, getColumnOrder } from "./utils";
-import { fixedTableCellStyles } from "./TableHeader";
 import Ajv from "ajv";
 
 const ajv = new Ajv();
 
-const TableRow = ({ item, itemHeight, columns, onRowChange, index }) => {
+const TableRow = ({ item, itemHeight, columns, onRowChange, tableOptions }) => {
   const [rowData, setRowData] = useState({});
   const [selected, setSelected] = useState(
     item.selected ? item.selected : false
@@ -113,17 +112,21 @@ const TableRow = ({ item, itemHeight, columns, onRowChange, index }) => {
         key={item.indexId}
         style={fixedTableCellStyles.cellStyle(columns, 40)}
       >
-        <Tooltip title={"Select to Delete Row"} arrow>
-          <Checkbox
-            color="default"
-            checked={selected}
-            onChange={() => {
-              setSubscribedData("rowsToDelete", rowData.indexId);
-              mutateRow(!selected, "selected", rowData);
-              setSelected(!selected);
-            }}
-          />
-        </Tooltip>
+        {tableOptions.deleteRow ? (
+          <Tooltip title={"Select to Delete Row"} arrow>
+            <Checkbox
+              color="default"
+              checked={selected}
+              onChange={() => {
+                setSubscribedData("rowsToDelete", rowData.indexId);
+                mutateRow(!selected, "selected", rowData);
+                setSelected(!selected);
+              }}
+            />
+          </Tooltip>
+        ) : (
+          findIndexById(item.indexId)
+        )}
       </Box>
 
       {columns.map((column, index) => (
@@ -133,6 +136,7 @@ const TableRow = ({ item, itemHeight, columns, onRowChange, index }) => {
           rowId={item.indexId}
           width={`${100 / columns.length}%`}
           isError={rowData?.error ? rowData.error : {}}
+          tableOptions={tableOptions}
           onChangeCell={(updatedCell, error) => {
             mutateRow(updatedCell, column.headerFieldName, rowData, error);
           }}
@@ -142,6 +146,26 @@ const TableRow = ({ item, itemHeight, columns, onRowChange, index }) => {
       ))}
     </Box>
   );
+};
+
+export const fixedTableCellStyles = {
+  cellStyle: (columns, p = 100) => {
+    return {
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
+      width: `${p / columns.length}%`,
+      minWidth: "60px",
+      textAlign: "left",
+      padding: "16px",
+      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+      fontSize: "0.875rem",
+      lineHeight: 1.5,
+      letterSpacing: "0.01071em",
+      borderLeft: `1px solid rgba(224, 224, 224, 1)`,
+      borderBottom: `1px solid rgba(224, 224, 224, 1)`,
+    };
+  },
 };
 
 export default memo(TableRow, isEqual);

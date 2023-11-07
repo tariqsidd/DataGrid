@@ -13,10 +13,10 @@ import {
   errorIdentifier,
 } from "./utils";
 import { commonStyles } from "./styles";
-import { DataGridOptions } from "./constants";
+import { DataGridOptions, itemHeightConstant } from "./constants";
 
 const VirtualTable = ({
-  itemHeight,
+  itemHeight = itemHeightConstant,
   incomingData,
   incomingTableOptions,
   tableHeaders,
@@ -26,7 +26,7 @@ const VirtualTable = ({
   onProceedAnyway = () => {},
   onSkip = () => {},
 }) => {
-  const [tableOptions, setTableOptions] = useState(DataGridOptions);
+  const [tableOptions, setTableOptions] = useState({});
   const viewportHeight = numberOfRows * itemHeight;
   const [data, setData] = useState([]);
   const [numVisibleItems, setNumVisibleItems] = useState(
@@ -56,8 +56,9 @@ const VirtualTable = ({
   }, []);
 
   useEffect(() => {
+    let options = DataGridOptions;
     let updatedTableOptions = {
-      ...tableOptions,
+      ...options,
       ...incomingTableOptions,
     };
 
@@ -119,6 +120,7 @@ const VirtualTable = ({
               columns={tableHeaders}
               itemHeight={itemHeight}
               onRowChange={onRowChange}
+              tableOptions={tableOptions}
             />
           );
       }
@@ -218,7 +220,9 @@ const VirtualTable = ({
           </Button>
         )}
       </Box>
-      <ErrorAlert scrollToRow={scrollToRow} data={data} />
+      {tableOptions.showErrorAlert && (
+        <ErrorAlert scrollToRow={scrollToRow} data={data} />
+      )}
       <Box
         ref={viewPortRef}
         style={{

@@ -27,9 +27,11 @@ const TableHeader = ({ columns }) => {
           minWidth: "100%",
         }}
       >
-        <Box style={fixedTableCellStyles.cellStyle(columns, 40)}>{`#`}</Box>
+        <Box
+          style={fixedTableHeaderCellStyles.cellStyle(columns, 40)}
+        >{`#`}</Box>
         {columns.map((header) => (
-          <Box style={tableCellStyles.cellStyle(columns)}>
+          <Box style={tableHeaderStyles.cellStyle(columns)}>
             {header.headerName}
           </Box>
         ))}
@@ -38,7 +40,7 @@ const TableHeader = ({ columns }) => {
   );
 };
 
-export const tableCellStyles = {
+export const tableHeaderStyles = {
   cellStyle: (columns, p = 100) => {
     return {
       display: "inline-flex",
@@ -56,13 +58,14 @@ export const tableCellStyles = {
   },
 };
 
-export const fixedTableCellStyles = {
+export const fixedTableHeaderCellStyles = {
   cellStyle: (columns, p = 100) => {
     return {
       display: "inline-flex",
       alignItems: "center",
       justifyContent: "center",
       width: `${p / columns.length}%`,
+      minWidth: "60px",
       textAlign: "left",
       padding: "16px",
       fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',

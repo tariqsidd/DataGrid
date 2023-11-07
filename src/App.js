@@ -3,20 +3,6 @@ import { tableHeader, Data, dataArray, dataSample } from "./Data";
 import { Button } from "@material-ui/core";
 import DataGrid from "./DataGrid/DataGrid";
 import VirtualTable from "./VirtualRender";
-import Ajv from "ajv";
-
-const ajv = new Ajv();
-const tableOptions = {
-  addRow: true,
-  deleteRow: true,
-  duplicateRow: true,
-  columnHeight: "40px",
-  editing: true,
-  showErrors: true,
-  showErrorAlert: true,
-  showExportButton: true,
-  showSubmitButton: true,
-};
 
 const cities = ["New York", "Los Angeles", "Chicago"];
 const userData = [];
@@ -64,6 +50,16 @@ for (let i = 0; i < 50000; i++) {
 }
 
 // Define the headers for the table
+const options = {
+  deleteRow: true,
+  editing: true,
+  showErrors: true,
+  showErrorAlert: true,
+  showExportButton: true,
+  showSubmitButton: true,
+  showProceedButton: true,
+  showSkipButton: true,
+};
 
 const App = () => {
   return (
@@ -73,6 +69,7 @@ const App = () => {
       itemHeight={50} // Adjust as needed
       incomingData={userData}
       tableHeaders={tableHeader}
+      incomingTableOptions={options}
     />
   );
 };

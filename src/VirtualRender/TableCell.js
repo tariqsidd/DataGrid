@@ -1,6 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import { Box, Tooltip } from "@material-ui/core";
-import { DataGridOptions } from "./constants";
 import GenericTextField from "./GenericTextField";
 import {
   clearOrdinates,
@@ -17,7 +16,7 @@ import {
 } from "./Reactive/subscriber";
 
 const TableCell = React.memo(
-  ({ children, width, column, onChangeCell, rowId, isError }) => {
+  ({ children, width, column, onChangeCell, rowId, isError, tableOptions }) => {
     // console.log("Table Cell rendered");
     const [validCell, setValidCell] = useState(true);
     const [editMode, setEditMode] = useState(false);
@@ -136,12 +135,14 @@ const TableCell = React.memo(
     };
 
     const onDoubleClick = () => {
-      if (DataGridOptions.editing) {
+      if (tableOptions.editing) {
         setEditMode(true);
       }
     };
 
     const onDragOver = useCallback((e) => {
+      console.log("Drag Over");
+      e.stopPropagation();
       e.preventDefault();
     }, []);
 
@@ -160,23 +161,26 @@ const TableCell = React.memo(
     };
 
     const BoxWithToolTip = () => {
-      if (!validCell) {
+      if (!validCell && tableOptions.showErrors) {
         return (
           <Tooltip
             arrow
             title={isError[column.headerFieldName]}
             placement="bottom"
-            style={{ color: "red" }}
           >
             <Box
               id={`cell-${rowId}-${column.headerFieldName}`}
               ref={cellRef}
-              draggable={true}
-              onDragOver={onDragOver}
+              draggable={tableOptions.editing}
+              onDragOver={tableOptions.editing ? onDragOver : () => {}}
               onDrop={() => {
                 onDrop(children, column.headerFieldName, rowId);
               }}
-              style={tableCellStyles.cellStyle(width, validCell)}
+              style={tableCellStyles.cellStyle(
+                width,
+                validCell,
+                tableOptions.showErrors
+              )}
               onDragStart={() => {
                 onDragStart(children, column, column.headerFieldName, rowId);
               }}
@@ -192,12 +196,16 @@ const TableCell = React.memo(
           <Box
             ref={cellRef}
             id={`cell-${rowId}-${column.headerFieldName}`}
-            draggable={true}
-            onDragOver={onDragOver}
+            draggable={tableOptions.editing}
+            onDragOver={tableOptions.editing ? onDragOver : () => {}}
             onDrop={() => {
               onDrop(children, column.headerFieldName, rowId);
             }}
-            style={tableCellStyles.cellStyle(width, validCell)}
+            style={tableCellStyles.cellStyle(
+              width,
+              validCell,
+              tableOptions.showErrors
+            )}
             onDragStart={() => {
               onDragStart(children, column, column.headerFieldName, rowId);
             }}
@@ -215,7 +223,7 @@ const TableCell = React.memo(
 );
 
 export const tableCellStyles = {
-  cellStyle: (width, validCell) => {
+  cellStyle: (width, validCell, showError) => {
     return {
       display: "inline-flex",
       alignItems: "center",
@@ -230,7 +238,7 @@ export const tableCellStyles = {
       fontSize: "0.875rem",
       lineHeight: 1.5,
       letterSpacing: "0.01071em",
-      ...(!validCell && { backgroundColor: "#ffe6e6" }),
+      ...(!validCell && showError && { backgroundColor: "#ffe6e6" }),
     };
   },
 };

@@ -1,6 +1,5 @@
 export const DataGridOptions = {
   deleteRow: true,
-  columnHeight: 40,
   editing: true,
   showErrors: true,
   showErrorAlert: true,
@@ -9,3 +8,5 @@ export const DataGridOptions = {
   showProceedButton: true,
   showSkipButton: true,
 };
+
+export const itemHeightConstant = 50;
