@@ -1,16 +1,11 @@
 import React, { useEffect, useState, memo, useCallback } from "react";
 import { Box, Checkbox, Tooltip } from "@material-ui/core";
-import isEqual from 'lodash.isequal'
+import isEqual from "lodash.isequal";
 import TableCell from "./TableCell";
-import {
-  subscribeToData,
-  setSubscribedData,
-  getSubscribedData,
-} from "../DataGrid/Reactive/subscriber";
+import { subscribeToData, setSubscribedData } from "./Reactive/subscriber";
 import { findIndexById, getColumnOrder } from "./utils";
-import { fixedTableCellStyles, tableCellStyles } from "./TableHeader";
+import { fixedTableCellStyles } from "./TableHeader";
 import Ajv from "ajv";
-import { error } from "ajv/dist/vocabularies/applicator/dependencies";
 
 const ajv = new Ajv();
 
@@ -150,4 +145,3 @@ const TableRow = ({ item, itemHeight, columns, onRowChange, index }) => {
 };
 
 export default memo(TableRow, isEqual);
-

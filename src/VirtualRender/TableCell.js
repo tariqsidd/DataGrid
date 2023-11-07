@@ -14,7 +14,7 @@ import {
   getSubscribedData,
   setSubscribedData,
   subscribeToData,
-} from "../DataGrid/Reactive/subscriber";
+} from "./Reactive/subscriber";
 
 const TableCell = React.memo(
   ({ children, width, column, onChangeCell, rowId, isError }) => {
@@ -49,6 +49,11 @@ const TableCell = React.memo(
     useEffect(() => {
       cellValue.current = children;
     }, [children]);
+
+    useEffect(() => {
+      let value = getSubscribedData("errorFocusCell");
+      getErrorFocusCell(value);
+    }, []);
 
     let extraProps = {
       ...(column?.headerOptions && { options: column.headerOptions }),

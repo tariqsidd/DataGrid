@@ -3,13 +3,13 @@ import { CSVLink } from "react-csv";
 import { Button } from "@material-ui/core";
 import GetAppIcon from "@material-ui/icons/GetApp";
 import DeleteIcon from "@material-ui/icons/Delete";
-import { commonStyles } from "../DataGrid/styles";
-import { errorIdentifier } from "../DataGrid/utils";
+import { commonStyles } from "./styles";
+import { errorIdentifier } from "./utils";
 import {
   subscribeToData,
   setSubscribedData,
   getSubscribedData,
-} from "../DataGrid/Reactive/subscriber";
+} from "./Reactive/subscriber";
 import { bulkDeleteFromDataAndHashMap } from "./utils";
 
 const GridButtons = ({

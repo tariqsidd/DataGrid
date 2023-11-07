@@ -1,13 +1,9 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
-import { Box, Paper, Button } from "@material-ui/core";
+import { Box, Button } from "@material-ui/core";
 import TableHeader from "./TableHeader";
 import TableRow from "./TableRow";
-import TableHeaderRow from "./TableHeaderRow";
-import {
-  setSubscribedData,
-  subscribeToData,
-  unsubscribe,
-} from "../DataGrid/Reactive/subscriber";
+import ErrorAlert from "./ErrorAlert";
+import { subscribeToData, unsubscribe } from "./Reactive/subscriber";
 import {
   bulkDeleteFromDataAndHashMap,
   convertToHashMap,
@@ -46,7 +42,6 @@ const VirtualTable = ({
     start: 0,
     end: numVisibleItems,
   });
-  // const cellErrors = useRef([]);
   const viewPortRef = useRef(null);
   const rowsToDelete = useRef([]);
   const scrollPositionRef = useRef(0);
@@ -161,35 +156,7 @@ const VirtualTable = ({
   };
 
   return (
-    // <Box
-    //   ref={viewPortRef}
-    //   style={{
-    //     position: "relative",
-    //     width: "100%",
-    //     height: "100vh",
-    //     border: "1px solid rgba(224, 224, 224, 1)",
-    //     overflowY: "scroll",
-    //     fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-    //   }}
-    //   onScroll={scrollPos}
-    // >
-    //   <TableHeader
-    //     columns={tableHeaders}
-    //     scrollToRow={scrollToRow}
-    //     data={data}
-    //   />
-    //   <Box
-    //     style={{
-    //       position: "absolute",
-    //       width: "100%",
-    //       ...containerStyle,
-    //     }}
-    //   >
-    //     {renderRows()}
-    //   </Box>
-    // </Box>
     <Box
-      // component={Paper}
       style={{
         height: "calc(100vh - 64px)",
         // overflow: "hidden"
@@ -207,11 +174,7 @@ const VirtualTable = ({
       >
         Delete
       </Button>
-      <TableHeader
-        columns={tableHeaders}
-        scrollToRow={scrollToRow}
-        data={data}
-      />
+      <ErrorAlert scrollToRow={scrollToRow} data={data} />
       <Box
         ref={viewPortRef}
         style={{
@@ -236,11 +199,7 @@ const VirtualTable = ({
         // }}
         onScroll={scrollPos}
       >
-        <TableHeaderRow
-          columns={tableHeaders}
-          scrollToRow={scrollToRow}
-          data={data}
-        />
+        <TableHeader columns={tableHeaders} />
         <Box
           style={{
             position: "absolute",

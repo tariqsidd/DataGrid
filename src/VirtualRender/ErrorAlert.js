@@ -1,17 +1,12 @@
-import React, { useEffect, useRef, useState, memo } from "react";
-import { IconButton, Typography } from "@material-ui/core";
+import React, { useEffect, useState } from "react";
+import { IconButton, Typography, Box } from "@material-ui/core";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
 import CancelIcon from "@material-ui/icons/Cancel";
 import CheckCircleIcon from "@material-ui/icons/CheckCircle";
-import {
-  subscribeToData,
-  setSubscribedData,
-  getSubscribedData,
-} from "../DataGrid/Reactive/subscriber";
-import { commonStyles } from "../DataGrid/styles";
-import { findIndexById } from "./utils";
-import { errorIdentifier } from "../DataGrid/utils";
+import { setSubscribedData, getSubscribedData } from "./Reactive/subscriber";
+import { commonStyles } from "./styles";
+import { findIndexById, errorIdentifier } from "./utils";
 
 const ErrorAlert = ({ scrollToRow, data = [] }) => {
   console.log("Error Alert Rendered");
@@ -28,36 +23,6 @@ const ErrorAlert = ({ scrollToRow, data = [] }) => {
 
   useEffect(() => {
     const errors = errorIdentifier(data);
-    if (errors.length > 0) {
-      if (errors[0]) {
-        setTimeout(() => {
-          setSubscribedData("errorFocusCell", {
-            current: {
-              rowIndex: errors[errors.length - 1].rowIndex,
-              fieldName: errors[errors.length - 1].cellName,
-              rowId: errors[errors.length - 1].indexId,
-            },
-            next: {
-              rowIndex: errors[0].rowIndex,
-              fieldName: errors[0].cellName,
-              rowId: errors[0].indexId,
-            },
-          });
-          setCurrentErrorIndex(0);
-        }, 50);
-      }
-    } else {
-      setSubscribedData("errorFocusCell", null);
-    }
-    setErrorCells(errors);
-  }, [data]);
-
-  useEffect(() => {
-    subscribeToData("gridData", getGridData);
-  }, []);
-
-  const getGridData = (value) => {
-    const errors = errorIdentifier(value);
     if (errors.length > 0) {
       let focusCell = getSubscribedData("errorFocusCell");
       if (focusCell === null) {
@@ -81,7 +46,38 @@ const ErrorAlert = ({ scrollToRow, data = [] }) => {
       setSubscribedData("errorFocusCell", null);
     }
     setErrorCells(errors);
-  };
+  }, [data]);
+
+  // useEffect(() => {
+  //   subscribeToData("gridData", getGridData);
+  // }, []);
+
+  // const getGridData = (value) => {
+  //   const errors = errorIdentifier(value);
+  //   if (errors.length > 0) {
+  //     let focusCell = getSubscribedData("errorFocusCell");
+  //     if (focusCell === null) {
+  //       setTimeout(() => {
+  //         setSubscribedData("errorFocusCell", {
+  //           current: {
+  //             rowIndex: errors[errors.length - 1].rowIndex,
+  //             fieldName: errors[errors.length - 1].cellName,
+  //             rowId: errors[errors.length - 1].indexId,
+  //           },
+  //           next: {
+  //             rowIndex: errors[0].rowIndex,
+  //             fieldName: errors[0].cellName,
+  //             rowId: errors[0].indexId,
+  //           },
+  //         });
+  //         setCurrentErrorIndex(0);
+  //       }, 50);
+  //     }
+  //   } else {
+  //     setSubscribedData("errorFocusCell", null);
+  //   }
+  //   setErrorCells(errors);
+  // };
 
   const focusOnErrorCell = (currentErrorIndex, nextErrorIndex) => {
     if (errorCells[currentErrorIndex] && errorCells[nextErrorIndex]) {
@@ -128,58 +124,64 @@ const ErrorAlert = ({ scrollToRow, data = [] }) => {
 
   return (
     <>
-      {errorCells.length > 0 && (
-        <div className={classes.errorAlert}>
-          {errorCells.length > 0 && (
+      <Box
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          position: "sticky",
+          top: 0,
+          zIndex: 1,
+        }}
+      >
+        {errorCells.length > 0 && (
+          <div className={classes.errorAlert}>
+            {errorCells.length > 0 && (
+              <div className={classes.errorTitle}>
+                <CancelIcon
+                  style={{
+                    color: "#F04438",
+                  }}
+                />
+                <Typography
+                  style={{ paddingLeft: "8px" }}
+                >{`${errorCells.length} Error(s) found !`}</Typography>
+              </div>
+            )}
+            <div>
+              <IconButton
+                onClick={handlePrevError}
+                aria-label="previous error"
+                style={{ padding: "4px" }}
+                // disabled={currentErrorIndex <= 0}
+              >
+                <ArrowBackIosIcon />
+              </IconButton>
+              <IconButton
+                onClick={handleNextError}
+                aria-label="next error"
+                style={{ padding: "4px" }}
+                // disabled={currentErrorIndex === errorCells.length - 1}
+              >
+                <ArrowForwardIosIcon />
+              </IconButton>
+            </div>
+          </div>
+        )}
+        {errorCells.length === 0 && (
+          <div className={classes.errorFreeAlert}>
             <div className={classes.errorTitle}>
-              <CancelIcon
+              <CheckCircleIcon
                 style={{
-                  // paddingRight: "8px",
-                  // paddingLeft: "8px",
-                  color: "#F04438",
+                  color: "#12B76A",
                 }}
               />
               <Typography
                 style={{ paddingLeft: "8px" }}
-              >{`${errorCells.length} Error(s) found !`}</Typography>
+              >{`No Error(s) found !`}</Typography>
             </div>
-          )}
-          <div>
-            <IconButton
-              onClick={handlePrevError}
-              aria-label="previous error"
-              style={{ padding: "4px" }}
-              // disabled={currentErrorIndex <= 0}
-            >
-              <ArrowBackIosIcon />
-            </IconButton>
-            <IconButton
-              onClick={handleNextError}
-              aria-label="next error"
-              style={{ padding: "4px" }}
-              // disabled={currentErrorIndex === errorCells.length - 1}
-            >
-              <ArrowForwardIosIcon />
-            </IconButton>
           </div>
-        </div>
-      )}
-      {errorCells.length === 0 && (
-        <div className={classes.errorFreeAlert}>
-          <div className={classes.errorTitle}>
-            <CheckCircleIcon
-              style={{
-                // paddingRight: "8px",
-                // paddingLeft: "8px",
-                color: "#12B76A",
-              }}
-            />
-            <Typography
-              style={{ paddingLeft: "8px" }}
-            >{`No Error(s) found !`}</Typography>
-          </div>
-        </div>
-      )}
+        )}
+      </Box>
     </>
   );
 };

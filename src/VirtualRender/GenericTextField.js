@@ -5,7 +5,7 @@ import {
 } from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
 import { TextField, MenuItem } from "@material-ui/core";
-import { commonStyles } from "../DataGrid/styles";
+import { commonStyles } from "./styles";
 import { getColumnOrder } from "./utils";
 import Ajv from "ajv";
 
@@ -154,9 +154,6 @@ const GenericTextField = ({
               setDate("");
               onChange("", true, error);
             }
-          }}
-          onClose={() => {
-            // onChange(inputRef.current.value, isValid);
           }}
           inputProps={{ readOnly: true }}
         />
