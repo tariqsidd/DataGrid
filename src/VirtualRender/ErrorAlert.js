@@ -48,37 +48,6 @@ const ErrorAlert = ({ scrollToRow, data = [] }) => {
     setErrorCells(errors);
   }, [data]);
 
-  // useEffect(() => {
-  //   subscribeToData("gridData", getGridData);
-  // }, []);
-
-  // const getGridData = (value) => {
-  //   const errors = errorIdentifier(value);
-  //   if (errors.length > 0) {
-  //     let focusCell = getSubscribedData("errorFocusCell");
-  //     if (focusCell === null) {
-  //       setTimeout(() => {
-  //         setSubscribedData("errorFocusCell", {
-  //           current: {
-  //             rowIndex: errors[errors.length - 1].rowIndex,
-  //             fieldName: errors[errors.length - 1].cellName,
-  //             rowId: errors[errors.length - 1].indexId,
-  //           },
-  //           next: {
-  //             rowIndex: errors[0].rowIndex,
-  //             fieldName: errors[0].cellName,
-  //             rowId: errors[0].indexId,
-  //           },
-  //         });
-  //         setCurrentErrorIndex(0);
-  //       }, 50);
-  //     }
-  //   } else {
-  //     setSubscribedData("errorFocusCell", null);
-  //   }
-  //   setErrorCells(errors);
-  // };
-
   const focusOnErrorCell = (currentErrorIndex, nextErrorIndex) => {
     if (errorCells[currentErrorIndex] && errorCells[nextErrorIndex]) {
       setSubscribedData("errorFocusCell", {

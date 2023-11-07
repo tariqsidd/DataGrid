@@ -63,7 +63,6 @@ const VirtualTable = ({
     return () => {
       unsubscribe("willRowMutate");
       unsubscribe("rowsToDelete");
-      unsubscribe("gridData");
       unsubscribe("errorFocusCell");
       unsubscribe("errorFocusCellRef");
     };

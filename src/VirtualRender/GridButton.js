@@ -52,7 +52,6 @@ const GridButtons = ({
 
   useEffect(() => {
     subscribeToData("rowsToDelete", getRowsToDelete);
-    // subscribeToData("gridData", getGridData);
   }, []);
 
   const getRowsToDelete = (value) => {
