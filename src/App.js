@@ -27,7 +27,7 @@ userData.push({
     .substring(2, 6 + 2),
 });
 
-for (let i = 0; i < 5; i++) {
+for (let i = 0; i < 10; i++) {
   userData.push({
     name: `Name ${i}`,
     surname: `Surname ${i}`,
@@ -63,18 +63,20 @@ const options = {
 
 const App = () => {
   return (
-    <VirtualTable
-      buffer={5}
-      numberOfRows={50}
-      itemHeight={50} // Adjust as needed
-      incomingData={userData}
-      tableHeaders={tableHeader}
-      incomingTableOptions={options}
-      callExportCSV={false}
-      onDataChange={(data) => {
-        console.log(data);
-      }}
-    />
+    <div style={{ maxHeight: "500px" }}>
+      <VirtualTable
+        buffer={5}
+        numberOfRows={50}
+        itemHeight={50} // Adjust as needed
+        incomingData={userData}
+        tableHeaders={tableHeader}
+        incomingTableOptions={options}
+        callExportCSV={false}
+        onDataChange={(data) => {
+          console.log(data);
+        }}
+      />
+    </div>
   );
 };
 
