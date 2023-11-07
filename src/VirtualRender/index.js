@@ -1,6 +1,7 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import { Box, Button } from "@material-ui/core";
 import DeleteIcon from "@material-ui/icons/Delete";
+import GetAppIcon from "@material-ui/icons/GetApp";
 import TableHeader from "./TableHeader";
 import TableRow from "./TableRow";
 import ErrorAlert from "./ErrorAlert";
@@ -14,6 +15,7 @@ import {
 } from "./utils";
 import { commonStyles } from "./styles";
 import { DataGridOptions, itemHeightConstant } from "./constants";
+import { CSVLink } from "react-csv";
 
 const VirtualTable = ({
   itemHeight = itemHeightConstant,
@@ -25,6 +27,7 @@ const VirtualTable = ({
   onSubmit = () => {},
   onProceedAnyway = () => {},
   onSkip = () => {},
+  callExportCSV = false,
 }) => {
   const [tableOptions, setTableOptions] = useState({});
   const viewportHeight = numberOfRows * itemHeight;
@@ -41,6 +44,7 @@ const VirtualTable = ({
   const scrollPositionRef = useRef(0);
   const containerStyle = { height: data.length * itemHeight };
   const [error, setError] = useState(false);
+  const csvLinkRef = useRef();
 
   useEffect(() => {
     setData(incomingData);
@@ -159,6 +163,23 @@ const VirtualTable = ({
     }
   }, [data]);
 
+  const prepareCSVData = () => {
+    const csvData = [];
+    const headerRow = tableHeaders.map((header) => header.headerName);
+    csvData.push(headerRow);
+    data.forEach((row) => {
+      const rowData = tableHeaders.map((header) => row[header.headerFieldName]);
+      csvData.push(rowData);
+    });
+    return csvData;
+  };
+
+  useEffect(() => {
+    if (callExportCSV && csvLinkRef.current) {
+      csvLinkRef.current.link.click();
+    }
+  }, [callExportCSV]);
+
   const classes = commonStyles();
   return (
     <Box
@@ -219,6 +240,27 @@ const VirtualTable = ({
             Delete
           </Button>
         )}
+        {tableOptions.showExportButton && (
+          <Button
+            variant="contained"
+            color="primary"
+            className={classes.button}
+            onClick={() => {
+              if (csvLinkRef.current) {
+                csvLinkRef.current.link.click();
+              }
+            }}
+            startIcon={<GetAppIcon />}
+          >
+            Export CSV
+          </Button>
+        )}
+
+        <CSVLink
+          data={prepareCSVData()}
+          filename="table-data.csv"
+          ref={csvLinkRef}
+        />
       </Box>
       {tableOptions.showErrorAlert && (
         <ErrorAlert scrollToRow={scrollToRow} data={data} />
