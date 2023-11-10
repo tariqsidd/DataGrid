@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import { tableHeader, Data, dataArray, dataSample } from "./Data";
-import { Button } from "@material-ui/core";
+import React, {useState} from "react";
+import {tableHeader, Data, dataArray, dataSample} from "./Data";
+import {Button} from "@material-ui/core";
 import DataGrid from "./DataGrid/DataGrid";
 import VirtualTable from "./VirtualRender";
 
@@ -27,7 +27,7 @@ userData.push({
     .substring(2, 6 + 2),
 });
 
-for (let i = 0; i < 10; i++) {
+for (let i = 0; i < 4000; i++) {
   userData.push({
     name: `Name ${i}`,
     surname: `Surname ${i}`,
@@ -63,20 +63,19 @@ const options = {
 
 const App = () => {
   return (
-    <div style={{ maxHeight: "500px" }}>
-      <VirtualTable
-        buffer={5}
-        numberOfRows={50}
-        itemHeight={50} // Adjust as needed
-        incomingData={userData}
-        tableHeaders={tableHeader}
-        incomingTableOptions={options}
-        callExportCSV={false}
-        onDataChange={(data) => {
-          console.log(data);
-        }}
-      />
-    </div>
+    <VirtualTable
+      containerHeight={400}
+      buffer={30}
+      numberOfRows={50}
+      itemHeight={50} // Adjust as needed
+      incomingData={userData}
+      tableHeaders={tableHeader}
+      incomingTableOptions={options}
+      callExportCSV={false}
+      onDataChange={(data) => {
+        console.log(data);
+      }}
+    />
   );
 };
 
