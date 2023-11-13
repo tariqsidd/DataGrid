@@ -178,6 +178,11 @@ const VirtualTable = ({
     return csvData;
   };
 
+  const cleanData = (data) => {
+    const result = data.map(({ selected, top, ...rest }) => rest);
+    return result;
+  };
+
   useEffect(() => {
     if (callExportCSV && csvLinkRef.current) {
       csvLinkRef.current.link.click();
@@ -185,7 +190,7 @@ const VirtualTable = ({
   }, [callExportCSV]);
 
   useEffect(() => {
-    onDataChange(data);
+    onDataChange(cleanData(data));
   }, [data]);
 
   const classes = commonStyles();
