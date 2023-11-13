@@ -1,6 +1,6 @@
-import React, {useState} from "react";
-import {tableHeader, Data, dataArray, dataSample} from "./Data";
-import {Button} from "@material-ui/core";
+import React, { useState } from "react";
+import { tableHeader, Data, dataArray, dataSample } from "./Data";
+import { Button } from "@material-ui/core";
 import DataGrid from "./DataGrid/DataGrid";
 import VirtualTable from "./VirtualRender";
 

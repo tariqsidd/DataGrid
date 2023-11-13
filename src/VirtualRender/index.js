@@ -30,7 +30,7 @@ const VirtualTable = ({
   onSkip = () => {},
   callExportCSV = false,
   onDataChange,
-  containerHeight=null
+  containerHeight = null,
 }) => {
   const [tableOptions, setTableOptions] = useState({});
   const viewportHeight = numberOfRows * itemHeight;
@@ -68,7 +68,6 @@ const VirtualTable = ({
       ...options,
       ...incomingTableOptions,
     };
-
     setTableOptions({
       ...updatedTableOptions,
     });
@@ -93,7 +92,7 @@ const VirtualTable = ({
     data.length,
   ]);
 
-  const debounceScrollPos  = debounce(scrollPos, 250)
+  const debounceScrollPos = debounce(scrollPos, 250);
 
   const scrollToRow = (rowIndex) => {
     const scrollPosition = rowIndex * itemHeight - itemHeight;
@@ -142,7 +141,7 @@ const VirtualTable = ({
       viewPortRef.current.scrollTop = scrollPositionRef.current;
     }
     return () => {
-      scrollPositionRef.current = viewPortRef.current.scrollTop;
+      scrollPositionRef.current = viewPortRef.current?.scrollTop;
     };
   }, []);
 
@@ -195,6 +194,7 @@ const VirtualTable = ({
       <Box className={classes.buttonContainer}>
         {tableOptions.showSkipButton && error && (
           <Button
+            data-testid="skip-button"
             variant="outlined"
             color="primary"
             className={classes.button}
@@ -205,6 +205,7 @@ const VirtualTable = ({
         )}
         {tableOptions.showSubmitButton && (
           <Button
+            data-testid="submit-button"
             variant="contained"
             color="primary"
             className={classes.button}
@@ -216,6 +217,7 @@ const VirtualTable = ({
         )}
         {tableOptions.showProceedButton && (
           <Button
+            data-testid="proceed-button"
             variant="contained"
             color="primary"
             className={classes.button}
@@ -228,6 +230,7 @@ const VirtualTable = ({
       <Box className={classes.buttonContainer}>
         {rowsToDelete.current.length > 0 && (
           <Button
+            data-testid="delete-button"
             variant="contained"
             className={classes.deleteButton}
             startIcon={<DeleteIcon />}
@@ -245,6 +248,7 @@ const VirtualTable = ({
         )}
         {tableOptions.showExportButton && (
           <Button
+            data-testid="export-button"
             variant="contained"
             color="primary"
             className={classes.button}
@@ -270,7 +274,12 @@ const VirtualTable = ({
       )}
       <Box
         ref={viewPortRef}
-        style={scrollBoxStyles.scrollContainer(itemHeight, data.length, containerHeight, numVisibleItems)}
+        style={scrollBoxStyles.scrollContainer(
+          itemHeight,
+          data.length,
+          containerHeight,
+          numVisibleItems
+        )}
         onScroll={debounceScrollPos}
       >
         <TableHeader columns={tableHeaders} />
@@ -293,8 +302,11 @@ const scrollBoxStyles = {
     height: "calc(100vh - 64px)",
   },
   scrollContainer: (itemHeight, length, containerHeight) => {
-    let dynamicHeight = Math.min(length * itemHeight, containerHeight || (window.innerHeight - itemHeight * 3 - 6));
-    let overFlow = length < (window.innerHeight/itemHeight) ? 'hidden' : 'auto';
+    let dynamicHeight = Math.min(
+      length * itemHeight,
+      containerHeight || window.innerHeight - itemHeight * 3 - 6
+    );
+    let overFlow = length < window.innerHeight / itemHeight ? "hidden" : "auto";
     return {
       position: "relative",
       width: "100%",
@@ -306,6 +318,5 @@ const scrollBoxStyles = {
     };
   },
 };
-
 
 export default VirtualTable;

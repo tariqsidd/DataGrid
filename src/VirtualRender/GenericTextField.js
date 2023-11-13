@@ -108,6 +108,7 @@ const GenericTextField = ({
     return (
       <TextField
         select
+        data-testid="selectField"
         placeholder={label}
         margin="dense"
         variant="outlined"
@@ -135,6 +136,7 @@ const GenericTextField = ({
     return (
       <MuiPickersUtilsProvider utils={DateFnsUtils}>
         <KeyboardDatePicker
+          data-testid="dateField"
           className={classes.dateField}
           margin="dense"
           error={!isValid}
