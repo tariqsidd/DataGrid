@@ -27,7 +27,7 @@ userData.push({
     .substring(2, 6 + 2),
 });
 
-for (let i = 0; i < 4000; i++) {
+for (let i = 0; i < 100; i++) {
   userData.push({
     name: `Name ${i}`,
     surname: `Surname ${i}`,
@@ -64,7 +64,7 @@ const options = {
 const App = () => {
   return (
     <VirtualTable
-      containerHeight={400}
+      // containerHeight={400}
       buffer={30}
       numberOfRows={50}
       itemHeight={50} // Adjust as needed

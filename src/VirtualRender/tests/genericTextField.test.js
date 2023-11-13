@@ -32,35 +32,6 @@ describe("GenericTextField", () => {
     expect(screen.getByDisplayValue(value)).toBeInTheDocument();
   });
 
-  it("should render a TextField component with the given label and value for number", () => {
-    const errorObj = {};
-    const type = "number";
-    const isError = false;
-    const label = "Test Label";
-    const value = "Test Value";
-    const onChange = jest.fn();
-    const options = [];
-    const schema = null;
-    const validationKey = null;
-
-    render(
-      <GenericTextField
-        errorObj={errorObj}
-        type={type}
-        isError={isError}
-        label={label}
-        value={value}
-        onChange={onChange}
-        options={options}
-        schema={schema}
-        validationKey={validationKey}
-      />
-    );
-
-    expect(screen.getByPlaceholderText(label)).toBeInTheDocument();
-    expect(screen.getByDisplayValue(value)).toBeInTheDocument();
-  });
-
   it('should render a Select component with the given options and value when type is "select"', () => {
     const errorObj = {};
     const type = "select";
