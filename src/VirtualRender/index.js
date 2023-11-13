@@ -16,6 +16,7 @@ import {
 import { commonStyles } from "./styles";
 import { DataGridOptions, itemHeightConstant } from "./constants";
 import { CSVLink } from "react-csv";
+import debounce from "lodash.debounce";
 
 const VirtualTable = ({
   itemHeight = itemHeightConstant,
@@ -29,6 +30,7 @@ const VirtualTable = ({
   onSkip = () => {},
   callExportCSV = false,
   onDataChange,
+  containerHeight=null
 }) => {
   const [tableOptions, setTableOptions] = useState({});
   const viewportHeight = numberOfRows * itemHeight;
@@ -90,6 +92,8 @@ const VirtualTable = ({
     viewState.end,
     data.length,
   ]);
+
+  const debounceScrollPos  = debounce(scrollPos, 250)
 
   const scrollToRow = (rowIndex) => {
     const scrollPosition = rowIndex * itemHeight - itemHeight;
@@ -266,8 +270,8 @@ const VirtualTable = ({
       )}
       <Box
         ref={viewPortRef}
-        style={scrollBoxStyles.scrollContainer(itemHeight, data.length)}
-        onScroll={scrollPos}
+        style={scrollBoxStyles.scrollContainer(itemHeight, data.length, containerHeight, numVisibleItems)}
+        onScroll={debounceScrollPos}
       >
         <TableHeader columns={tableHeaders} />
         <Box
@@ -288,17 +292,20 @@ const scrollBoxStyles = {
   parentContainer: {
     height: "calc(100vh - 64px)",
   },
-  scrollContainer: (itemHeight, length) => {
+  scrollContainer: (itemHeight, length, containerHeight) => {
+    let dynamicHeight = Math.min(length * itemHeight, containerHeight || (window.innerHeight - itemHeight * 3 - 6));
+    let overFlow = length < (window.innerHeight/itemHeight) ? 'hidden' : 'auto';
     return {
       position: "relative",
       width: "100%",
       height: `calc(100vh - ${itemHeight * 3 + 6}px)`,
+      maxHeight: `${dynamicHeight}px`,
       border: "1px solid rgba(224, 224, 224, 1)",
-      overflowY: "auto",
+      overflowY: overFlow,
       fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-      maxHeight: `${itemHeight * length + itemHeight + 6}px`,
     };
   },
 };
+
 
 export default VirtualTable;
