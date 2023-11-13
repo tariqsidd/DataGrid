@@ -19,9 +19,9 @@ import { CSVLink } from "react-csv";
 
 const VirtualTable = ({
   itemHeight = itemHeightConstant,
-  incomingData,
+  incomingData = [],
   incomingTableOptions,
-  tableHeaders,
+  tableHeaders = [],
   buffer = 5,
   numberOfRows = 6,
   onSubmit = () => {},
