@@ -3,7 +3,9 @@ import {tableHeader, Data, dataArray, dataSample} from "./Data";
 import {Button} from "@material-ui/core";
 import DataGrid from "./DataGrid/DataGrid";
 import VirtualTable from "./VirtualRender";
-
+import MaterialTable from "./Matrial-Table";
+import ClearIcon from '@material-ui/icons/Clear';
+import DeleteIcon from '@material-ui/icons/Delete';
 const cities = ["New York", "Los Angeles", "Chicago"];
 const userData = [];
 
@@ -61,21 +63,48 @@ const options = {
   showSkipButton: true,
 };
 
+const departments = [
+  { label: "Engineering", value: "engineering" },
+  { label: "Marketing", value: "marketing" },
+  { label: "Sales", value: "sales" },
+  { label: "Human Resources", value: "hr" },
+];
+
+const columns = [
+  { header: 'Name', field: 'name', filterType: 'textField' },
+  { header: 'Age', field: 'age', filterType: 'numberField' },
+  { header: 'Department', field: 'department', filterType: 'select', options: departments },
+  { header: 'Joining Date', field: 'joiningDate', filterType: 'dateSelect' }
+];
+
+const initialRows = [
+  { id: 1, name: 'John Doe', age: 30, department: 'engineering', joiningDate: '2020-01-15' },
+  { id: 2, name: 'Jane Smith', age: 28, department: 'marketing', joiningDate: '2019-07-23' },
+  { id: 3, name: 'Alice Johnson', age: 35, department: 'sales', joiningDate: '2018-03-11' },
+
+];
+
 const App = () => {
   return (
-    <VirtualTable
-      containerHeight={400}
-      buffer={30}
-      numberOfRows={50}
-      itemHeight={50} // Adjust as needed
-      incomingData={userData}
-      tableHeaders={tableHeader}
-      incomingTableOptions={options}
-      callExportCSV={false}
-      onDataChange={(data) => {
-        console.log(data);
-      }}
-    />
+    <MaterialTable
+      data={initialRows}
+      columns={columns}
+      options={{
+      selection: true,
+      selectionProps: rowData => ({
+        disabled: rowData.name === 'Alice Johnson'
+      }),
+      selectionActions:[
+        {
+          icon: <ClearIcon/>,
+          action: ()=>{}
+        },
+        {
+          icon: <DeleteIcon/>,
+          action: ()=>{}
+        }
+      ]
+    }}/>
   );
 };
 
