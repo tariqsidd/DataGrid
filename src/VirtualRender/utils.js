@@ -4,7 +4,13 @@ let DragEndCellOrdinate = null;
 let columnOrder = [];
 
 export const setColumnOrder = (tableHeaders) => {
-  columnOrder = tableHeaders.map((item) => item.headerFieldName);
+  const validHeaders = tableHeaders
+    ? tableHeaders.filter(
+        (item) =>
+          item.headerFieldName !== undefined && item.headerFieldName !== null
+      )
+    : [];
+  columnOrder = validHeaders.map((item) => item.headerFieldName.toString());
 };
 
 export const getColumnOrder = () => {
@@ -37,18 +43,17 @@ export const getEndCellOrdinate = () => {
 };
 
 export const clearOrdinates = () => {
-  console.log("Clear ordinates called");
   DragStartCellOrdinate = null;
   DragEndCellOrdinate = null;
 };
 
-export const convertToHasMap = (data) => {
-  const indexMap = new Map();
-  data.forEach((item, index) => {
-    indexMap.set(item.indexId, index);
-  });
-  return indexMap;
-};
+// export const convertToHasMap = (data) => {
+//   const indexMap = new Map();
+//   data.forEach((item, index) => {
+//     indexMap.set(item.indexId, index);
+//   });
+//   return indexMap;
+// };
 
 export const findIndexById = (indexId) => {
   return indexMap.has(indexId) ? indexMap.get(indexId) : -1;
@@ -63,7 +68,9 @@ export const convertToHashMap = (data, chunkSize = 500) => {
       i++
     ) {
       const item = data[i];
-      indexMap.set(item.indexId, i);
+      if (item.indexId) {
+        indexMap.set(item.indexId, i);
+      }
     }
   };
 
@@ -74,9 +81,8 @@ export const convertToHashMap = (data, chunkSize = 500) => {
 };
 
 export const bulkDeleteFromDataAndHashMap = (data, idsToDelete) => {
-  console.log("idsToDelete", idsToDelete);
   // Filter out the items from the data array
-  data = data.filter((item) => !idsToDelete.includes(item.indexId));
+  data = data.filter((item) => !idsToDelete?.includes(item.indexId));
   // Clear the existing hashmap
   indexMap.clear();
   // Rebuild the hashmap with the updated data

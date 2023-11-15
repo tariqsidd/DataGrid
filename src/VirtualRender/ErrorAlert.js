@@ -8,7 +8,7 @@ import { setSubscribedData, getSubscribedData } from "./Reactive/subscriber";
 import { commonStyles } from "./styles";
 import { findIndexById, errorIdentifier } from "./utils";
 
-const ErrorAlert = ({ scrollToRow, data = [] }) => {
+const ErrorAlert = ({ scrollToRow = () => {}, data = [] }) => {
   // console.log("Error Alert Rendered");
 
   const [currentErrorIndex, setCurrentErrorIndex] = useState(0);
@@ -99,6 +99,7 @@ const ErrorAlert = ({ scrollToRow, data = [] }) => {
             {errorCells.length > 0 && (
               <div className={classes.errorTitle}>
                 <CancelIcon
+                  data-testid="cancel-icon"
                   style={{
                     color: "#F04438",
                   }}
@@ -110,20 +111,22 @@ const ErrorAlert = ({ scrollToRow, data = [] }) => {
             )}
             <div>
               <IconButton
+                data-testid="prev-button"
                 onClick={handlePrevError}
                 aria-label="previous error"
                 style={{ padding: "4px" }}
                 // disabled={currentErrorIndex <= 0}
               >
-                <ArrowBackIosIcon />
+                <ArrowBackIosIcon data-testid="arrow-back-icon" />
               </IconButton>
               <IconButton
+                data-testid="next-button"
                 onClick={handleNextError}
                 aria-label="next error"
                 style={{ padding: "4px" }}
                 // disabled={currentErrorIndex === errorCells.length - 1}
               >
-                <ArrowForwardIosIcon />
+                <ArrowForwardIosIcon data-testid="arrow-forward-icon" />
               </IconButton>
             </div>
           </div>
@@ -132,6 +135,7 @@ const ErrorAlert = ({ scrollToRow, data = [] }) => {
           <div className={classes.errorFreeAlert}>
             <div className={classes.errorTitle}>
               <CheckCircleIcon
+                data-testid="check-circle-icon"
                 style={{
                   color: "#12B76A",
                 }}

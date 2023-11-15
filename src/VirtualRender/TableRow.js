@@ -110,6 +110,7 @@ const TableRow = ({ item, itemHeight, columns, onRowChange, tableOptions }) => {
             <Checkbox
               color="default"
               checked={selected}
+              data-testid={`checkbox-${item.indexId}`}
               onChange={() => {
                 setSubscribedData("rowsToDelete", rowData.indexId);
                 mutateRow(!selected, "selected", rowData);
