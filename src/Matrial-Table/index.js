@@ -78,7 +78,7 @@ const Filter = ({type, value, onChange, options, label, handleDateChange}) => {
   return renderField();
 };
 
-const MaterialTable = ({options, columns, data, page=1, setPage=()=>{}, isNextPage=true}) => {
+const _MaterialTable = ({options, columns, data, page=1, setPage=()=>{}, isNextPage=true}) => {
   // Example data
   const [rows, setRows] = useState(data);
   const [selectedRows, setSelectedRows] = useState({});
@@ -255,7 +255,7 @@ const MaterialTable = ({options, columns, data, page=1, setPage=()=>{}, isNextPa
   );
 };
 
-export default MaterialTable;
+export default _MaterialTable;
 
 const useStyles = makeStyles((theme) => ({
   table: {

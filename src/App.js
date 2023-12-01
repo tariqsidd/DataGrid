@@ -1,81 +1,341 @@
-import React, { useState } from "react";
-import { tableHeader, Data, dataArray, dataSample } from "./Data";
-import { Button } from "@material-ui/core";
-import DataGrid from "./DataGrid/DataGrid";
-import VirtualTable from "./VirtualRender";
+import React from "react";
+import DeleteIcon from '@mui/icons-material/Delete';
+import GetAppRoundedIcon from '@mui/icons-material/GetAppRounded';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import _MaterialTable from './Table';
+import {Chip, IconButton} from "@mui/material";
 
-const cities = ["New York", "Los Angeles", "Chicago"];
-const userData = [];
+const cities = [
+  {label: "New York", value: "New York"},
+  {label: "Los Angeles", value: "Los Angeles"},
+  {label: "Chicago", value: "Chicago"},
+  {label: "San Francisco", value: "San Francisco"},
+];
 
-userData.push({
-  name: `Name`,
-  surname: `Surname `,
-  date: new Date(2023, 9, (2 % 31) + 1).toLocaleDateString(),
-  city: "Lordv",
-  phoneNo: 1000000,
-  country: `Country`,
-  country1: `Country1`,
-  country2: `Country2`,
-  country3: `Country3`,
-  country4: `Country4`,
-  error: {
-    name: "Error in name",
-    surname: "Error in surname",
+const columns = [
+  {
+    field: "name",
+    header: "Name",
+    type: "text",
+    filterType: "textField",
+    width: "400px",
   },
-  indexId: Math.random()
-    .toString(36)
-    .substring(2, 6 + 2),
-});
+  {
+    field: "age",
+    header: "Age",
+    type: "number",
+    filterType: "numberField",
+  },
+  {field: "email", header: "Email"},
+  {
+    field: "city",
+    header: "City",
+    filterType: "select",
+    options: cities,
+    render: (rowData) => (
+      <Chip
+        label={rowData.city}
+        variant="outlined"
+        style={{
+          color: "#EB6262",
+          backgroundColor: "#eb626238",
+          fontWeight: "500",
+        }}
+      />
+    ),
+    headerAlign: "left",
+    cellAlign: "center",
+  },
+  {field: "date", header: "Date", filterType: "dateSelect"},
+  {
+    header: "Actions",
+    render: (rowData) => (
+      <IconButton onClick={() => {
+      }}>
+        <VisibilityIcon
+          style={{
+            color: "#ff9800",
+          }}
+        />
+      </IconButton>
+    ),
+    width: "100px",
+    align: "left",
+  },
+  // {
+  //   field: "name",
+  //   header: "Name",
+  //   type: "text",
+  //   filterType: "textField",
+  // },
+  // {
+  //   field: "age",
+  //   header: "Age",
+  //   type: "number",
+  //   filterType: "numberField",
+  // },
+  // { field: "email", header: "Email" },
+  // { field: "city", header: "City", filterType: "select", options: cities },
+  // { field: "date", header: "Date", filterType: "dateSelect" },
+  // {
+  //   field: "name",
+  //   header: "Name",
+  //   type: "text",
+  //   filterType: "textField",
+  // },
+  // {
+  //   field: "age",
+  //   header: "Age",
+  //   type: "number",
+  //   filterType: "numberField",
+  // },
+  // { field: "email", header: "Email" },
+  // { field: "city", header: "City", filterType: "select", options: cities },
+  // { field: "date", header: "Date", filterType: "dateSelect" },
+];
+const initialRows = [
+  {
+    id: "1",
+    name: "John Doe",
+    age: 28,
+    email: "john.doe@example.com",
+    city: "New York",
+    date: new Date().toISOString(),
+  },
+  {
+    id: "2",
+    name: "Jane Smith",
+    age: 34,
+    email: "jane.smith@example.com",
+    city: "New York",
+    date: "2023-11-23",
+  },
+  {
+    id: "3",
+    name: "Alice Johnson",
+    age: 34,
+    email: "jane.smith@example.com",
+    city: "Los Angeles",
+    date: "2023-11-22",
+  },
+  {
+    id: "1",
+    name: "John Doe",
+    age: 28,
+    email: "john.doe@example.com",
+    city: "New York",
+    date: "2023-11-22",
+  },
+  {
+    id: "2",
+    name: "Jane Smith",
+    age: 34,
+    email: "jane.smith@example.com",
+    city: "New York",
+    date: "2023-11-23",
+  },
+  {
+    id: "3",
+    name: "Alice Johnson",
+    age: 34,
+    email: "jane.smith@example.com",
+    city: "Los Angeles",
+    date: "2023-11-22",
+  },
+  {
+    id: "1",
+    name: "John Doe",
+    age: 28,
+    email: "john.doe@example.com",
+    city: "New York",
+    date: "2023-11-22",
+  },
+  {
+    id: "2",
+    name: "Jane Smith",
+    age: 34,
+    email: "jane.smith@example.com",
+    city: "New York",
+    date: "2023-11-23",
+  },
+  {
+    id: "3",
+    name: "Alice Johnson",
+    age: 34,
+    email: "jane.smith@example.com",
+    city: "Los Angeles",
+    date: "2023-11-22",
+  },
 
-for (let i = 0; i < 50000; i++) {
-  userData.push({
-    name: `Name ${i}`,
-    surname: `Surname ${i}`,
-    date: new Date(2023, 9, (i % 31) + 1).toLocaleDateString(),
-    city: cities[i % cities.length],
-    phoneNo: 1000000 + i,
-    country: `Country ${i % 10}`,
-    country1: `Country ${i % 10}`,
-    country2: `Country ${i % 10}`,
-    country3: `Country ${i % 10}`,
-    country4: `Country ${i % 10}`,
-    // error: {
-    //   name: "Error in name",
-    //   surname: "Error in surname",
-    // },
-    indexId: Math.random()
-      .toString(36)
-      .substring(2, 6 + 2),
-  });
-}
-
-// Define the headers for the table
-const options = {
-  deleteRow: true,
-  editing: true,
-  showErrors: true,
-  showErrorAlert: true,
-  showExportButton: true,
-  showSubmitButton: true,
-  showProceedButton: true,
-  showSkipButton: true,
-};
-
+  {
+    id: "1",
+    name: "John Doe",
+    age: 28,
+    email: "john.doe@example.com",
+    city: "New York",
+    date: "2023-11-22",
+  },
+  {
+    id: "2",
+    name: "Jane Smith",
+    age: 34,
+    email: "jane.smith@example.com",
+    city: "New York",
+    date: "2023-11-23",
+  },
+  {
+    id: "3",
+    name: "Alice Johnson",
+    age: 34,
+    email: "jane.smith@example.com",
+    city: "Los Angeles",
+    date: "2023-11-22",
+  },
+  // {
+  //   id: "1",
+  //   name: "John Doe",
+  //   age: 28,
+  //   email: "john.doe@example.com",
+  //   city: "New York",
+  //   date: "2023-11-22",
+  // },
+  // {
+  //   id: "2",
+  //   name: "Jane Smith",
+  //   age: 34,
+  //   email: "jane.smith@example.com",
+  //   city: "New York",
+  //   date: "2023-11-23",
+  // },
+  // {
+  //   id: "3",
+  //   name: "Alice Johnson",
+  //   age: 34,
+  //   email: "jane.smith@example.com",
+  //   city: "Los Angeles",
+  //   date: "2023-11-22",
+  // },
+  // {
+  //   id: "1",
+  //   name: "John Doe2",
+  //   age: 28,
+  //   email: "john.doe@example.com",
+  //   city: "New York",
+  //   date: "2023-11-22",
+  // },
+  // {
+  //   id: "2",
+  //   name: "Jane Smith2",
+  //   age: 34,
+  //   email: "jane.smith@example.com",
+  //   city: "New York",
+  //   date: "2023-11-23",
+  // },
+  // {
+  //   id: "3",
+  //   name: "Alice Johnson2",
+  //   age: 34,
+  //   email: "jane.smith@example.com",
+  //   city: "Los Angeles",
+  //   date: "2023-11-22",
+  // },
+  // {
+  //   id: "1",
+  //   name: "John Doe2",
+  //   age: 28,
+  //   email: "john.doe@example.com",
+  //   city: "New York",
+  //   date: "2023-11-22",
+  // },
+  // {
+  //   id: "2",
+  //   name: "Jane Smith2",
+  //   age: 34,
+  //   email: "jane.smith@example.com",
+  //   city: "New York",
+  //   date: "2023-11-23",
+  // },
+  // {
+  //   id: "3",
+  //   name: "Alice Johnson2",
+  //   age: 34,
+  //   email: "jane.smith@example.com",
+  //   city: "Los Angeles",
+  //   date: "2023-11-22",
+  // },
+];
 const App = () => {
   return (
-    <VirtualTable
-      // containerHeight={400}
-      buffer={30}
-      numberOfRows={50}
-      itemHeight={50} // Adjust as needed
-      incomingData={userData}
-      tableHeaders={tableHeader}
-      incomingTableOptions={options}
-      callExportCSV={false}
-      onDataChange={(data) => {
-        console.log(data);
-      }}
-    />
+    <>
+      {/* <VirtualDataGrid
+        // containerHeight={400}
+        buffer={30}
+        numberOfRows={50}
+        itemHeight={50} // Adjust as needed
+        incomingData={getUserData(5000)}
+        tableHeaders={tableHeader}
+        incomingTableOptions={tableOptions}
+        callExportCSV={false}
+        onDataChange={(data) => {
+          console.log(data);
+        }}
+      /> */}
+      <_MaterialTable
+        data={initialRows}
+        onRowSelection={(rows)=>{
+          console.log('rows',rows)
+        }}
+        // selectedRow={{
+        //   "1": {
+        //     "id": "1",
+        //     "name": "John Doe",
+        //     "age": 28,
+        //     "email": "john.doe@example.com",
+        //     "city": "New York",
+        //     "date": "2023-11-29T11:52:07.475Z"
+        //   },
+        //   "2": {
+        //     "id": "2",
+        //     "name": "Jane Smith",
+        //     "age": 34,
+        //     "email": "jane.smith@example.com",
+        //     "city": "New York",
+        //     "date": "2023-11-23"
+        //   }
+        // }}
+        // ssf
+        // onChangeFilter={(qp)=>{
+        //   console.log('qp',qp)
+        // }}
+        columns={columns}
+        // isNextPage={false}
+        options={{
+          uniqueIdKey:'id',
+          // selection: true,
+          // selectionProps: (rowData) => ({
+          //   disabled: rowData.name === "Alice Johnson",
+          // }),
+          rowsPerPageOptions: [10, 20, 50, 100],
+          selectionActions: [
+            {
+              icon: <DeleteIcon/>, action: () => {
+              }
+            },
+            {
+              icon: <GetAppRoundedIcon/>, action: () => {
+              }
+            },
+          ],
+          defaultPageSize: 10,
+        }}
+        setPage={(page) => {
+          console.log("Current Page:", page);
+        }}
+        onPageSizeChange={(pageSize) => {
+          console.log("Page Size:", pageSize);
+        }}
+      />
+    </>
   );
 };
 
