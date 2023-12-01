@@ -311,10 +311,10 @@ const App = () => {
         // isNextPage={false}
         options={{
           uniqueIdKey:'id',
-          // selection: true,
-          // selectionProps: (rowData) => ({
-          //   disabled: rowData.name === "Alice Johnson",
-          // }),
+          selection: true,
+          selectionProps: (rowData) => ({
+            disabled: rowData.name === "Alice Johnson",
+          }),
           rowsPerPageOptions: [10, 20, 50, 100],
           selectionActions: [
             {

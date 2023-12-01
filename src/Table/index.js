@@ -135,9 +135,8 @@ const MaterialTable = ({
     setRows(filteredRows);
   };
 
-  // const classes = useStyles();
   return (
-      <TableContainer component={Paper} sx={{ maxHeight: 'calc(100vh - 100px)' }}>
+    <Paper sx={{ width: '100%', overflow: 'hidden' }}>
       <Box
         style={{
           display: "flex",
@@ -156,60 +155,35 @@ const MaterialTable = ({
             );
           })}
       </Box>
-      <Box
-        // style={{ overflowX: "auto", maxWidth: "100%" }}
-        sx={{
-          "&::-webkit-scrollbar": {
-            height: "8px",
-          },
-          "&::-webkit-scrollbar-track": {
-            backgroundColor: "#f1f1f1",
-            borderRadius: "6px",
-          },
-          "&::-webkit-scrollbar-thumb": {
-            backgroundColor: "#ccc",
-            borderRadius: "6px",
-          },
-        }}
-      >
-        <Table sx={tableStyles.table}>
+      <TableContainer sx={{ maxHeight: 440 }}>
+        <Table stickyHeader aria-label="sticky table">
           <TableHead>
             <TableRow>
               {options.selection && (
-                <TableCell
-                  sx={[tableStyles.checkboxCell, tableStyles.headerCell]}
-                >
+                <TableCell>
                   <Checkbox checked={selectAll} onChange={handleSelectAll} />
                 </TableCell>
               )}
               {columns.map((column) => (
                 <TableCell
                   key={column}
-                  sx={tableStyles.headerCell}
-                  style={tableCellStyles.cellCustom(
-                    column.width,
-                    column.headerAlign
-                  )}
+                  // style={tableCellStyles.cellCustom(
+                  //   column.width,
+                  //   column.headerAlign
+                  // )}
                 >
                   {column.header}
                 </TableCell>
               ))}
             </TableRow>
-            <TableRow>
+          </TableHead>
+          <TableBody>
+          <TableRow>
               {options.selection && (
-                <TableCell
-                  sx={[tableStyles.checkboxCell,tableStyles.filterCell]}
-                />
+                <TableCell />
               )}
               {columns.map((column) => (
-                <TableCell
-                  key={column + "-filter"}
-                  sx={tableStyles.filterCell}
-                  style={tableCellStyles.cellCustom(
-                    column.width,
-                    column.headerAlign
-                  )}
-                >
+                <TableCell key={column + "-filter"}>
                   <Filter
                     type={column.filterType}
                     value={filters[column.field]}
@@ -223,14 +197,10 @@ const MaterialTable = ({
                 </TableCell>
               ))}
             </TableRow>
-          </TableHead>
-          <TableBody>
             {rows.map((row) => (
               <TableRow key={row[options.uniqueIdKey]}>
                 {options.selection && (
-                  <TableCell
-                    sx={[tableStyles.checkboxCell, tableStyles.cell]}
-                  >
+                  <TableCell>
                     <Checkbox
                       checked={!!selectedRows[row[options.uniqueIdKey]]}
                       onChange={() => handleSelectRow(row[options.uniqueIdKey])}
@@ -243,14 +213,7 @@ const MaterialTable = ({
                   </TableCell>
                 )}
                 {columns.map((column) => (
-                  <TableCell
-                    key={column.field}
-                    sx={tableStyles.cell}
-                    style={tableCellStyles.cellCustom(
-                      column.width,
-                      column.cellAlign
-                    )}
-                  >
+                  <TableCell key={column.field}>
                     {column.render ? column.render(row) : row[column.field]}
                   </TableCell>
                 ))}
@@ -258,90 +221,33 @@ const MaterialTable = ({
             ))}
           </TableBody>
         </Table>
-      </Box>
-      <Box
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "flex-end",
-          flex: 1,
-          flexDirection: "row",
+      </TableContainer>
+      <TablePagination
+        rowsPerPageOptions={
+          options.rowsPerPageOptions ? options.rowsPerPageOptions : []
+        }
+        rowsPerPage={pageSize}
+        onRowsPerPageChange={(event) => {
+          onPageSizeChange(event.target.value);
+          setPageSize(event.target.value);
         }}
-      >
-        <TablePagination
-          rowsPerPageOptions={
-            options.rowsPerPageOptions ? options.rowsPerPageOptions : []
+        count={2}
+        component="div"
+        page={page}
+        nextIconButtonProps={{ disabled: !isNextPage }}
+        backIconButtonProps={page === 1 ? { disabled: true } : undefined}
+        onPageChange={(e, p) => {
+          if (p > page) {
+            setPage(p);
+          } else {
+            setPage(p);
           }
-          rowsPerPage={pageSize}
-          onRowsPerPageChange={(event) => {
-            onPageSizeChange(event.target.value);
-            setPageSize(event.target.value);
-          }}
-          count={2}
-          page={page}
-          nextIconButtonProps={{ disabled: !isNextPage }}
-          backIconButtonProps={page === 1 ? { disabled: true } : undefined}
-          onPageChange={(e, p) => {
-            if (p > page) {
-              setPage(p);
-            } else {
-              setPage(p);
-            }
-          }}
-          labelDisplayedRows={() => {
-            return `Page ${page}`;
-          }}
-        />
-      </Box>
-    </TableContainer>
+        }}
+        labelDisplayedRows={() => {
+          return `Page ${page}`;
+        }}
+      />
+    </Paper>
   );
 };
-
-const tableStyles =  {
-    table: {
-      // minWidth: 750, // This is the minimum width for the entire table
-      tableLayout: "auto", // Fixed table layout
-    },
-    headerCell: {
-      position: "sticky",
-      border: "none",
-      top: 0, // Top of the table container
-      zIndex: 10, // Higher than the row z-index to stay on top
-      background: '#fff', // Ensures the background matches
-      backgroundColor: "#ccc",
-      fontWeight: "bold",
-    },
-    filterCell: {
-      position: "sticky",
-      top: 55, // Height of the header cell, adjust accordingly
-      zIndex: 5, // Lower than the header but above the rows
-      background: '#fff',
-      paddingTop: "12px", // Consistent padding
-      paddingBottom: "12px",
-    },
-    cell: {
-      paddingTop: "8px", // Consistent padding
-      paddingBottom: "8px",
-    },
-    container: {
-      // maxHeight: "calc(100vh - 100px)", // Adjust the height accordingly
-    },
-    checkboxCell: {
-      minWidth: "60px", // Reduce this to your desired width
-      width: 60, // Set a fixed width for checkbox cells
-    },
-};
-
-const tableCellStyles = {
-  cellCustom: (cellWidth, align) => {
-    return {
-      minWidth: "250px",
-      ...(align && {
-        textAlign: align,
-      }),
-      ...(cellWidth && { minWidth: cellWidth }),
-    };
-  },
-};
-
 export default MaterialTable
